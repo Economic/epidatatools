@@ -1,0 +1,34 @@
+Package: epidatatools
+Type: Package
+Title: some data tools we use at EPI
+Version: 0.1.0
+Authors@R:
+    c(person(given = "Ben",
+             family = "Zipperer",
+             role = c("aut", "cre"),
+             email = "benzipperer@gmail.com"),
+      person(given = "Jori",
+             family = "Kandra",
+             role = "aut",
+             email = "jkandra@epi.org"),
+      person(given = "Economic Policy Institute",
+             role = c("cph", "fnd")))
+Description: Tools used by the Economic Policy Institute.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr,
+    purrr,
+    magrittr,
+    rlang,
+    tidyr,
+    haven,
+    tidyselect
+RoxygenNote: 7.1.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    pkgdown,
+    tidyverse
+VignetteBuilder: knitr
