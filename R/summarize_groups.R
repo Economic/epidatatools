@@ -1,39 +1,50 @@
 #' summarize_groups: summarize distinct groups
 #'
-#' @param data a data frame
-#' @param ... one or two variables, for a one- or two-way cross-tabulation
-#' @param w weight
-#' @param col column percentages in a two-way cross-tabulation
-#' @param row row percentages in a two-way cross-tabulation
+#' @param .data a data frame
+#' @param .groups grouping variables
+#' @param ... name-value pairs passed to dplyr::summarize()
 #' @return a tibble
 #' @importFrom magrittr %>%
-#' @examples groups <- c("cyl", "gear", "carb")
-#' @examples summarize_groups(mtcars, groups, median(mpg), mean(hp))
+#' @examples summarize_groups(mtcars, cyl|gear|carb, median(mpg), mean(hp))
 
 #' @export
 summarize_groups <- function(.data, .groups, ...) {
   dots <- rlang::enquos(...)
 
-  purrr::map_dfr(.groups, ~ summarize_onegroup(.data, tidyselect::all_of(.x), !!!dots)) %>%
-    dplyr::relocate(name, value)
+  vars <- .data %>%
+    ungroup() %>%
+    dplyr::select({{ .groups }}) %>%
+    colnames()
+
+  purrr::map_dfr(vars, ~ summarize_onegroup(.data,
+                                            tidyselect::all_of(.x),
+                                            !!!dots))
+
 }
 
 summarize_onegroup <- function(.data, .group, ...) {
-  data <- .data %>%
-    dplyr::rename(value = {{ .group }}) %>%
-    dplyr::group_by(value) %>%
-    dplyr::summarize(..., .groups = "drop") %>%
-    dplyr::mutate(name = .group)
 
-  if (haven::is.labelled(data$value)) {
-    data %>%
-      dplyr::mutate(value_label = as.character(haven::as_factor(value))) %>%
+  data <- .data %>%
+    dplyr::rename(group_value = {{ .group }}) %>%
+    dplyr::group_by(group_value, .add = TRUE) %>%
+    dplyr::summarize(...) %>%
+    dplyr::mutate(group_name := .group)
+
+  # order variables
+  if (haven::is.labelled(data$group_value)) {
+    data <- data %>%
+      dplyr::mutate(group_value_label = as.character(haven::as_factor(group_value))) %>%
       haven::zap_labels() %>%
-      dplyr::relocate(name, value, value_label)
+      dplyr::relocate(group_name, group_value, group_value_label)
   }
   else {
-    data %>% dplyr::relocate(name, value)
+    data <- data %>% dplyr::relocate(group_name, group_value)
   }
+
+  # promote original group variables to the front
+    data <- relocate(data, group_vars(data))
+
+  data
 }
 
 
