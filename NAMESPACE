@@ -3,4 +3,5 @@
 export(crosstab)
 export(summarize_groups)
 importFrom(magrittr,"%>%")
+importFrom(rlang,":=")
 importFrom(rlang,.data)

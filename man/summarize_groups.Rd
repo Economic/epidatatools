@@ -7,15 +7,11 @@
 summarize_groups(.data, .groups, ...)
 }
 \arguments{
-\item{...}{one or two variables, for a one- or two-way cross-tabulation}
+\item{.data}{a data frame}
 
-\item{data}{a data frame}
+\item{.groups}{grouping variables}
 
-\item{w}{weight}
-
-\item{col}{column percentages in a two-way cross-tabulation}
-
-\item{row}{row percentages in a two-way cross-tabulation}
+\item{...}{name-value pairs passed to dplyr::summarize()}
 }
 \value{
 a tibble
@@ -24,6 +20,5 @@ a tibble
 summarize_groups: summarize distinct groups
 }
 \examples{
-groups <- c("cyl", "gear", "carb")
-summarize_groups(mtcars, groups, median(mpg), mean(hp))
+summarize_groups(mtcars, cyl|gear|carb, median(mpg), mean(hp))
 }
