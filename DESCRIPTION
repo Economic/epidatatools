@@ -1,7 +1,7 @@
 Package: epidatatools
 Type: Package
 Title: some data tools we use at EPI
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
     c(person(given = "Ben",
              family = "Zipperer",
@@ -9,7 +9,7 @@ Authors@R:
              email = "benzipperer@gmail.com"),
       person(given = "Jori",
              family = "Kandra",
-             role = "aut",
+             role = "ctb",
              email = "jkandra@epi.org"),
       person(given = "Economic Policy Institute",
              role = c("cph", "fnd")))
@@ -25,10 +25,11 @@ Imports:
     tidyr,
     haven,
     tidyselect
-RoxygenNote: 7.1.1
 Suggests: 
     knitr,
     rmarkdown,
     pkgdown,
     tidyverse
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
