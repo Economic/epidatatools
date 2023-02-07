@@ -14,17 +14,36 @@ knitr::opts_chunk$set(
 ```
 
 # epidatatools
+epidatatools contains some functions we find useful at [EPI](https://epi.org/) that don't have exact analogues elsewhere in the R package ecosystem.
 
-<!-- badges: start -->
-<!-- badges: end -->
+## One and two-way cross-tabulations
+```{r, message = FALSE}
+library(epidatatools)
 
-The goal of epidatatools is to ...
+crosstab(mtcars, cyl)
+
+crosstab(mtcars, cyl, gear)
+
+# weighted counts expressed as column percentages
+crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
+```
+
+## Join data frames and add a merge status indicator
+```{r, message = FALSE}
+library(dplyr)
+
+merge_status(band_members, band_instruments, by = "name")
+```
+
+## Summarize across several distinct groups
+```{r}
+summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
+```
 
 ## Installation
-
 You can install latest version of epidatatools with:
 
-``` r
+```{r, eval = FALSE}
 devtools::install_github("economic/epidatatools")
 ```
 

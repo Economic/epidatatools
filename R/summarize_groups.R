@@ -1,7 +1,8 @@
 #' summarize_groups: summarize distinct groups
 #'
 #' @param .data a data frame
-#' @param .groups grouping variables
+#' @param .groups grouping variables as a tidy selection specification
+#' of columns, as used in `dplyr::select()`
 #' @param ... name-value pairs passed to dplyr::summarize()
 #' @return a tibble
 #' @importFrom magrittr %>%
@@ -43,7 +44,7 @@ summarize_onegroup <- function(.data, .group, ...) {
   }
 
   # promote original group variables to the front
-    data <- dplyr::relocate(data, dplyr::group_vars(data))
+  data <- dplyr::relocate(data, dplyr::group_vars(data))
 
   data
 }

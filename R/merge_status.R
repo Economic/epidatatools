@@ -1,8 +1,8 @@
-#' summarize_groups: summarize distinct groups
+#' merge_status: join data frames and create a merge indicator
 #'
 #' @param x,y data frames
 #' @param ... passed to dplyr::full_join()
-#' @return a merged data frame
+#' @return a merged data frame from full_join with an extra column `_merge`
 #' @examples library(dplyr)
 #' @examples merge_status(band_members, band_instruments, by = "name")
 #' @importFrom magrittr %>%

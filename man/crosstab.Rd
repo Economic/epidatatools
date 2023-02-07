@@ -4,7 +4,7 @@
 \alias{crosstab}
 \title{crosstab: cross-tabulations}
 \usage{
-crosstab(data, ..., w = NULL, col = FALSE, row = FALSE)
+crosstab(data, ..., w = NULL, percent = NULL)
 }
 \arguments{
 \item{data}{a data frame}
@@ -13,9 +13,12 @@ crosstab(data, ..., w = NULL, col = FALSE, row = FALSE)
 
 \item{w}{weight}
 
-\item{col}{column percentages in a two-way cross-tabulation}
-
-\item{row}{row percentages in a two-way cross-tabulation}
+\item{percent}{for a two-way cross-tabulation, replace counts with row or column percentages
+\itemize{
+\item NULL, the default, shows counts rather than percentages
+\item "row" will replace counts with row percentages, summing to 100\% across columns within each row
+\item "column" will replace counts with column percentages, adding to 100\% across rows within each column
+}}
 }
 \value{
 a tibble
@@ -26,5 +29,5 @@ crosstab: cross-tabulations
 \examples{
 crosstab(mtcars, cyl)
 crosstab(mtcars, cyl, gear)
-crosstab(mtcars, cyl, gear, w = mpg, col = TRUE)
+crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
 }

@@ -3,7 +3,7 @@
 \name{merge_status}
 \alias{merge_status}
 \alias{merge_status.data.frame}
-\title{summarize_groups: summarize distinct groups}
+\title{merge_status: join data frames and create a merge indicator}
 \usage{
 merge_status(x, y, ...)
 
@@ -15,10 +15,10 @@ merge_status(x, y, ...)
 \item{...}{passed to dplyr::full_join()}
 }
 \value{
-a merged data frame
+a merged data frame from full_join with an extra column \verb{_merge}
 }
 \description{
-summarize_groups: summarize distinct groups
+merge_status: join data frames and create a merge indicator
 }
 \examples{
 library(dplyr)

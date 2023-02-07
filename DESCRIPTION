@@ -1,7 +1,7 @@
 Package: epidatatools
 Type: Package
 Title: some data tools we use at EPI
-Version: 0.2.0
+Version: 0.3.0
 Authors@R:
     c(person(given = "Ben",
              family = "Zipperer",
@@ -18,7 +18,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    dplyr,
+    dplyr (>= 1.0.0),
     purrr,
     magrittr,
     rlang,
@@ -31,5 +31,5 @@ Suggests:
     pkgdown,
     tidyverse
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr

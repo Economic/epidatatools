@@ -1,0 +1,5 @@
+url: https://economic.github.io/epidatatools
+template:
+  bootstrap: 5
+development:
+  mode: auto

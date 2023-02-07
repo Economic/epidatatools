@@ -9,7 +9,8 @@ summarize_groups(.data, .groups, ...)
 \arguments{
 \item{.data}{a data frame}
 
-\item{.groups}{grouping variables}
+\item{.groups}{grouping variables as a tidy selection specification
+of columns, as used in \code{dplyr::select()}}
 
 \item{...}{name-value pairs passed to dplyr::summarize()}
 }
