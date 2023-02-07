@@ -1,9 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# epidatatools
+# epidatatools <a href="https://economic.github.io/epidatatools/"><img src="man/figures/logo.png" align="right" height="139" /></a>
 
-epidatatools contains some functions we find useful at
+epidatatools contains functions we find useful at
 [EPI](https://epi.org/) that don’t have exact analogues elsewhere in the
 R package ecosystem.
 

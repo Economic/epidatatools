@@ -13,8 +13,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# epidatatools
-epidatatools contains some functions we find useful at [EPI](https://epi.org/) that don't have exact analogues elsewhere in the R package ecosystem.
+# epidatatools <a href="https://economic.github.io/epidatatools/"><img src="man/figures/logo.png" align="right" height="139" /></a>
+
+epidatatools contains functions we find useful at [EPI](https://epi.org/) that don't have exact analogues elsewhere in the R package ecosystem.
 
 ## One and two-way cross-tabulations
 ```{r, message = FALSE}

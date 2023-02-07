@@ -1,4 +1,11 @@
 url: https://economic.github.io/epidatatools/
 template:
   bootstrap: 5
-
+  opengraph:
+    image:
+      src: man/figures/logo.png
+      alt: "epidatatools: tools used by the Economic Policy Institute"
+    twitter:
+      creator: "@benzipperer"
+      site: "@EconomicPolicy"
+      card: summary_large_image
