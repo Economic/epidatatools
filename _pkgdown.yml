@@ -9,3 +9,8 @@ template:
       creator: "@benzipperer"
       site: "@EconomicPolicy"
       card: summary_large_image
+authors:
+  Ben Zipperer:
+    href: "https://www.epi.org/people/ben-zipperer/"
+  Jori Kandra:
+    href: "https://www.epi.org/people/jori-kandra/"
