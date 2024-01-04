@@ -10,7 +10,7 @@
 #' @examples binipolate(mtcars, var = "cyl", binsize = 0.25)
 #' @examples binipolate(mtcars, var = "gear", w = wt, binsize = 0.25)
 #' @examples binipolate(mtcars, var = "mpg", group_vars = c("cyl", "gear"), w = wt, binsize = 0.25)
-binipolate <- function(data, var, p = 50, group_vars, binsize, w = NULL) {
+binipolate <- function(data, var, p = 50, group_vars, binsize, w = 1) {
   
   # convert character to symbol for evaluation
   var <- rlang::sym(var)
