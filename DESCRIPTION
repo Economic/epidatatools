@@ -1,7 +1,7 @@
 Package: epidatatools
 Type: Package
 Title: some data tools we use at EPI
-Version: 0.3.0
+Version: 0.4.0
 Authors@R:
     c(person(given = "Ben",
              family = "Zipperer",
@@ -31,7 +31,7 @@ Suggests:
     pkgdown,
     tidyverse
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epidatatools
 BugReports: https://github.com/Economic/epidatatools/issues
