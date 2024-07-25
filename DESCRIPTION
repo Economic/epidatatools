@@ -1,6 +1,6 @@
 Package: epidatatools
 Type: Package
-Title: some data tools we use at EPI
+Title: Data tools used at the Economic Policy Institute
 Version: 0.4.0
 Authors@R:
     c(person(given = "Ben",
