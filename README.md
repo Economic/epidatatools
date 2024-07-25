@@ -19,6 +19,9 @@ crosstab(mtcars, cyl)
 #> 1     4    11   0.344         0.344
 #> 2     6     7   0.219         0.562
 #> 3     8    14   0.438         1
+```
+
+``` r
 
 crosstab(mtcars, cyl, gear)
 #> # A tibble: 3 × 4
@@ -27,6 +30,9 @@ crosstab(mtcars, cyl, gear)
 #> 1     4     1     8     2
 #> 2     6     2     4     1
 #> 3     8    12     0     2
+```
+
+``` r
 
 # weighted counts expressed as column percentages
 crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
@@ -76,8 +82,8 @@ summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
 
 ## Installation
 
-You can install latest version of epidatatools with:
+Install the latest version from R-Universe:
 
 ``` r
-devtools::install_github("economic/epidatatools")
+install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
 ```
