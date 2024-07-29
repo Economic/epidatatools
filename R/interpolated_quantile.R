@@ -1,13 +1,15 @@
 #' interpolated_quantile: binned interpolated quantiles
-#' @param x
-#' @param bin_size
-#' @param probs
-#' @param w
-#' @param na.rm
+#' @param x numeric vector or an R object
+#' @param bin_size size used for binning
+#' @param probs numeric vector of percentiles with values [0,1]
+#' @param w numeric vector of weights the same length as x giving the weights to use for elements of x
+#' @param na.rm logical; if true, any NA or NaN's are removed from x before computation
 #'
-#' @return
+#' @return a tibble or data frame
 #' @export
 #'
+#' @examples
+#' @examples
 #' @examples
 interpolated_quantile = function(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE) {
 
@@ -50,10 +52,10 @@ interpolated_quantile = function(x, bin_size, probs = 0.5, w = NULL, na.rm = TRU
 
 #' interpolated_quantile helper
 #'
-#' @param data
-#' @param p
+#' @param data data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse
+#' @param p numeric; percentile with value [0,1]
 #'
-#' @return
+#' @return a tibble or data frame
 #'
 #' @examples
 interpolated_quantile_p = function(data, p) {
@@ -75,12 +77,12 @@ interpolated_quantile_p = function(data, p) {
 
 #' interpolated_median: binned interpolated median
 #'
-#' @param x
-#' @param bin_size
-#' @param w
-#' @param na.rm
+#' @param x numeric vector or an R object
+#' @param bin_size size used for binning
+#' @param w numeric vector of weights the same length as x giving the weights to use for elements of x
+#' @param na.rm logical; if true, any NA or NaN's are removed from x before computation
 #'
-#' @return
+#' @return a tibble or data frame
 #' @export
 #'
 #' @examples
@@ -92,25 +94,25 @@ interpolated_median = function(x, bin_size, w = NULL, na.rm = TRUE) {
 #' Calculates binned interpolated percentiles
 #' If classical = TRUE, uses [MetricsWeighted::weighted_quantile()]
 #'
-#' @param data a data frame
-#' @param var unquoted variable for analysis
-#' @param probs percentiles to calculate
-#' @param bin_size size of bin
-#' @param .by tidy selection of grouping variable
-#' @param w optional weight in data
-#' @return a tibble
+#' @param data data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse
+#' @param x column to compute
+#' @param probs numeric vector of percentiles with values [0,1]
+#' @param bin_size size of binning
+#' @param .by optional, a tidy-selection of columns for single-operation grouping
+#' @param w numeric vector of weights the same length as x giving the weights to use for elements of x
+#'
+#' @return a tibble or data frame
 #' @export
-#' @importFrom dplyr %>%
-#' @examples binipolate(mtcars, var = "cyl", binsize = 0.25)
-#' @examples binipolate(mtcars, var = "gear", w = wt, binsize = 0.25)
-#' @examples binipolate(mtcars, var = "mpg", group_vars = c("cyl", "gear"), w = wt, binsize = 0.25)
-binipolate = function(data, var, probs = 0.5, bin_size, .by = NULL, w = NULL) {
+#' @examples binipolate(mtcars, x = "cyl", binsize = 0.25)
+#' @examples binipolate(mtcars, x = "gear", w = wt, binsize = 0.25)
+#' @examples binipolate(mtcars, x = "mpg", group_vars = c("cyl", "gear"), w = wt, binsize = 0.25)
+binipolate = function(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL) {
   data |>
     group_by(pick({{.by}})) |>
     dplyr::reframe(
       probs = probs,
       value = interpolated_quantile(
-        {{var}},
+        {{x}},
         bin_size = bin_size,
         probs = probs,
         w = {{w}},
