@@ -4,12 +4,8 @@
 .Ruserdata
 docs
 
-deciles_test.R
 *.csv
 *.xlsx
-
-test*.R
-test*.do
 
 *test.R
 *test.do
