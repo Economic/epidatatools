@@ -1,7 +1,7 @@
 #' interpolated_quantile: binned interpolated quantile
 #' @param x numeric vector or an R object
 #' @param bin_size size used for binning
-#' @param probs numeric; percentile with value [0,1]
+#' @param probs numeric; percentile with value `[0,1]`
 #' @param w numeric vector of weights the same length as x giving the weights to use for elements of x
 #' @param na.rm logical; if true, any NA or NaN's are removed from x before computation
 #'
@@ -9,7 +9,10 @@
 #' @export
 #'
 #' @examples interpolated_quantile(x = mtcars[["cyl"]], bin_size = 0.25)
-#' @examples mtcars |> dplyr::summarise(value = interpolated_quantile(x = cyl, bin_size = 0.25, probs = 0.75, w = mpg))
+#' @examples mtcars |>
+#'             dplyr::summarise(value = interpolated_quantile(x = cyl,
+#'                                                            bin_size = 0.25,
+#'                                                            probs = 0.75, w = mpg))
 interpolated_quantile = function(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE) {
 
   if (is.null(w)) w = 1
@@ -52,7 +55,7 @@ interpolated_quantile = function(x, bin_size, probs = 0.5, w = NULL, na.rm = TRU
 #' interpolated_quantile helper
 #'
 #' @param data data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse
-#' @param p numeric; percentile with value [0,1]
+#' @param p numeric; percentile with value `[0,1]`
 #'
 #' @return a numeric vector of length 1
 interpolated_quantile_p = function(data, p) {
@@ -92,19 +95,19 @@ interpolated_median = function(x, bin_size, w = NULL, na.rm = TRUE) {
 #'
 #' @param data data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse
 #' @param x column to compute
-#' @param probs numeric vector of percentiles with values [0,1]
+#' @param probs numeric vector of percentiles with values `[0,1]`
 #' @param bin_size size of binning
 #' @param .by optional, a tidy-selection of columns for single-operation grouping
 #' @param w numeric vector of weights the same length as x giving the weights to use for elements of x
 #'
 #' @return a tibble or data frame
 #' @export
-#' @examples binipolate(mtcars, x = cyl, binsize = 0.25)
-#' @examples mtcars |> binipolate(disp, probs = (0.25, 0.5, 0.75), binsize = 0.25)
-#' @examples mtcars |> binipolate(disp, probs = (0.25, 0.5, 0.75), binsize = 0.25, .by = cyl, w = mpg)
+#' @examples binipolate(mtcars, x = cyl, bin_size = 0.25)
+#' @examples mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25)
+#' @examples mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25, .by = cyl, w = mpg)
 binipolate = function(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL) {
   data |>
-    group_by(pick({{.by}})) |>
+    dplyr::group_by(dplyr::pick({{.by}})) |>
     dplyr::reframe(
       probs = probs,
       value = interpolated_quantile(
@@ -114,6 +117,6 @@ binipolate = function(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL) {
         w = {{w}},
       )
     ) |>
-    ungroup()
+    dplyr::ungroup()
 }
 

@@ -7,7 +7,12 @@
 interpolated_quantile_p(data, p)
 }
 \arguments{
-\item{p}{}
+\item{data}{data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse}
+
+\item{p}{numeric; percentile with value \verb{[0,1]}}
+}
+\value{
+a numeric vector of length 1
 }
 \description{
 interpolated_quantile helper

@@ -3,34 +3,32 @@
 \name{binipolate}
 \alias{binipolate}
 \title{Binipolate
-Calculates binned interpolated percentiles
-If classical = TRUE, uses \code{\link[MetricsWeighted:weighted_quantile]{MetricsWeighted::weighted_quantile()}}}
+Calculates binned interpolated percentiles}
 \usage{
-binipolate(data, var, probs = 0.5, bin_size, .by = NULL, w = NULL)
+binipolate(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL)
 }
 \arguments{
-\item{data}{a data frame}
+\item{data}{data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse}
 
-\item{var}{unquoted variable for analysis}
+\item{x}{column to compute}
 
-\item{probs}{percentiles to calculate}
+\item{probs}{numeric vector of percentiles with values \verb{[0,1]}}
 
-\item{bin_size}{size of bin}
+\item{bin_size}{size of binning}
 
-\item{w}{optional weight in data}
+\item{.by}{optional, a tidy-selection of columns for single-operation grouping}
 
-\item{by}{tidy selection of grouping variable}
+\item{w}{numeric vector of weights the same length as x giving the weights to use for elements of x}
 }
 \value{
-a tibble
+a tibble or data frame
 }
 \description{
 Binipolate
 Calculates binned interpolated percentiles
-If classical = TRUE, uses \code{\link[MetricsWeighted:weighted_quantile]{MetricsWeighted::weighted_quantile()}}
 }
 \examples{
-binipolate(mtcars, var = "cyl", binsize = 0.25)
-binipolate(mtcars, var = "gear", w = wt, binsize = 0.25)
-binipolate(mtcars, var = "mpg", group_vars = c("cyl", "gear"), w = wt, binsize = 0.25)
+binipolate(mtcars, x = cyl, bin_size = 0.25)
+mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25)
+mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25, .by = cyl, w = mpg)
 }

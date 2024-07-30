@@ -7,8 +7,20 @@
 interpolated_median(x, bin_size, w = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{na.rm}{}
+\item{x}{numeric vector or an R object}
+
+\item{bin_size}{size used for binning}
+
+\item{w}{numeric vector of weights the same length as x giving the weights to use for elements of x}
+
+\item{na.rm}{logical; if true, any NA or NaN's are removed from x before computation}
+}
+\value{
+a tibble or data frame
 }
 \description{
 interpolated_median: binned interpolated median
+}
+\examples{
+interpolated_median(x = mtcars[["cyl"]], bin_size = 0.25)
 }

@@ -2,13 +2,31 @@
 % Please edit documentation in R/interpolated_quantile.R
 \name{interpolated_quantile}
 \alias{interpolated_quantile}
-\title{interpolated_quantile: binned interpolated quantiles}
+\title{interpolated_quantile: binned interpolated quantile}
 \usage{
 interpolated_quantile(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{na.rm}{}
+\item{x}{numeric vector or an R object}
+
+\item{bin_size}{size used for binning}
+
+\item{probs}{numeric; percentile with value \verb{[0,1]}}
+
+\item{w}{numeric vector of weights the same length as x giving the weights to use for elements of x}
+
+\item{na.rm}{logical; if true, any NA or NaN's are removed from x before computation}
+}
+\value{
+a numeric vector of length 1
 }
 \description{
-interpolated_quantile: binned interpolated quantiles
+interpolated_quantile: binned interpolated quantile
+}
+\examples{
+interpolated_quantile(x = mtcars[["cyl"]], bin_size = 0.25)
+mtcars |>
+            dplyr::summarise(value = interpolated_quantile(x = cyl,
+                                                           bin_size = 0.25,
+                                                           probs = 0.75, w = mpg))
 }
