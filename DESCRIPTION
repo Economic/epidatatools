@@ -24,7 +24,8 @@ Imports:
     rlang,
     tidyr,
     haven,
-    tidyselect
+    tidyselect,
+    tibble
 Suggests: 
     knitr,
     rmarkdown,
