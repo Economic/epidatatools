@@ -7,5 +7,4 @@ docs
 *.csv
 *.xlsx
 
-*test.R
-*test.do
+testing
