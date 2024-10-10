@@ -52,12 +52,7 @@ interpolated_quantile = function(x, bin_size, probs = 0.5, w = NULL, na.rm = TRU
 
 }
 
-#' interpolated_quantile helper
-#'
-#' @param data data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse
-#' @param p numeric; percentile with value `[0,1]`
-#'
-#' @return a numeric vector of length 1
+# interpolated quantile helper
 interpolated_quantile_p = function(data, p) {
   # identify the highest bin that doesn't contain p
   below = data |>
