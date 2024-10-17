@@ -3,3 +3,8 @@
 .RData
 .Ruserdata
 docs
+
+*.csv
+*.xlsx
+
+testing

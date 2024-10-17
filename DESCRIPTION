@@ -1,7 +1,7 @@
 Package: epidatatools
 Type: Package
-Title: some data tools we use at EPI
-Version: 0.3.0
+Title: Data tools used at the Economic Policy Institute
+Version: 0.4.0
 Authors@R:
     c(person(given = "Ben",
              family = "Zipperer",
@@ -19,19 +19,22 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     dplyr (>= 1.0.0),
-    purrr,
-    magrittr,
-    rlang,
-    tidyr,
     haven,
-    tidyselect
+    ipumsr,
+    purrr,
+    lubridate,
+    rlang,
+    stringr,
+    tibble,
+    tidyr,
+    tidyselect,
+    utils
 Suggests: 
     knitr,
-    rmarkdown,
     pkgdown,
+    rmarkdown,
     tidyverse
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
-VignetteBuilder: knitr
+RoxygenNote: 7.3.2
 URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epidatatools
 BugReports: https://github.com/Economic/epidatatools/issues

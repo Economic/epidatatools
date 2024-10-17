@@ -1,4 +1,4 @@
-#' crosstab: cross-tabulations
+#' Cross-tabulate one or two variables
 #'
 #' @param data a data frame
 #' @param ... one or two variables, for a one- or two-way cross-tabulation
@@ -9,7 +9,6 @@
 #'  - "column" will replace counts with column percentages, adding to 100% across rows within each column
 #' @return a tibble
 #' @export
-#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @examples crosstab(mtcars, cyl)
 #' @examples crosstab(mtcars, cyl, gear)
@@ -44,10 +43,10 @@ crosstab <- function(data, ... , w = NULL, percent = NULL) {
       warning("Column and row percent options are ignored in a one-way cross-tabulation")
     }
 
-    out <- out %>%
+    out <- out |>
       dplyr::mutate(
         percent = .data$n/sum(.data$n),
-        cumul_percent = cumsum(.data$percent)) %>%
+        cumul_percent = cumsum(.data$percent)) |>
       dplyr::as_tibble()
   }
 
@@ -59,25 +58,25 @@ crosstab <- function(data, ... , w = NULL, percent = NULL) {
 
     if (!is.null(percent)) {
       if (percent == "column") {
-        out <- out %>%
-          dplyr::group_by(!! col_names[[2]]) %>%
-          dplyr::mutate(n = .data$n / sum(.data$n)) %>%
+        out <- out |>
+          dplyr::group_by(!! col_names[[2]]) |>
+          dplyr::mutate(n = .data$n / sum(.data$n)) |>
           dplyr::ungroup()
       }
 
       # row percentages
       if (percent == "row") {
-        out <- out %>%
-          dplyr::group_by(!! col_names[[1]]) %>%
-          dplyr::mutate(n = .data$n / sum(.data$n)) %>%
+        out <- out |>
+          dplyr::group_by(!! col_names[[1]]) |>
+          dplyr::mutate(n = .data$n / sum(.data$n)) |>
           dplyr::ungroup()
       }
     }
 
-    out <- out %>%
-      dplyr::mutate(dplyr::across(!! col_names[[2]], ~ as.character(haven::as_factor(.x)))) %>%
-      tidyr::pivot_wider(id_cols = !! col_names[[1]], names_from = !! col_names[[2]], values_from = "n") %>%
-      dplyr::mutate(across(-c(1), ~ tidyr::replace_na(.x, 0)))
+    out <- out |>
+      dplyr::mutate(dplyr::across(!! col_names[[2]], ~ as.character(haven::as_factor(.x)))) |>
+      tidyr::pivot_wider(id_cols = !! col_names[[1]], names_from = !! col_names[[2]], values_from = "n") |>
+      dplyr::mutate(dplyr::across(-c(1), ~ tidyr::replace_na(.x, 0)))
   }
 
   out

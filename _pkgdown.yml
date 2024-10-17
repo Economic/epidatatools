@@ -1,4 +1,5 @@
 url: https://economic.github.io/epidatatools/
+
 template:
   bootstrap: 5
   opengraph:
@@ -9,8 +10,29 @@ template:
       creator: "@benzipperer"
       site: "@EconomicPolicy"
       card: summary_large_image
+
 authors:
   Ben Zipperer:
     href: "https://www.epi.org/people/ben-zipperer/"
   Jori Kandra:
     href: "https://www.epi.org/people/jori-kandra/"
+
+reference:
+- title: Quantiles
+  contents:
+  - binipolate
+  - interpolated_median
+  - interpolated_quantile
+- title: IPUMS microdata extracts
+  contents:
+  - dl_ipums_acs1
+  - dl_ipums_asec
+  - dl_ipums_cps
+  - dl_ipums_micro
+- title: Summarizing data
+  contents:
+  - crosstab
+  - summarize_groups
+- title: Other functions
+  contents:
+  - merge_status

@@ -42,9 +42,8 @@ summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
 ```
 
 ## Installation
-You can install latest version of epidatatools with:
-
+Install the latest version from R-Universe:
 ```{r, eval = FALSE}
-devtools::install_github("economic/epidatatools")
+install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
 ```
 
