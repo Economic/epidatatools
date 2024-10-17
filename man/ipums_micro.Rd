@@ -48,19 +48,22 @@ These functions are simply wrappers around \href{https://tech.popdata.org/ipumsr
 }}
 \examples{
 \dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-extract = ipumsr::define_extract_micro(
-  collection = "cps",
-  description = "CPS ASEC extract",
-  samples = c("cps2021_03s", "cps2022_03s", "cps2023_03s"),
-  variables = c("YEAR", "OFFPOV", "WTSUPP")
-)
-dl_ipums_micro(extract)
+# example ASEC download
+dl_ipums_asec(2021:2023, c("YEAR", "OFFPOV", "ASECWT"))
 
-dl_ipums_asec(2021:2023, c("YEAR", "OFFPOV", "WTSUPP"))
-
+# example monthly CPS download
 begin_month = lubridate::ym("2022 September")
 end_month = lubridate::ym("2024 August")
 cps_months = seq(begin_month, end_month, by = "month")
 dl_ipums_cps(cps_months, c("EARNWT", "HOURWAGE2"))
+
+# use dl_ipums_micro with a custom extract
+extract = ipumsr::define_extract_micro(
+  collection = "cps",
+  description = "CPS ASEC extract",
+  samples = c("cps2021_03s", "cps2022_03s", "cps2023_03s"),
+  variables = c("YEAR", "OFFPOV", "ASECWT")
+)
+dl_ipums_micro(extract)
 \dontshow{\}) # examplesIf}
 }

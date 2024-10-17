@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize_groups.R
 \name{summarize_groups}
 \alias{summarize_groups}
-\title{summarize_groups: summarize distinct groups}
+\title{Summarize distinct groups}
 \usage{
 summarize_groups(.data, .groups, ...)
 }
@@ -18,7 +18,7 @@ of columns, as used in \code{dplyr::select()}}
 a tibble
 }
 \description{
-summarize_groups: summarize distinct groups
+Summarize distinct groups
 }
 \examples{
 summarize_groups(mtcars, cyl|gear|carb, median(mpg), mean(hp))

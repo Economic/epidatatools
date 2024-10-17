@@ -2,7 +2,7 @@
 % Please edit documentation in R/interpolated_quantile.R
 \name{interpolated_quantile}
 \alias{interpolated_quantile}
-\title{interpolated_quantile: binned interpolated quantile}
+\title{Calculate the binned interpolated quantile}
 \usage{
 interpolated_quantile(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE)
 }
@@ -18,15 +18,11 @@ interpolated_quantile(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE)
 \item{na.rm}{logical; if true, any NA or NaN's are removed from x before computation}
 }
 \value{
-a numeric vector of length 1
+a numeric vector
 }
 \description{
-interpolated_quantile: binned interpolated quantile
+Calculate the binned interpolated quantile
 }
 \examples{
-interpolated_quantile(x = mtcars[["cyl"]], bin_size = 0.25)
-mtcars |>
-            dplyr::summarise(value = interpolated_quantile(x = cyl,
-                                                           bin_size = 0.25,
-                                                           probs = 0.75, w = mpg))
+interpolated_quantile(x = mtcars$mpg, bin_size = 0.50, probs = c(0.25, 0.5, 0.75))
 }

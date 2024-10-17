@@ -3,7 +3,7 @@
 \name{merge_status}
 \alias{merge_status}
 \alias{merge_status.data.frame}
-\title{merge_status: join data frames and create a merge indicator}
+\title{Join data frames and create a merge indicator}
 \usage{
 merge_status(x, y, ...)
 
@@ -18,7 +18,7 @@ merge_status(x, y, ...)
 a merged data frame from full_join with an extra column \verb{_merge}
 }
 \description{
-merge_status: join data frames and create a merge indicator
+Join data frames and create a merge indicator
 }
 \examples{
 library(dplyr)

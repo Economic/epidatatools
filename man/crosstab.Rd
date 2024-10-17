@@ -2,7 +2,7 @@
 % Please edit documentation in R/crosstab.R
 \name{crosstab}
 \alias{crosstab}
-\title{crosstab: cross-tabulations}
+\title{Cross-tabulate one or two variables}
 \usage{
 crosstab(data, ..., w = NULL, percent = NULL)
 }
@@ -24,7 +24,7 @@ crosstab(data, ..., w = NULL, percent = NULL)
 a tibble
 }
 \description{
-crosstab: cross-tabulations
+Cross-tabulate one or two variables
 }
 \examples{
 crosstab(mtcars, cyl)

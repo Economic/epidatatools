@@ -1,18 +1,15 @@
-#' interpolated_quantile: binned interpolated quantile
+#' Calculate the binned interpolated quantile
+#' 
 #' @param x numeric vector or an R object
 #' @param bin_size size used for binning
 #' @param probs numeric; percentile with value `[0,1]`
 #' @param w numeric vector of weights the same length as x giving the weights to use for elements of x
 #' @param na.rm logical; if true, any NA or NaN's are removed from x before computation
 #'
-#' @return a numeric vector of length 1
+#' @return a numeric vector
 #' @export
 #'
-#' @examples interpolated_quantile(x = mtcars[["cyl"]], bin_size = 0.25)
-#' @examples mtcars |>
-#'             dplyr::summarise(value = interpolated_quantile(x = cyl,
-#'                                                            bin_size = 0.25,
-#'                                                            probs = 0.75, w = mpg))
+#' @examples interpolated_quantile(x = mtcars$mpg, bin_size = 0.50, probs = c(0.25, 0.5, 0.75))
 interpolated_quantile = function(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE) {
 
   if (is.null(w)) w = 1
@@ -70,25 +67,24 @@ interpolated_quantile_p = function(data, p) {
     dplyr::pull(value)
 }
 
-#' interpolated_median: binned interpolated median
+#' Calculate the binned interpolated median
 #'
 #' @param x numeric vector or an R object
 #' @param bin_size size used for binning
 #' @param w numeric vector of weights the same length as x giving the weights to use for elements of x
 #' @param na.rm logical; if true, any NA or NaN's are removed from x before computation
 #'
-#' @return a tibble or data frame
+#' @return numeric vector
 #' @export
 #'
-#' @examples interpolated_median(x = mtcars[["cyl"]], bin_size = 0.25)
+#' @examples interpolated_median(x = mtcars$mpg, bin_size = 0.50)
 interpolated_median = function(x, bin_size, w = NULL, na.rm = TRUE) {
   interpolated_quantile(x, bin_size = bin_size, probs = 0.5, w = w, na.rm = na.rm)
 }
 
-#' Binipolate
-#' Calculates binned interpolated percentiles
+#' Summarize a data frame as binned interpolated percentiles
 #'
-#' @param data data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse
+#' @param data data frame
 #' @param x column to compute
 #' @param probs numeric vector of percentiles with values `[0,1]`
 #' @param bin_size size of binning
@@ -97,9 +93,9 @@ interpolated_median = function(x, bin_size, w = NULL, na.rm = TRUE) {
 #'
 #' @return a tibble or data frame
 #' @export
-#' @examples binipolate(mtcars, x = cyl, bin_size = 0.25)
-#' @examples mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25)
-#' @examples mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25, .by = cyl, w = mpg)
+#' @examples binipolate(mtcars, mpg, bin_size = 0.25)
+#' @examples binipolate(mtcars, mpg, probs = c(0.25, 0.5, 0.75), bin_size = 0.25)
+#' @examples binipolate(mtcars, mpg, probs = c(0.25, 0.5, 0.75), bin_size = 0.25, .by = cyl, w = wt)
 binipolate = function(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL) {
   data |>
     dplyr::group_by(dplyr::pick({{.by}})) |>

@@ -2,13 +2,12 @@
 % Please edit documentation in R/interpolated_quantile.R
 \name{binipolate}
 \alias{binipolate}
-\title{Binipolate
-Calculates binned interpolated percentiles}
+\title{Summarize a data frame as binned interpolated percentiles}
 \usage{
 binipolate(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL)
 }
 \arguments{
-\item{data}{data frame, data frame extension (e.g. a tibble), or a lazy data frame (dbplyr, dtplyr) inherited from tidyverse}
+\item{data}{data frame}
 
 \item{x}{column to compute}
 
@@ -24,11 +23,10 @@ binipolate(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL)
 a tibble or data frame
 }
 \description{
-Binipolate
-Calculates binned interpolated percentiles
+Summarize a data frame as binned interpolated percentiles
 }
 \examples{
-binipolate(mtcars, x = cyl, bin_size = 0.25)
-mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25)
-mtcars |> binipolate(disp, probs = c(0.25, 0.5, 0.75), bin_size = 0.25, .by = cyl, w = mpg)
+binipolate(mtcars, mpg, bin_size = 0.25)
+binipolate(mtcars, mpg, probs = c(0.25, 0.5, 0.75), bin_size = 0.25)
+binipolate(mtcars, mpg, probs = c(0.25, 0.5, 0.75), bin_size = 0.25, .by = cyl, w = wt)
 }

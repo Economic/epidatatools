@@ -19,20 +19,22 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     dplyr (>= 1.0.0),
-    purrr,
-    magrittr,
-    rlang,
-    tidyr,
     haven,
+    ipumsr,
+    purrr,
+    lubridate,
+    rlang,
+    stringr,
+    tibble,
+    tidyr,
     tidyselect,
-    tibble
+    utils
 Suggests: 
     knitr,
-    rmarkdown,
     pkgdown,
+    rmarkdown,
     tidyverse
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-VignetteBuilder: knitr
 URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epidatatools
 BugReports: https://github.com/Economic/epidatatools/issues

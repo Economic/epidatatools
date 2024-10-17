@@ -2,7 +2,7 @@
 % Please edit documentation in R/interpolated_quantile.R
 \name{interpolated_median}
 \alias{interpolated_median}
-\title{interpolated_median: binned interpolated median}
+\title{Calculate the binned interpolated median}
 \usage{
 interpolated_median(x, bin_size, w = NULL, na.rm = TRUE)
 }
@@ -16,11 +16,11 @@ interpolated_median(x, bin_size, w = NULL, na.rm = TRUE)
 \item{na.rm}{logical; if true, any NA or NaN's are removed from x before computation}
 }
 \value{
-a tibble or data frame
+numeric vector
 }
 \description{
-interpolated_median: binned interpolated median
+Calculate the binned interpolated median
 }
 \examples{
-interpolated_median(x = mtcars[["cyl"]], bin_size = 0.25)
+interpolated_median(x = mtcars$mpg, bin_size = 0.50)
 }
