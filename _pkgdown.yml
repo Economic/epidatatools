@@ -21,6 +21,8 @@ reference:
 - title: Quantiles
   contents:
   - binipolate
+  - averaged_median
+  - averaged_quantile
   - interpolated_median
   - interpolated_quantile
 - title: IPUMS microdata extracts
