@@ -17,7 +17,7 @@
 #' end_month = lubridate::ym("2024 August")
 #' cps_months = seq(begin_month, end_month, by = "month")
 #' dl_ipums_cps(cps_months, c("EARNWT", "HOURWAGE2"))
-#' 
+#'
 #' # use dl_ipums_micro with a custom extract
 #' extract = ipumsr::define_extract_micro(
 #'   collection = "cps",
@@ -41,11 +41,13 @@ dl_ipums_micro = function(extract) {
 #' @param variables a vector of variable names, or a list of detailed variable specifications as created by [ipumsr::var_spec()]
 #' @param years a vector of years
 #' @param description description for the extract
+#' @param ... arguments passed to [ipumsr::define_extract_micro()] other than collection, description, samples, variables
 dl_ipums_acs1 = function(
-    years = NULL,
-    variables,
-    description = NULL) {
-
+  years = NULL,
+  variables,
+  description = NULL,
+  ...
+) {
   if (is.null(description)) description = "ACS extract"
 
   extract = refine_ipums_extract(
@@ -54,7 +56,8 @@ dl_ipums_acs1 = function(
     dates = years,
     variables = variables,
     frequency = "annual",
-    description = description
+    description = description,
+    ...
   )
 
   dl_ipums_micro(extract)
@@ -63,10 +66,11 @@ dl_ipums_acs1 = function(
 #' @export
 #' @describeIn ipums_micro Download IPUMS CPS ASEC
 dl_ipums_asec = function(
-    years = NULL,
-    variables,
-    description = NULL) {
-
+  years = NULL,
+  variables,
+  description = NULL,
+  ...
+) {
   if (is.null(description)) description = "CPS ASEC extract"
 
   extract = refine_ipums_extract(
@@ -75,20 +79,24 @@ dl_ipums_asec = function(
     dates = years,
     variables = variables,
     frequency = "annual",
-    description = description
+    description = description,
+    ...
   )
 
-  dl_ipums_micro(extract)
+  #dl_ipums_micro(extract)
+
+  extract
 }
 
 #' @export
 #' @describeIn ipums_micro Download IPUMS Monthly CPS
 #' @param months a vector of dates representing months of CPS samples.
 dl_ipums_cps = function(
-    months = NULL,
-    variables,
-    description = NULL) {
-
+  months = NULL,
+  variables,
+  description = NULL,
+  ...
+) {
   if (is.null(description)) description = "CPS Monthly"
 
   extract = refine_ipums_extract(
@@ -97,7 +105,8 @@ dl_ipums_cps = function(
     dates = months,
     variables = variables,
     frequency = "monthly",
-    description = description
+    description = description,
+    ...
   )
 
   dl_ipums_micro(extract)
@@ -105,13 +114,14 @@ dl_ipums_cps = function(
 
 
 refine_ipums_extract = function(
-    collection,
-    sample_filter,
-    dates,
-    variables,
-    frequency,
-    description) {
-
+  collection,
+  sample_filter,
+  dates,
+  variables,
+  frequency,
+  description,
+  ...
+) {
   # refine collection to appropriate samples
   all_samples = ipumsr::get_sample_info(collection) |>
     dplyr::filter(stringr::str_detect(description, sample_filter))
@@ -119,17 +129,14 @@ refine_ipums_extract = function(
   if (frequency == "annual") {
     all_samples = all_samples |>
       dplyr::mutate(date = stringr::str_extract(name, "\\d{4}"))
-
-  }
-  else if (frequency == "monthly" & collection == "cps") {
+  } else if (frequency == "monthly" & collection == "cps") {
     all_samples = all_samples |>
       dplyr::filter(stringr::str_detect(description, "ASEC", negate = TRUE)) |>
       dplyr::mutate(
         date = stringr::word(description, start = -2, end = -1),
         date = lubridate::my(date)
       )
-  }
-  else stop("Unable to parse collection and/or dates")
+  } else stop("Unable to parse collection and/or dates")
 
   all_samples = dplyr::select(all_samples, name, date)
 
@@ -143,7 +150,7 @@ refine_ipums_extract = function(
 
   # filter samples only to requested dates
   valid_samples = all_samples |>
-      dplyr::filter(date %in% dates)
+    dplyr::filter(date %in% dates)
 
   sample_names = valid_samples |>
     dplyr::pull(name)
@@ -153,10 +160,11 @@ refine_ipums_extract = function(
     dplyr::pull(date) |>
     unique()
 
-  if(length(dates) != length(valid_dates)) {
+  if (length(dates) != length(valid_dates)) {
     warning(
       "Available IPUMS time periods differ from periods requested.",
-      "\nOnly downloading IPUMS samples ", paste(sample_names, collapse = ", ")
+      "\nOnly downloading IPUMS samples ",
+      paste(sample_names, collapse = ", ")
     )
   }
 
@@ -164,10 +172,9 @@ refine_ipums_extract = function(
     collection = collection,
     description = description,
     samples = sample_names,
-    variables = variables
+    variables = variables,
+    ...
   )
 
   extract
 }
-
-
