@@ -9,11 +9,11 @@
 \usage{
 dl_ipums_micro(extract)
 
-dl_ipums_acs1(years = NULL, variables, description = NULL)
+dl_ipums_acs1(years = NULL, variables, description = NULL, ...)
 
-dl_ipums_asec(years = NULL, variables, description = NULL)
+dl_ipums_asec(years = NULL, variables, description = NULL, ...)
 
-dl_ipums_cps(months = NULL, variables, description = NULL)
+dl_ipums_cps(months = NULL, variables, description = NULL, ...)
 }
 \arguments{
 \item{extract}{an IPUMS microdata extract as defined by \code{\link[ipumsr:define_extract_micro]{ipumsr::define_extract_micro()}}}
@@ -23,6 +23,8 @@ dl_ipums_cps(months = NULL, variables, description = NULL)
 \item{variables}{a vector of variable names, or a list of detailed variable specifications as created by \code{\link[ipumsr:var_spec]{ipumsr::var_spec()}}}
 
 \item{description}{description for the extract}
+
+\item{...}{arguments passed to \code{\link[ipumsr:define_extract_micro]{ipumsr::define_extract_micro()}} other than collection, description, samples, variables}
 
 \item{months}{a vector of dates representing months of CPS samples.}
 }
