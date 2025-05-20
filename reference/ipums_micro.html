@@ -40,11 +40,11 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dl_ipums_micro</span><span class="op">(</span><span class="va">extract</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">dl_ipums_acs1</span><span class="op">(</span>years <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">variables</span>, description <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">dl_ipums_acs1</span><span class="op">(</span>years <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">variables</span>, description <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">dl_ipums_asec</span><span class="op">(</span>years <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">variables</span>, description <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">dl_ipums_asec</span><span class="op">(</span>years <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">variables</span>, description <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">dl_ipums_cps</span><span class="op">(</span>months <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">variables</span>, description <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">dl_ipums_cps</span><span class="op">(</span>months <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">variables</span>, description <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,6 +65,10 @@
 
 <dt id="arg-description">description<a class="anchor" aria-label="anchor" href="#arg-description"></a></dt>
 <dd><p>description for the extract</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>arguments passed to <code><a href="https://tech.popdata.org/ipumsr/reference/define_extract_micro.html" class="external-link">ipumsr::define_extract_micro()</a></code> other than collection, description, samples, variables</p></dd>
 
 
 <dt id="arg-months">months<a class="anchor" aria-label="anchor" href="#arg-months"></a></dt>
