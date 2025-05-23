@@ -1,3 +1,6 @@
+# epidatatools 0.6.1
+* corrected error in `dl_ipums_asec()` resulting in no downloaded data 
+
 # epidatatools 0.6.0
 * added passthrough options `...` to IPUMS microdata extract download helpers `dl_ipums_acs1()`, `dl_ipums_asec()`, `dl_ipums_cps()`
 
