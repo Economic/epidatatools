@@ -83,9 +83,7 @@ dl_ipums_asec = function(
     ...
   )
 
-  #dl_ipums_micro(extract)
-
-  extract
+  dl_ipums_micro(extract)
 }
 
 #' @export
