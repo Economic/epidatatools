@@ -41,6 +41,25 @@ merge_status(band_members, band_instruments, by = "name")
 summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
 ```
 
+## Calculate smoothed quantiles
+```{r}
+p = seq(10, 50, 90)
+
+mtcars |>
+  reframe(
+    p,
+    value = averaged_quantile(mpg, probs = p / 100)
+  )
+```
+
+## Interpolated quantiles
+``` {r}
+p = seq(10, 50, 90)
+
+mtcars |> 
+  binipolate(mpg, probs = p/100, bin_size = 0.25)
+```
+
 ## Installation
 Install the latest version from R-Universe:
 ```{r, eval = FALSE}
