@@ -13,11 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# epidatatools <a href="https://economic.github.io/epidatatools/"><img src="man/figures/logo.png" align="right" height="139" /></a>
+# epidatatools <a href="https://economic.github.io/epidatatools/"><img src="man/figures/logo.png" align="right" height="139"/></a>
 
 epidatatools contains functions we find useful at [EPI](https://epi.org/) that don't have exact analogues elsewhere in the R package ecosystem.
 
 ## One and two-way cross-tabulations
+
 ```{r, message = FALSE}
 library(epidatatools)
 
@@ -30,6 +31,7 @@ crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
 ```
 
 ## Join data frames and add a merge status indicator
+
 ```{r, message = FALSE}
 library(dplyr)
 
@@ -37,11 +39,13 @@ merge_status(band_members, band_instruments, by = "name")
 ```
 
 ## Summarize across several distinct groups
+
 ```{r}
 summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
 ```
 
 ## Calculate smoothed quantiles
+
 ```{r}
 p = seq(10, 50, 90)
 
@@ -53,16 +57,34 @@ mtcars |>
 ```
 
 ## Interpolated quantiles
-``` {r}
+
+```{r}
 p = seq(10, 50, 90)
 
 mtcars |> 
   binipolate(mpg, probs = p/100, bin_size = 0.25)
 ```
 
+## Access IPUMS microdata
+
+Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
+
+```{r, eval = FALSE}
+# CPS ASEC microdata
+dl_ipums_asec(2021:2023, c("YEAR", "OFFPOV", "ASECWT"))
+
+# CPS Basic microdata
+begin_month = ym("2022m10")
+end_month = ym("2024m9")
+months = seq(begin_month, end_month, by = "month")
+
+dl_ipums_cps(months, c("TELWRKPAY", "TELWRKHR", "COMPWT"))
+```
+
 ## Installation
+
 Install the latest version from R-Universe:
+
 ```{r, eval = FALSE}
 install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
 ```
-
