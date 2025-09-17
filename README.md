@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# epidatatools <a href="https://economic.github.io/epidatatools/"><img src="man/figures/logo.png" align="right" height="139" /></a>
+# epidatatools <a href="https://economic.github.io/epidatatools/"><img src="man/figures/logo.png" align="right" height="139"/></a>
 
 epidatatools contains functions we find useful at
 [EPI](https://epi.org/) that don’t have exact analogues elsewhere in the
@@ -19,9 +19,6 @@ crosstab(mtcars, cyl)
 #> 1     4    11   0.344         0.344
 #> 2     6     7   0.219         0.562
 #> 3     8    14   0.438         1
-```
-
-``` r
 
 crosstab(mtcars, cyl, gear)
 #> # A tibble: 3 × 4
@@ -30,9 +27,6 @@ crosstab(mtcars, cyl, gear)
 #> 1     4     1     8     2
 #> 2     6     2     4     1
 #> 3     8    12     0     2
-```
-
-``` r
 
 # weighted counts expressed as column percentages
 crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
@@ -78,6 +72,54 @@ summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
 #> 10 carb                 4  15.2 187  
 #> 11 carb                 6  19.7 175  
 #> 12 carb                 8  15   335
+```
+
+## Calculate averaged (smoothed) quantiles
+
+``` r
+averaged_median(mtcars$mpg)
+#> [1] 19.2
+
+p = c(10, 50, 90)
+
+mtcars |>
+  reframe(
+    p,
+    value = averaged_quantile(mpg, probs = p / 100)
+  )
+#>    p  value
+#> 1 10 13.832
+#> 2 50 19.200
+#> 3 90 30.108
+```
+
+## Interpolated quantiles
+
+``` r
+binipolate(mtcars, mpg, probs = c(0.1, 0.5, 0.9), bin_size = 0.25)
+#> # A tibble: 3 × 2
+#>   probs value
+#>   <dbl> <dbl>
+#> 1   0.1  13.6
+#> 2   0.5  19.1
+#> 3   0.9  28.7
+```
+
+## Access IPUMS microdata
+
+Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
+
+``` r
+# CPS ASEC microdata
+dl_ipums_asec(2021:2023, c("YEAR", "OFFPOV", "ASECWT"))
+
+# CPS Basic microdata
+library(lubridate)
+begin_month = ym("2022m10")
+end_month = ym("2024m9")
+months = seq(begin_month, end_month, by = "month")
+
+dl_ipums_cps(months, c("TELWRKPAY", "TELWRKHR", "COMPWT"))
 ```
 
 ## Installation
