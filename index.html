@@ -75,18 +75,16 @@
 <span><span class="co">#&gt;   &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;         &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1     4    11   0.344         0.344</span></span>
 <span><span class="co">#&gt; 2     6     7   0.219         0.562</span></span>
-<span><span class="co">#&gt; 3     8    14   0.438         1</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; 3     8    14   0.438         1</span></span>
+<span></span>
 <span><span class="fu"><a href="reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span>, <span class="va">gear</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
 <span><span class="co">#&gt;     cyl   `3`   `4`   `5`</span></span>
 <span><span class="co">#&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1     4     1     8     2</span></span>
 <span><span class="co">#&gt; 2     6     2     4     1</span></span>
-<span><span class="co">#&gt; 3     8    12     0     2</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; 3     8    12     0     2</span></span>
+<span></span>
 <span><span class="co"># weighted counts expressed as column percentages</span></span>
 <span><span class="fu"><a href="reference/crosstab.html">crosstab</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span>, <span class="va">gear</span>, w <span class="op">=</span> <span class="va">mpg</span>, percent <span class="op">=</span> <span class="st">"column"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
@@ -99,7 +97,7 @@
 <div class="section level2">
 <h2 id="join-data-frames-and-add-a-merge-status-indicator">Join data frames and add a merge status indicator<a class="anchor" aria-label="anchor" href="#join-data-frames-and-add-a-merge-status-indicator"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/merge_status.html">merge_status</a></span><span class="op">(</span><span class="va">band_members</span>, <span class="va">band_instruments</span>, by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span></span>
@@ -114,7 +112,7 @@
 <div class="section level2">
 <h2 id="summarize-across-several-distinct-groups">Summarize across several distinct groups<a class="anchor" aria-label="anchor" href="#summarize-across-several-distinct-groups"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/summarize_groups.html">summarize_groups</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span><span class="op">|</span><span class="va">gear</span><span class="op">|</span><span class="va">carb</span>, p50 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span>, avg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">hp</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 12 × 4</span></span>
 <span><span class="co">#&gt;    group_name group_value   p50   avg</span></span>
@@ -133,10 +131,57 @@
 <span><span class="co">#&gt; 12 carb                 8  15   335</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="calculate-averaged-smoothed-quantiles">Calculate averaged (smoothed) quantiles<a class="anchor" aria-label="anchor" href="#calculate-averaged-smoothed-quantiles"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/averaged_median.html">averaged_median</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 19.2</span></span>
+<span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">90</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mtcars</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe</a></span><span class="op">(</span></span>
+<span>    <span class="va">p</span>,</span>
+<span>    value <span class="op">=</span> <span class="fu"><a href="reference/averaged_quantile.html">averaged_quantile</a></span><span class="op">(</span><span class="va">mpg</span>, probs <span class="op">=</span> <span class="va">p</span> <span class="op">/</span> <span class="fl">100</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt;    p  value</span></span>
+<span><span class="co">#&gt; 1 10 13.832</span></span>
+<span><span class="co">#&gt; 2 50 19.200</span></span>
+<span><span class="co">#&gt; 3 90 30.108</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="interpolated-quantiles">Interpolated quantiles<a class="anchor" aria-label="anchor" href="#interpolated-quantiles"></a>
+</h2>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/binipolate.html">binipolate</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">mpg</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span><span class="op">)</span>, bin_size <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span><span class="co">#&gt;   probs value</span></span>
+<span><span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1   0.1  13.6</span></span>
+<span><span class="co">#&gt; 2   0.5  19.1</span></span>
+<span><span class="co">#&gt; 3   0.9  28.7</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="access-ipums-microdata">Access IPUMS microdata<a class="anchor" aria-label="anchor" href="#access-ipums-microdata"></a>
+</h2>
+<p>Requires valid IPUMS API key stored in the .Renviron as <code>IPUMS_API_KEY</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># CPS ASEC microdata</span></span>
+<span><span class="fu"><a href="reference/ipums_micro.html">dl_ipums_asec</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2023</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"YEAR"</span>, <span class="st">"OFFPOV"</span>, <span class="st">"ASECWT"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># CPS Basic microdata</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
+<span><span class="va">begin_month</span> <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ym</a></span><span class="op">(</span><span class="st">"2022m10"</span><span class="op">)</span></span>
+<span><span class="va">end_month</span> <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ym</a></span><span class="op">(</span><span class="st">"2024m9"</span><span class="op">)</span></span>
+<span><span class="va">months</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">begin_month</span>, <span class="va">end_month</span>, by <span class="op">=</span> <span class="st">"month"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/ipums_micro.html">dl_ipums_cps</a></span><span class="op">(</span><span class="va">months</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TELWRKPAY"</span>, <span class="st">"TELWRKHR"</span>, <span class="st">"COMPWT"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>Install the latest version from R-Universe:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"epidatatools"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://economic.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -185,7 +230,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
