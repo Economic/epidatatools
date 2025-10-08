@@ -95,24 +95,9 @@
 <span><span class="co">#&gt; 3     8 0.748  0     0.288</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="join-data-frames-and-add-a-merge-status-indicator">Join data frames and add a merge status indicator<a class="anchor" aria-label="anchor" href="#join-data-frames-and-add-a-merge-status-indicator"></a>
-</h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/merge_status.html">merge_status</a></span><span class="op">(</span><span class="va">band_members</span>, <span class="va">band_instruments</span>, by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 4 × 4</span></span>
-<span><span class="co">#&gt;   name  band    plays  `_merge`  </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;     </span></span>
-<span><span class="co">#&gt; 1 Mick  Stones  &lt;NA&gt;   left_only </span></span>
-<span><span class="co">#&gt; 2 John  Beatles guitar both      </span></span>
-<span><span class="co">#&gt; 3 Paul  Beatles bass   both      </span></span>
-<span><span class="co">#&gt; 4 Keith &lt;NA&gt;    guitar right_only</span></span></code></pre></div>
-</div>
-<div class="section level2">
 <h2 id="summarize-across-several-distinct-groups">Summarize across several distinct groups<a class="anchor" aria-label="anchor" href="#summarize-across-several-distinct-groups"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/summarize_groups.html">summarize_groups</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">cyl</span><span class="op">|</span><span class="va">gear</span><span class="op">|</span><span class="va">carb</span>, p50 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span>, avg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">hp</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 12 × 4</span></span>
 <span><span class="co">#&gt;    group_name group_value   p50   avg</span></span>
@@ -133,14 +118,14 @@
 <div class="section level2">
 <h2 id="calculate-averaged-smoothed-quantiles">Calculate averaged (smoothed) quantiles<a class="anchor" aria-label="anchor" href="#calculate-averaged-smoothed-quantiles"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/averaged_median.html">averaged_median</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 19.2</span></span>
 <span></span>
 <span><span class="va">p</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">90</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mtcars</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe</a></span><span class="op">(</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe</a></span><span class="op">(</span></span>
 <span>    <span class="va">p</span>,</span>
 <span>    value <span class="op">=</span> <span class="fu"><a href="reference/averaged_quantile.html">averaged_quantile</a></span><span class="op">(</span><span class="va">mpg</span>, probs <span class="op">=</span> <span class="va">p</span> <span class="op">/</span> <span class="fl">100</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -150,32 +135,92 @@
 <span><span class="co">#&gt; 3 90 30.108</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="interpolated-quantiles">Interpolated quantiles<a class="anchor" aria-label="anchor" href="#interpolated-quantiles"></a>
-</h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/binipolate.html">binipolate</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">mpg</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span><span class="op">)</span>, bin_size <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
-<span><span class="co">#&gt;   probs value</span></span>
-<span><span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1   0.1  13.6</span></span>
-<span><span class="co">#&gt; 2   0.5  19.1</span></span>
-<span><span class="co">#&gt; 3   0.9  28.7</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="access-ipums-microdata">Access IPUMS microdata<a class="anchor" aria-label="anchor" href="#access-ipums-microdata"></a>
+<h2 id="download-ipums-microdata">Download IPUMS microdata<a class="anchor" aria-label="anchor" href="#download-ipums-microdata"></a>
 </h2>
 <p>Requires valid IPUMS API key stored in the .Renviron as <code>IPUMS_API_KEY</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.</span></span>
+<span></span>
+<span><span class="co"># CPS ASEC microdata</span></span>
+<span><span class="fu"><a href="reference/ipums_micro.html">dl_ipums_asec</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2022</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"YEAR"</span>, <span class="st">"OFFPOV"</span>, <span class="st">"ASECWT"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#&gt; DDI codebook file saved to /tmp/RtmpGaUUhf/cps_00161.xml</span></span>
+<span><span class="co">#&gt; Data file saved to /tmp/RtmpGaUUhf/cps_00161.dat.gz</span></span>
+<span><span class="co">#&gt; Use of data from IPUMS CPS is subject to conditions including that users should cite the data appropriately. Use command `ipums_conditions()` for more details.</span></span>
+<span><span class="co">#&gt; # A tibble: 316,275 × 11</span></span>
+<span><span class="co">#&gt;     YEAR SERIAL MONTH       CPSID ASECFLAG ASECWTH PERNUM  CPSIDP  CPSIDV ASECWT</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;int+lbl&gt;   &lt;dbl&gt; &lt;int+lb&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      1 2.02e13 2.02e14   706.</span></span>
+<span><span class="co">#&gt;  2  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      2 2.02e13 2.02e14   706.</span></span>
+<span><span class="co">#&gt;  3  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      3 2.02e13 2.02e14   608.</span></span>
+<span><span class="co">#&gt;  4  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      1 2.02e13 2.02e14  1537.</span></span>
+<span><span class="co">#&gt;  5  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      2 2.02e13 2.02e14  1537.</span></span>
+<span><span class="co">#&gt;  6  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      3 2.02e13 2.02e14  2119.</span></span>
+<span><span class="co">#&gt;  7  2021      3 3 [March] 2.02e13 1 [ASEC]   1499.      1 2.02e13 2.02e14  1499.</span></span>
+<span><span class="co">#&gt;  8  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      1 2.02e13 2.02e14   948.</span></span>
+<span><span class="co">#&gt;  9  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      2 2.02e13 2.02e14  1225.</span></span>
+<span><span class="co">#&gt; 10  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      3 2.02e13 2.02e14   948.</span></span>
+<span><span class="co">#&gt; # ℹ 316,265 more rows</span></span>
+<span><span class="co">#&gt; # ℹ 1 more variable: OFFPOV &lt;int+lbl&gt;</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="get-data-from-the-bls-api">Get data from the BLS API<a class="anchor" aria-label="anchor" href="#get-data-from-the-bls-api"></a>
+</h2>
+<p>Requires valid BLS or FRED API keys stored in the .Renviron as <code>IPUMS_API_KEY</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># To run this example you will need a BLS API key </span></span>
+<span><span class="co"># in your .Renviron file named BLS_API_KEY</span></span>
+<span></span>
+<span><span class="va">bls_series_ids</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  prime_age_epop <span class="op">=</span> <span class="st">"LNS12300060"</span>,</span>
+<span>  injuries_annual <span class="op">=</span> <span class="st">"ISU00000000031004"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/get_bls.html">get_bls</a></span><span class="op">(</span><span class="va">bls_series_ids</span>, start <span class="op">=</span> <span class="fl">2023</span>, end <span class="op">=</span> <span class="fl">2023</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 13 × 8</span></span>
+<span><span class="co">#&gt;    name       series_id series_title date_frequency date        year month value</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;        &lt;chr&gt;          &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;</span></span>
+<span><span class="co">#&gt;  1 prime_age… LNS12300… (Seas) Empl… month          2023-01-01  2023     1 80.3 </span></span>
+<span><span class="co">#&gt;  2 prime_age… LNS12300… (Seas) Empl… month          2023-02-01  2023     2 80.5 </span></span>
+<span><span class="co">#&gt;  3 prime_age… LNS12300… (Seas) Empl… month          2023-03-01  2023     3 80.7 </span></span>
+<span><span class="co">#&gt;  4 prime_age… LNS12300… (Seas) Empl… month          2023-04-01  2023     4 80.7 </span></span>
+<span><span class="co">#&gt;  5 prime_age… LNS12300… (Seas) Empl… month          2023-05-01  2023     5 80.7 </span></span>
+<span><span class="co">#&gt;  6 prime_age… LNS12300… (Seas) Empl… month          2023-06-01  2023     6 80.9 </span></span>
+<span><span class="co">#&gt;  7 prime_age… LNS12300… (Seas) Empl… month          2023-07-01  2023     7 80.9 </span></span>
+<span><span class="co">#&gt;  8 prime_age… LNS12300… (Seas) Empl… month          2023-08-01  2023     8 80.8 </span></span>
+<span><span class="co">#&gt;  9 prime_age… LNS12300… (Seas) Empl… month          2023-09-01  2023     9 80.8 </span></span>
+<span><span class="co">#&gt; 10 prime_age… LNS12300… (Seas) Empl… month          2023-10-01  2023    10 80.6 </span></span>
+<span><span class="co">#&gt; 11 prime_age… LNS12300… (Seas) Empl… month          2023-11-01  2023    11 80.7 </span></span>
+<span><span class="co">#&gt; 12 prime_age… LNS12300… (Seas) Empl… month          2023-12-01  2023    12 80.5 </span></span>
+<span><span class="co">#&gt; 13 injuries_… ISU00000… Industry-le… year           2023-01-01  2023     1 2.6</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="get-data-from-the-fred-api">Get data from the FRED API<a class="anchor" aria-label="anchor" href="#get-data-from-the-fred-api"></a>
+</h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># CPS ASEC microdata</span></span>
-<span><span class="fu"><a href="reference/ipums_micro.html">dl_ipums_asec</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2023</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"YEAR"</span>, <span class="st">"OFFPOV"</span>, <span class="st">"ASECWT"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># To run this example you will need a FRED API key </span></span>
+<span><span class="co"># in your .Renviron named FRED_API_KEY</span></span>
 <span></span>
-<span><span class="co"># CPS Basic microdata</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
-<span><span class="va">begin_month</span> <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ym</a></span><span class="op">(</span><span class="st">"2022m10"</span><span class="op">)</span></span>
-<span><span class="va">end_month</span> <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ym</a></span><span class="op">(</span><span class="st">"2024m9"</span><span class="op">)</span></span>
-<span><span class="va">months</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">begin_month</span>, <span class="va">end_month</span>, by <span class="op">=</span> <span class="st">"month"</span><span class="op">)</span></span>
+<span><span class="va">fred_series_ids</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  gdp <span class="op">=</span> <span class="st">"GDP"</span>,</span>
+<span>  unemployment_rate <span class="op">=</span> <span class="st">"UNRATE"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/ipums_micro.html">dl_ipums_cps</a></span><span class="op">(</span><span class="va">months</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TELWRKPAY"</span>, <span class="st">"TELWRKHR"</span>, <span class="st">"COMPWT"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/get_fred.html">get_fred</a></span><span class="op">(</span><span class="va">fred_series_ids</span>, start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-06-01"</span><span class="op">)</span>, end <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 10 × 9</span></span>
+<span><span class="co">#&gt;    name     series_id series_title date_frequency date        year quarter month</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;        &lt;chr&gt;          &lt;date&gt;     &lt;dbl&gt;   &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 gdp      GDP       Gross Domes… quarter        2024-04-01  2024       2     4</span></span>
+<span><span class="co">#&gt;  2 gdp      GDP       Gross Domes… quarter        2024-07-01  2024       3     7</span></span>
+<span><span class="co">#&gt;  3 gdp      GDP       Gross Domes… quarter        2024-10-01  2024       4    10</span></span>
+<span><span class="co">#&gt;  4 unemplo… UNRATE    Unemploymen… month          2024-06-01  2024       2     6</span></span>
+<span><span class="co">#&gt;  5 unemplo… UNRATE    Unemploymen… month          2024-07-01  2024       3     7</span></span>
+<span><span class="co">#&gt;  6 unemplo… UNRATE    Unemploymen… month          2024-08-01  2024       3     8</span></span>
+<span><span class="co">#&gt;  7 unemplo… UNRATE    Unemploymen… month          2024-09-01  2024       3     9</span></span>
+<span><span class="co">#&gt;  8 unemplo… UNRATE    Unemploymen… month          2024-10-01  2024       4    10</span></span>
+<span><span class="co">#&gt;  9 unemplo… UNRATE    Unemploymen… month          2024-11-01  2024       4    11</span></span>
+<span><span class="co">#&gt; 10 unemplo… UNRATE    Unemploymen… month          2024-12-01  2024       4    12</span></span>
+<span><span class="co">#&gt; # ℹ 1 more variable: value &lt;dbl&gt;</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
