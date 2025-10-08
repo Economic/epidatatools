@@ -38,21 +38,6 @@ crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
 #> 3     8 0.748  0     0.288
 ```
 
-## Join data frames and add a merge status indicator
-
-``` r
-library(dplyr)
-
-merge_status(band_members, band_instruments, by = "name")
-#> # A tibble: 4 × 4
-#>   name  band    plays  `_merge`  
-#>   <chr> <chr>   <chr>  <chr>     
-#> 1 Mick  Stones  <NA>   left_only 
-#> 2 John  Beatles guitar both      
-#> 3 Paul  Beatles bass   both      
-#> 4 Keith <NA>    guitar right_only
-```
-
 ## Summarize across several distinct groups
 
 ``` r
@@ -83,7 +68,7 @@ averaged_median(mtcars$mpg)
 p = c(10, 50, 90)
 
 mtcars |>
-  reframe(
+  dplyr::reframe(
     p,
     value = averaged_quantile(mpg, probs = p / 100)
   )
@@ -93,33 +78,95 @@ mtcars |>
 #> 3 90 30.108
 ```
 
-## Interpolated quantiles
-
-``` r
-binipolate(mtcars, mpg, probs = c(0.1, 0.5, 0.9), bin_size = 0.25)
-#> # A tibble: 3 × 2
-#>   probs value
-#>   <dbl> <dbl>
-#> 1   0.1  13.6
-#> 2   0.5  19.1
-#> 3   0.9  28.7
-```
-
-## Access IPUMS microdata
+## Download IPUMS microdata
 
 Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
 
 ``` r
+# First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.
+
 # CPS ASEC microdata
-dl_ipums_asec(2021:2023, c("YEAR", "OFFPOV", "ASECWT"))
+dl_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
 
-# CPS Basic microdata
-library(lubridate)
-begin_month = ym("2022m10")
-end_month = ym("2024m9")
-months = seq(begin_month, end_month, by = "month")
+#> DDI codebook file saved to /tmp/RtmpGaUUhf/cps_00161.xml
+#> Data file saved to /tmp/RtmpGaUUhf/cps_00161.dat.gz
+#> Use of data from IPUMS CPS is subject to conditions including that users should cite the data appropriately. Use command `ipums_conditions()` for more details.
+#> # A tibble: 316,275 × 11
+#>     YEAR SERIAL MONTH       CPSID ASECFLAG ASECWTH PERNUM  CPSIDP  CPSIDV ASECWT
+#>    <dbl>  <dbl> <int+lbl>   <dbl> <int+lb>   <dbl>  <dbl>   <dbl>   <dbl>  <dbl>
+#>  1  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      1 2.02e13 2.02e14   706.
+#>  2  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      2 2.02e13 2.02e14   706.
+#>  3  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      3 2.02e13 2.02e14   608.
+#>  4  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      1 2.02e13 2.02e14  1537.
+#>  5  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      2 2.02e13 2.02e14  1537.
+#>  6  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      3 2.02e13 2.02e14  2119.
+#>  7  2021      3 3 [March] 2.02e13 1 [ASEC]   1499.      1 2.02e13 2.02e14  1499.
+#>  8  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      1 2.02e13 2.02e14   948.
+#>  9  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      2 2.02e13 2.02e14  1225.
+#> 10  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      3 2.02e13 2.02e14   948.
+#> # ℹ 316,265 more rows
+#> # ℹ 1 more variable: OFFPOV <int+lbl>
+```
 
-dl_ipums_cps(months, c("TELWRKPAY", "TELWRKHR", "COMPWT"))
+## Get data from the BLS API
+
+Requires valid BLS or FRED API keys stored in the .Renviron as
+`IPUMS_API_KEY`.
+
+``` r
+# To run this example you will need a BLS API key 
+# in your .Renviron file named BLS_API_KEY
+
+bls_series_ids = c(
+  prime_age_epop = "LNS12300060",
+  injuries_annual = "ISU00000000031004"
+)
+
+get_bls(bls_series_ids, start = 2023, end = 2023)
+#> # A tibble: 13 × 8
+#>    name       series_id series_title date_frequency date        year month value
+#>    <chr>      <chr>     <chr>        <chr>          <date>     <dbl> <dbl> <chr>
+#>  1 prime_age… LNS12300… (Seas) Empl… month          2023-01-01  2023     1 80.3 
+#>  2 prime_age… LNS12300… (Seas) Empl… month          2023-02-01  2023     2 80.5 
+#>  3 prime_age… LNS12300… (Seas) Empl… month          2023-03-01  2023     3 80.7 
+#>  4 prime_age… LNS12300… (Seas) Empl… month          2023-04-01  2023     4 80.7 
+#>  5 prime_age… LNS12300… (Seas) Empl… month          2023-05-01  2023     5 80.7 
+#>  6 prime_age… LNS12300… (Seas) Empl… month          2023-06-01  2023     6 80.9 
+#>  7 prime_age… LNS12300… (Seas) Empl… month          2023-07-01  2023     7 80.9 
+#>  8 prime_age… LNS12300… (Seas) Empl… month          2023-08-01  2023     8 80.8 
+#>  9 prime_age… LNS12300… (Seas) Empl… month          2023-09-01  2023     9 80.8 
+#> 10 prime_age… LNS12300… (Seas) Empl… month          2023-10-01  2023    10 80.6 
+#> 11 prime_age… LNS12300… (Seas) Empl… month          2023-11-01  2023    11 80.7 
+#> 12 prime_age… LNS12300… (Seas) Empl… month          2023-12-01  2023    12 80.5 
+#> 13 injuries_… ISU00000… Industry-le… year           2023-01-01  2023     1 2.6
+```
+
+## Get data from the FRED API
+
+``` r
+# To run this example you will need a FRED API key 
+# in your .Renviron named FRED_API_KEY
+
+fred_series_ids = c(
+  gdp = "GDP",
+  unemployment_rate = "UNRATE"
+)
+
+get_fred(fred_series_ids, start = as.Date("2024-06-01"), end = 2024)
+#> # A tibble: 10 × 9
+#>    name     series_id series_title date_frequency date        year quarter month
+#>    <chr>    <chr>     <chr>        <chr>          <date>     <dbl>   <int> <dbl>
+#>  1 gdp      GDP       Gross Domes… quarter        2024-04-01  2024       2     4
+#>  2 gdp      GDP       Gross Domes… quarter        2024-07-01  2024       3     7
+#>  3 gdp      GDP       Gross Domes… quarter        2024-10-01  2024       4    10
+#>  4 unemplo… UNRATE    Unemploymen… month          2024-06-01  2024       2     6
+#>  5 unemplo… UNRATE    Unemploymen… month          2024-07-01  2024       3     7
+#>  6 unemplo… UNRATE    Unemploymen… month          2024-08-01  2024       3     8
+#>  7 unemplo… UNRATE    Unemploymen… month          2024-09-01  2024       3     9
+#>  8 unemplo… UNRATE    Unemploymen… month          2024-10-01  2024       4    10
+#>  9 unemplo… UNRATE    Unemploymen… month          2024-11-01  2024       4    11
+#> 10 unemplo… UNRATE    Unemploymen… month          2024-12-01  2024       4    12
+#> # ℹ 1 more variable: value <dbl>
 ```
 
 ## Installation
