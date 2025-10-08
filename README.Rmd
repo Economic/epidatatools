@@ -30,14 +30,6 @@ crosstab(mtcars, cyl, gear)
 crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
 ```
 
-## Join data frames and add a merge status indicator
-
-```{r, message = FALSE}
-library(dplyr)
-
-merge_status(band_members, band_instruments, by = "name")
-```
-
 ## Summarize across several distinct groups
 
 ```{r}
@@ -52,39 +44,78 @@ averaged_median(mtcars$mpg)
 p = c(10, 50, 90)
 
 mtcars |>
-  reframe(
+  dplyr::reframe(
     p,
     value = averaged_quantile(mpg, probs = p / 100)
   )
 ```
 
-## Interpolated quantiles
 
-```{r}
-binipolate(mtcars, mpg, probs = c(0.1, 0.5, 0.9), bin_size = 0.25)
-```
-
-## Access IPUMS microdata
+## Download IPUMS microdata
 
 Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
 
-```{r, eval = FALSE}
+```{r, eval = F}
+# First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.
+
 # CPS ASEC microdata
-dl_ipums_asec(2021:2023, c("YEAR", "OFFPOV", "ASECWT"))
+dl_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
 
-# CPS Basic microdata
-library(lubridate)
-begin_month = ym("2022m10")
-end_month = ym("2024m9")
-months = seq(begin_month, end_month, by = "month")
+#> DDI codebook file saved to /tmp/RtmpGaUUhf/cps_00161.xml
+#> Data file saved to /tmp/RtmpGaUUhf/cps_00161.dat.gz
+#> Use of data from IPUMS CPS is subject to conditions including that users should cite the data appropriately. Use command `ipums_conditions()` for more details.
+#> # A tibble: 316,275 × 11
+#>     YEAR SERIAL MONTH       CPSID ASECFLAG ASECWTH PERNUM  CPSIDP  CPSIDV ASECWT
+#>    <dbl>  <dbl> <int+lbl>   <dbl> <int+lb>   <dbl>  <dbl>   <dbl>   <dbl>  <dbl>
+#>  1  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      1 2.02e13 2.02e14   706.
+#>  2  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      2 2.02e13 2.02e14   706.
+#>  3  2021      1 3 [March] 2.02e13 1 [ASEC]    706.      3 2.02e13 2.02e14   608.
+#>  4  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      1 2.02e13 2.02e14  1537.
+#>  5  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      2 2.02e13 2.02e14  1537.
+#>  6  2021      2 3 [March] 2.02e13 1 [ASEC]   1537.      3 2.02e13 2.02e14  2119.
+#>  7  2021      3 3 [March] 2.02e13 1 [ASEC]   1499.      1 2.02e13 2.02e14  1499.
+#>  8  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      1 2.02e13 2.02e14   948.
+#>  9  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      2 2.02e13 2.02e14  1225.
+#> 10  2021      8 3 [March] 2.02e13 1 [ASEC]    948.      3 2.02e13 2.02e14   948.
+#> # ℹ 316,265 more rows
+#> # ℹ 1 more variable: OFFPOV <int+lbl>
+```
 
-dl_ipums_cps(months, c("TELWRKPAY", "TELWRKHR", "COMPWT"))
+## Get data from the BLS API 
+
+Requires valid BLS or FRED API keys stored in the .Renviron as `IPUMS_API_KEY`.
+
+```{r}
+# To run this example you will need a BLS API key 
+# in your .Renviron file named BLS_API_KEY
+
+bls_series_ids = c(
+  prime_age_epop = "LNS12300060",
+  injuries_annual = "ISU00000000031004"
+)
+
+get_bls(bls_series_ids, start = 2023, end = 2023)
+
+```
+
+## Get data from the FRED API 
+```{r}
+# To run this example you will need a FRED API key 
+# in your .Renviron named FRED_API_KEY
+
+fred_series_ids = c(
+  gdp = "GDP",
+  unemployment_rate = "UNRATE"
+)
+
+get_fred(fred_series_ids, start = as.Date("2024-06-01"), end = 2024)
+
 ```
 
 ## Installation
 
 Install the latest version from R-Universe:
 
-```{r, eval = FALSE}
+```{r, eval = F}
 install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
 ```
