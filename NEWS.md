@@ -1,3 +1,6 @@
+# epidatatools 0.7.0
+* added `get_bls()` and `get_fred()` for retrieval from BLS and FRED APIs
+
 # epidatatools 0.6.1
 * corrected error in `dl_ipums_asec()` resulting in no downloaded data 
 

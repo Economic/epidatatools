@@ -25,16 +25,24 @@ reference:
   - averaged_quantile
   - interpolated_median
   - interpolated_quantile
-- title: IPUMS microdata extracts
+
+- title: Download data
+- subtitle: IPUMS microdata extracts
   contents:
   - dl_ipums_acs1
   - dl_ipums_asec
   - dl_ipums_cps
   - dl_ipums_micro
+- subtitle: BLS or FRED time series
+  contents:
+  - get_bls
+  - get_fred
+
 - title: Summarizing data
   contents:
   - crosstab
   - summarize_groups
+
 - title: Other functions
   contents:
   - merge_status
