@@ -1,3 +1,6 @@
+# epidatatools 0.7.1
+* force `get_bls()` to produce numeric values
+
 # epidatatools 0.7.0
 * added `get_bls()` and `get_fred()` for retrieval from BLS and FRED APIs
 

@@ -125,20 +125,20 @@ bls_series_ids = c(
 get_bls(bls_series_ids, start = 2023, end = 2023)
 #> # A tibble: 13 × 8
 #>    name       series_id series_title date_frequency date        year month value
-#>    <chr>      <chr>     <chr>        <chr>          <date>     <dbl> <dbl> <chr>
-#>  1 prime_age… LNS12300… (Seas) Empl… month          2023-01-01  2023     1 80.3 
-#>  2 prime_age… LNS12300… (Seas) Empl… month          2023-02-01  2023     2 80.5 
-#>  3 prime_age… LNS12300… (Seas) Empl… month          2023-03-01  2023     3 80.7 
-#>  4 prime_age… LNS12300… (Seas) Empl… month          2023-04-01  2023     4 80.7 
-#>  5 prime_age… LNS12300… (Seas) Empl… month          2023-05-01  2023     5 80.7 
-#>  6 prime_age… LNS12300… (Seas) Empl… month          2023-06-01  2023     6 80.9 
-#>  7 prime_age… LNS12300… (Seas) Empl… month          2023-07-01  2023     7 80.9 
-#>  8 prime_age… LNS12300… (Seas) Empl… month          2023-08-01  2023     8 80.8 
-#>  9 prime_age… LNS12300… (Seas) Empl… month          2023-09-01  2023     9 80.8 
-#> 10 prime_age… LNS12300… (Seas) Empl… month          2023-10-01  2023    10 80.6 
-#> 11 prime_age… LNS12300… (Seas) Empl… month          2023-11-01  2023    11 80.7 
-#> 12 prime_age… LNS12300… (Seas) Empl… month          2023-12-01  2023    12 80.5 
-#> 13 injuries_… ISU00000… Industry-le… year           2023-01-01  2023     1 2.6
+#>    <chr>      <chr>     <chr>        <chr>          <date>     <dbl> <dbl> <dbl>
+#>  1 prime_age… LNS12300… (Seas) Empl… month          2023-01-01  2023     1  80.3
+#>  2 prime_age… LNS12300… (Seas) Empl… month          2023-02-01  2023     2  80.5
+#>  3 prime_age… LNS12300… (Seas) Empl… month          2023-03-01  2023     3  80.7
+#>  4 prime_age… LNS12300… (Seas) Empl… month          2023-04-01  2023     4  80.7
+#>  5 prime_age… LNS12300… (Seas) Empl… month          2023-05-01  2023     5  80.7
+#>  6 prime_age… LNS12300… (Seas) Empl… month          2023-06-01  2023     6  80.9
+#>  7 prime_age… LNS12300… (Seas) Empl… month          2023-07-01  2023     7  80.9
+#>  8 prime_age… LNS12300… (Seas) Empl… month          2023-08-01  2023     8  80.8
+#>  9 prime_age… LNS12300… (Seas) Empl… month          2023-09-01  2023     9  80.8
+#> 10 prime_age… LNS12300… (Seas) Empl… month          2023-10-01  2023    10  80.6
+#> 11 prime_age… LNS12300… (Seas) Empl… month          2023-11-01  2023    11  80.7
+#> 12 prime_age… LNS12300… (Seas) Empl… month          2023-12-01  2023    12  80.5
+#> 13 injuries_… ISU00000… Industry-le… year           2023-01-01  2023     1   2.6
 ```
 
 ## Get data from the FRED API

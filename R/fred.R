@@ -138,17 +138,14 @@ fetch_fred_series_complete = function(
 
 #' @noRd
 fred_series_data_extractor = function(series_id, complete_results) {
-  filtered_results = complete_results |>
+  complete_results |>
     dplyr::filter(.data$series_id == {{ series_id }}) |>
     tidyr::unnest("metadata") |>
     dplyr::mutate(
       date_frequency = normalize_fred_frequency(.data$frequency_short)
     ) |>
     dplyr::rename(series_title = .data$title) |>
-    tidyr::unnest("data")
-
-  # Select relevant columns, including name if present
-  filtered_results |>
+    tidyr::unnest("data") |>
     dplyr::select(dplyr::any_of(c(
       "name",
       "series_id",

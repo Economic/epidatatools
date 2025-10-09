@@ -66,7 +66,7 @@ add_date_component = function(data, var) {
 
 #' @noRd
 extract_data = function(data, extractor) {
-  data |>
+  final_data = data |>
     dplyr::pull(.data$series_id) |>
     purrr::map(~ extractor(.x, data)) |>
     purrr::list_rbind() |>
@@ -85,4 +85,9 @@ extract_data = function(data, extractor) {
       "day",
       "value"
     )))
+
+  # would be better to have a check here about numeric values
+  # and not convert if it would introduce missings
+  final_data |>
+    dplyr::mutate(value = as.numeric(.data$value))
 }

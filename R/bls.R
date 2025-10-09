@@ -137,7 +137,7 @@ date_from_bls_frequency = function(date_frequency, year, period) {
 
 #' @noRd
 bls_series_data_extractor = function(series_id, complete_results) {
-  filtered_results = complete_results |>
+  complete_results |>
     dplyr::filter(.data$series_id == {{ series_id }}) |>
     tidyr::unnest("metadata") |>
     dplyr::select(dplyr::any_of(c(
@@ -146,9 +146,7 @@ bls_series_data_extractor = function(series_id, complete_results) {
       "series_title",
       "data"
     ))) |>
-    tidyr::unnest("data")
-
-  filtered_results |>
+    tidyr::unnest("data") |>
     dplyr::select(dplyr::any_of(c(
       "name",
       "series_id",
