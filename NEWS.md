@@ -1,3 +1,7 @@
+# epidatatools 0.8.0
+* New BEA API helper: `get_bea_nipa()`
+* search FRED and BLS series with `find_fred()` and `find_bls()`
+
 # epidatatools 0.7.1
 * force `get_bls()` to produce numeric values
 

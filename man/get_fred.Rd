@@ -22,7 +22,7 @@ A tibble
 This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{\code{fredr}} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key} saved in the \code{FRED_API_KEY} environment variable.
 }
 \examples{
-\dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 get_fred("UNRATE")
 
 series = c(

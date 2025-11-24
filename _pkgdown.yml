@@ -37,6 +37,9 @@ reference:
   contents:
   - get_bls
   - get_fred
+- subtitle: BEA time series
+  contents:
+  - get_bea_nipa
 
 - title: Summarizing data
   contents:

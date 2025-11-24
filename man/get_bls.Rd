@@ -22,7 +22,7 @@ a tibble
 This function is simply a wrapper around \href{https://github.com/groditi/blsR}{\code{blsR}} and requires you to have an \href{https://www.bls.gov/developers/}{BLS API key} saved in the \code{BLS_API_KEY} environment variable.
 }
 \examples{
-\dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 get_bls("LNU02300060", start = 2020, end = 2024)
 
 bls_series_ids = c(

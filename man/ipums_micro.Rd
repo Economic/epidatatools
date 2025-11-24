@@ -49,7 +49,7 @@ These functions are simply wrappers around \href{https://tech.popdata.org/ipumsr
 
 }}
 \examples{
-\dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # example ASEC download
 dl_ipums_asec(2021:2023, c("YEAR", "OFFPOV", "ASECWT"))
 
