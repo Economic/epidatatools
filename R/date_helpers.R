@@ -11,38 +11,42 @@
 normalize_api_frequency = function(period_code, api_type = c("bls", "bea", "fred")) {
   api_type = match.arg(api_type)
 
-  if (api_type == "bls") {
-    # BLS uses period codes like "M01", "Q01", "A01", "S01"
-    period_type = substr(period_code, 1, 1)
+  switch(api_type,
+    bls = {
+      # BLS uses period codes like "M01", "Q01", "A01", "S01"
+      period_type = substr(period_code, 1, 1)
 
-    dplyr::case_match(
-      period_type,
-      "M" ~ "month",
-      "Q" ~ "quarter",
-      "A" ~ "year",
-      "S" ~ "semiyear"
-    )
-  } else if (api_type == "bea") {
-    # BEA uses time periods like "2024Q1", "2024M01", "2024"
-    dplyr::case_when(
-      grepl("Q[1-4]$", period_code) ~ "quarter",
-      grepl("M(0[1-9]|1[0-2])$", period_code) ~ "month",
-      grepl("^[0-9]{4}$", period_code) ~ "year",
-      .default = NA_character_
-    )
-  } else if (api_type == "fred") {
-    # FRED uses frequency_short codes like "M", "Q", "A", "SA", "D", "W"
-    dplyr::case_match(
-      period_code,
-      "M" ~ "month",
-      "Q" ~ "quarter",
-      "SA" ~ "semiyear",
-      "A" ~ "year",
-      "D" ~ "day",
-      "W" ~ "week",
-      .default = tolower(period_code)
-    )
-  }
+      dplyr::case_match(
+        period_type,
+        "M" ~ "month",
+        "Q" ~ "quarter",
+        "A" ~ "year",
+        "S" ~ "semiyear"
+      )
+    },
+    bea = {
+      # BEA uses time periods like "2024Q1", "2024M01", "2024"
+      dplyr::case_when(
+        grepl("Q[1-4]$", period_code) ~ "quarter",
+        grepl("M(0[1-9]|1[0-2])$", period_code) ~ "month",
+        grepl("^[0-9]{4}$", period_code) ~ "year",
+        .default = NA_character_
+      )
+    },
+    fred = {
+      # FRED uses frequency_short codes like "M", "Q", "A", "SA", "D", "W"
+      dplyr::case_match(
+        period_code,
+        "M" ~ "month",
+        "Q" ~ "quarter",
+        "SA" ~ "semiyear",
+        "A" ~ "year",
+        "D" ~ "day",
+        "W" ~ "week",
+        .default = tolower(period_code)
+      )
+    }
+  )
 }
 
 
@@ -120,29 +124,33 @@ parse_bea_date = function(time_period) {
 extract_period_component = function(period, component = c("year", "quarter", "month")) {
   component = match.arg(component)
 
-  if (component == "year") {
-    purrr::map_int(period, function(p) {
-      if (grepl("^[0-9]{4}", p)) {
-        as.integer(substr(p, 1, 4))
-      } else {
-        NA_integer_
-      }
-    })
-  } else if (component == "quarter") {
-    purrr::map_int(period, function(p) {
-      if (grepl("Q[1-4]$", p)) {
-        as.integer(substr(p, nchar(p), nchar(p)))
-      } else {
-        NA_integer_
-      }
-    })
-  } else if (component == "month") {
-    purrr::map_int(period, function(p) {
-      if (grepl("M(0[1-9]|1[0-2])$", p)) {
-        as.integer(substr(p, 6, 7))
-      } else {
-        NA_integer_
-      }
-    })
-  }
+  switch(component,
+    year = {
+      purrr::map_int(period, function(p) {
+        if (grepl("^[0-9]{4}", p)) {
+          as.integer(substr(p, 1, 4))
+        } else {
+          NA_integer_
+        }
+      })
+    },
+    quarter = {
+      purrr::map_int(period, function(p) {
+        if (grepl("Q[1-4]$", p)) {
+          as.integer(substr(p, nchar(p), nchar(p)))
+        } else {
+          NA_integer_
+        }
+      })
+    },
+    month = {
+      purrr::map_int(period, function(p) {
+        if (grepl("M(0[1-9]|1[0-2])$", p)) {
+          as.integer(substr(p, 6, 7))
+        } else {
+          NA_integer_
+        }
+      })
+    }
+  )
 }
