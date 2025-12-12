@@ -4,7 +4,13 @@
 \alias{get_fred}
 \title{Retrieve data from the FRED API}
 \usage{
-get_fred(series, start = NULL, end = NULL, metadata = F)
+get_fred(
+  series,
+  start = NULL,
+  end = NULL,
+  metadata = F,
+  fred_api_key = Sys.getenv("FRED_API_KEY")
+)
 }
 \arguments{
 \item{series}{FRED series code}
@@ -14,12 +20,14 @@ get_fred(series, start = NULL, end = NULL, metadata = F)
 \item{end}{End year or date (numeric year or Date object)}
 
 \item{metadata}{Flag for additional metadata}
+
+\item{fred_api_key}{FRED API key (defaults to FRED_API_KEY environment variable)}
 }
 \value{
 A tibble
 }
 \description{
-This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{\code{fredr}} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key} saved in the \code{FRED_API_KEY} environment variable.
+This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{\code{fredr}} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 }
 \examples{
 \dontshow{if (FALSE) withAutoprint(\{ # examplesIf}

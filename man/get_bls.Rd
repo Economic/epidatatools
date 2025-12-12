@@ -4,7 +4,13 @@
 \alias{get_bls}
 \title{Retrieve data from the BLS API}
 \usage{
-get_bls(series, start, end, metadata = F)
+get_bls(
+  series,
+  start,
+  end,
+  metadata = F,
+  bls_api_key = Sys.getenv("BLS_API_KEY")
+)
 }
 \arguments{
 \item{series}{BLS series code}
@@ -14,6 +20,8 @@ get_bls(series, start, end, metadata = F)
 \item{end}{End year (numeric)}
 
 \item{metadata}{Flag for additional metadata}
+
+\item{bls_api_key}{BLS API key (defaults to BLS_API_KEY environment variable)}
 }
 \value{
 a tibble

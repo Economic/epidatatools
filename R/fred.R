@@ -4,13 +4,13 @@
 #' for series matching a search string.
 #'
 #' This function is a wrapper around \href{https://sboysel.github.io/fredr/}{`fredr::fredr_series_search_text()`}
-#' and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}
-#' saved in the `FRED_API_KEY` environment variable.
+#' and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 #'
 #' @param search_string Character string to search for in series titles
 #' @param max_results Maximum number of results to return (default: 20)
 #' @param metadata Logical flag to retrieve additional metadata (default: FALSE). When FALSE, only series_id and series_title are returned.
 #' @param seasonality Optional filter for seasonal adjustment: NULL (no filter, default), "NSA" (Not Seasonally Adjusted), or "SA" (Seasonally Adjusted)
+#' @param fred_api_key FRED API key (defaults to FRED_API_KEY environment variable)
 #'
 #' @returns A tibble with columns series_id, series_title, and optionally metadata (a list column containing additional metadata when metadata = TRUE)
 #'
@@ -25,8 +25,15 @@ find_fred = function(
   search_string,
   max_results = 20,
   metadata = FALSE,
-  seasonality = NULL
+  seasonality = NULL,
+  fred_api_key = Sys.getenv("FRED_API_KEY")
 ) {
+  validate_api_key(
+    fred_api_key,
+    "FRED",
+    "https://fred.stlouisfed.org/docs/api/fred/v2/api_key.html"
+  )
+
   # Determine filter parameters based on seasonality
   if (!is.null(seasonality)) {
     # Validate seasonality argument
@@ -40,6 +47,9 @@ find_fred = function(
     } else {
       "Seasonally Adjusted"
     }
+
+    # Set API key once before using fredr
+    fredr::fredr_set_key(fred_api_key)
 
     # Call fredr_series_search_text with filtering
     search_results = fredr::fredr_series_search_text(
@@ -58,18 +68,7 @@ find_fred = function(
 
   # If no results, return empty tibble
   if (nrow(search_results) == 0) {
-    if (metadata) {
-      return(tibble::tibble(
-        series_id = character(),
-        series_title = character(),
-        metadata = list()
-      ))
-    } else {
-      return(tibble::tibble(
-        series_id = character(),
-        series_title = character()
-      ))
-    }
+    return(empty_search_result(metadata))
   }
 
   # Rename id to series_id and title to series_title
@@ -88,12 +87,13 @@ find_fred = function(
 
 #' Retrieve data from the FRED API
 #'
-#' This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{`fredr`} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key} saved in the `FRED_API_KEY` environment variable.
+#' This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{`fredr`} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 
 #' @param series FRED series code
 #' @param start Start year or date (numeric year or Date object)
 #' @param end End year or date (numeric year or Date object)
 #' @param metadata Flag for additional metadata
+#' @param fred_api_key FRED API key (defaults to FRED_API_KEY environment variable)
 #'
 #' @returns A tibble
 #' @export
@@ -113,7 +113,19 @@ find_fred = function(
 #'
 #' complete_results |>
 #'   tidyr::unnest(metadata)
-get_fred = function(series, start = NULL, end = NULL, metadata = F) {
+get_fred = function(
+  series,
+  start = NULL,
+  end = NULL,
+  metadata = F,
+  fred_api_key = Sys.getenv("FRED_API_KEY")
+) {
+  validate_api_key(
+    fred_api_key,
+    "FRED",
+    "https://fred.stlouisfed.org/docs/api/fred/v2/api_key.html"
+  )
+
   # Convert start/end to Date objects if provided
   observation_start = convert_to_date(start, is_start = TRUE)
   observation_end = convert_to_date(end, is_start = FALSE)
@@ -122,7 +134,8 @@ get_fred = function(series, start = NULL, end = NULL, metadata = F) {
   complete_results = fetch_fred_complete(
     series,
     observation_start,
-    observation_end
+    observation_end,
+    fred_api_key
   )
 
   if (metadata) {
@@ -158,22 +171,15 @@ convert_to_date = function(date_input, is_start) {
 }
 
 #' @noRd
-normalize_fred_frequency = function(frequency_short) {
-  # Map FRED frequency codes to standardized names
-  dplyr::case_match(
-    frequency_short,
-    "M" ~ "month",
-    "Q" ~ "quarter",
-    "SA" ~ "semiyear",
-    "A" ~ "year",
-    "D" ~ "day",
-    "W" ~ "week",
-    .default = tolower(frequency_short)
-  )
-}
+fetch_fred_complete = function(
+  series,
+  observation_start,
+  observation_end,
+  fred_api_key
+) {
+  # Set API key once before fetching all series
+  fredr::fredr_set_key(fred_api_key)
 
-#' @noRd
-fetch_fred_complete = function(series, observation_start, observation_end) {
   # Fetch data for all series, creating list columns for metadata and data
   complete_results = seq_along(series) |>
     purrr::map(
@@ -226,22 +232,29 @@ fetch_fred_series_complete = function(
 
 #' @noRd
 fred_series_data_extractor = function(series_id, complete_results) {
-  complete_results |>
-    dplyr::filter(.data$series_id == {{ series_id }}) |>
-    tidyr::unnest("metadata") |>
-    dplyr::mutate(
-      date_frequency = normalize_fred_frequency(.data$frequency_short)
-    ) |>
-    dplyr::rename(series_title = .data$title) |>
-    tidyr::unnest("data") |>
-    dplyr::select(dplyr::any_of(c(
+  # Define transformation to add date_frequency and rename title
+  fred_transform = function(data) {
+    data |>
+      dplyr::mutate(
+        date_frequency = normalize_api_frequency(.data$frequency_short, "fred")
+      ) |>
+      dplyr::rename(series_title = .data$title)
+  }
+
+  generic_data_extractor(
+    series_id,
+    complete_results,
+    metadata_cols = c("name", "series_id", "title", "frequency_short", "data"),
+    final_cols = c(
       "name",
       "series_id",
       "series_title",
       "date_frequency",
       "date",
       "value"
-    )))
+    ),
+    transform_fn = fred_transform
+  )
 }
 
 # scratchpad

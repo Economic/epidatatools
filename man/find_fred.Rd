@@ -8,7 +8,8 @@ find_fred(
   search_string,
   max_results = 20,
   metadata = FALSE,
-  seasonality = NULL
+  seasonality = NULL,
+  fred_api_key = Sys.getenv("FRED_API_KEY")
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ find_fred(
 \item{metadata}{Logical flag to retrieve additional metadata (default: FALSE). When FALSE, only series_id and series_title are returned.}
 
 \item{seasonality}{Optional filter for seasonal adjustment: NULL (no filter, default), "NSA" (Not Seasonally Adjusted), or "SA" (Seasonally Adjusted)}
+
+\item{fred_api_key}{FRED API key (defaults to FRED_API_KEY environment variable)}
 }
 \value{
 A tibble with columns series_id, series_title, and optionally metadata (a list column containing additional metadata when metadata = TRUE)
@@ -29,8 +32,7 @@ for series matching a search string.
 }
 \details{
 This function is a wrapper around \href{https://sboysel.github.io/fredr/}{\code{fredr::fredr_series_search_text()}}
-and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}
-saved in the \code{FRED_API_KEY} environment variable.
+and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 }
 \examples{
 \dontshow{if (FALSE) withAutoprint(\{ # examplesIf}

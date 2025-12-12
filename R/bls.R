@@ -144,7 +144,11 @@ find_bls = function(
       # Build the base URL with basic query parameters
       url = httr::modify_url(base_url, query = query)
       # Manually append multiple fq parameters
-      fq_params = paste0("fq=", utils::URLencode(fq_filters, reserved = TRUE), collapse = "&")
+      fq_params = paste0(
+        "fq=",
+        utils::URLencode(fq_filters, reserved = TRUE),
+        collapse = "&"
+      )
       url = paste0(url, "&", fq_params)
       response = httr::GET(url)
     } else {
@@ -217,18 +221,7 @@ find_bls = function(
 
   # Combine all results
   if (length(all_results) == 0) {
-    if (metadata) {
-      return(tibble::tibble(
-        series_id = character(),
-        series_title = character(),
-        metadata = list()
-      ))
-    } else {
-      return(tibble::tibble(
-        series_id = character(),
-        series_title = character()
-      ))
-    }
+    return(empty_search_result(metadata))
   }
 
   final_results = dplyr::bind_rows(all_results)
@@ -249,6 +242,7 @@ find_bls = function(
 #' @param start Start year (numeric)
 #' @param end End year (numeric)
 #' @param metadata Flag for additional metadata
+#' @param bls_api_key BLS API key (defaults to BLS_API_KEY environment variable)
 #'
 #' @returns a tibble
 #'
@@ -273,12 +267,26 @@ find_bls = function(
 #'
 #' complete_results |>
 #'   tidyr::unnest(metadata)
-get_bls = function(series, start, end, metadata = F) {
+get_bls = function(
+  series,
+  start,
+  end,
+  metadata = F,
+  bls_api_key = Sys.getenv("BLS_API_KEY")
+) {
+  # Check for API key
+  validate_api_key(
+    bls_api_key,
+    "BLS",
+    "https://data.bls.gov/registrationEngine/"
+  )
+
   raw_results = blsR::get_n_series(
     series,
     start_year = start,
     end_year = end,
-    catalog = T
+    catalog = T,
+    api_key = bls_api_key
   )
 
   complete_results = bls_payload_to_tibble(
@@ -338,66 +346,30 @@ bls_payload_series_to_tibble = function(id, payload, start, end) {
 add_dates_to_bls_tibble = function(data) {
   data |>
     dplyr::mutate(
-      date_frequency = normalize_bls_frequency(.data$period),
-      date = date_from_bls_frequency(
-        .data$date_frequency,
-        .data$year,
-        .data$period
+      date_frequency = normalize_api_frequency(.data$period, "bls"),
+      date = parse_api_date(
+        .data$period,
+        frequency = .data$date_frequency,
+        year = .data$year
       )
     )
 }
 
 #' @noRd
-normalize_bls_frequency = function(period) {
-  period_type = substr(period, 1, 1)
-
-  dplyr::case_match(
-    period_type,
-    "M" ~ "month",
-    "Q" ~ "quarter",
-    "A" ~ "year",
-    "S" ~ "semiyear"
-  )
-}
-
-#' @noRd
-date_from_bls_frequency = function(date_frequency, year, period) {
-  period_num = as.numeric(substr(period, 2, 3))
-
-  if (date_frequency == "semiyear") {
-    period_num = dplyr::case_match(period_num, 1 ~ 1, 2 ~ 7)
-  }
-
-  year_period = paste(year, period_num)
-
-  ifelse(
-    date_frequency == "quarter",
-    lubridate::yq(year_period),
-    lubridate::ym(year_period)
-  ) |>
-    as.Date()
-}
-
-#' @noRd
 bls_series_data_extractor = function(series_id, complete_results) {
-  complete_results |>
-    dplyr::filter(.data$series_id == {{ series_id }}) |>
-    tidyr::unnest("metadata") |>
-    dplyr::select(dplyr::any_of(c(
-      "name",
-      "series_id",
-      "series_title",
-      "data"
-    ))) |>
-    tidyr::unnest("data") |>
-    dplyr::select(dplyr::any_of(c(
+  generic_data_extractor(
+    series_id,
+    complete_results,
+    metadata_cols = c("name", "series_id", "series_title", "data"),
+    final_cols = c(
       "name",
       "series_id",
       "series_title",
       "date_frequency",
       "date",
       "value"
-    )))
+    )
+  )
 }
 
 # scratchpad

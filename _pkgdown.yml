@@ -33,14 +33,17 @@ reference:
   - dl_ipums_asec
   - dl_ipums_cps
   - dl_ipums_micro
-- subtitle: BLS or FRED time series
+- subtitle: BLS time series
   contents:
   - get_bls
+  - find_bls
+ - subtitle: FRED time series
+  contents:
   - get_fred
-- subtitle: BEA time series
+  - find_fred
+- subtitle: BEA data
   contents:
   - get_bea_nipa
-
 - title: Summarizing data
   contents:
   - crosstab
