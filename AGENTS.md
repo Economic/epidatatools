@@ -30,5 +30,18 @@ Here is a list of the main user-facing functions available in this package:
 - `merge_status(x, y, ...)`: Joins two data frames and creates a `_merge` indicator column to show the merge status (left_only, right_only, both).
 - `summarize_groups(.data, .groups, ...)`: Summarizes distinct groups in a data frame.
 
+## Datasets
+
+- `state_geocodes`: A data frame with 51 rows and 8 variables containing geographic codes for US states including FIPS codes, Census codes, and region/division classifications. Variables: state_name, state_abb, state_fips, state_census, division, division_name, region, region_name.
+
+## Development Workflow
+
+After any changes to the package (functions, documentation, or data), run the following commands to rebuild and verify:
+
+```r
+devtools::document()  # Regenerate documentation
+devtools::check()     # Run R CMD check to verify package integrity
+```
+
 ## Updates
 Keep this document updated after modifying the functions in this package.

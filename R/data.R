@@ -1,0 +1,18 @@
+#' State Geographic Codes
+#'
+#' A dataset containing geographic codes for US states including FIPS codes,
+#' Census codes, and region/division classifications.
+#'
+#' @format A data frame with 51 rows and 8 variables:
+#' \describe{
+#'   \item{state_name}{Full state name}
+#'   \item{state_abb}{Two-letter state abbreviation}
+#'   \item{state_fips}{State FIPS code}
+#'   \item{state_census}{State Census code}
+#'   \item{division}{Census division number (1-9)}
+#'   \item{division_name}{Census division name (e.g., "New England", "Pacific")}
+#'   \item{region}{Census region number (1-4)}
+#'   \item{region_name}{Census region name (Northeast, Midwest, South, West)}
+#' }
+#' @source \url{https://github.com/Economic/state_geocodes}
+"state_geocodes"
