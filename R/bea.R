@@ -16,7 +16,11 @@ get_bea_api = function(
   bea_api_key = Sys.getenv("BEA_API_KEY")
 ) {
   # Check for API key
-  validate_api_key(bea_api_key, "BEA", "https://www.bea.gov/API/signup/index.cfm")
+  validate_api_key(
+    bea_api_key,
+    "BEA",
+    "https://www.bea.gov/API/signup/index.cfm"
+  )
 
   # Build query parameters
   query = list(
@@ -419,13 +423,27 @@ get_bea_regional = function(
   # Process series groups using consolidated helper
   complete_results = process_bea_series_groups(
     data_tibble,
-    group_vars = c("geo_fips", "geo_name", "table_name", "line_code", "description"),
+    group_vars = c(
+      "geo_fips",
+      "geo_name",
+      "table_name",
+      "line_code",
+      "description"
+    ),
     series_id_cols = c("geo_fips", "table_name", "line_code"),
     series_title_fn = function(group) {
       paste(unique(group$geo_name), unique(group$description), sep = " - ")
     },
-    metadata_cols = c("geo_fips", "geo_name", "table_name", "line_code", "description", "cl_unit", "unit_mult"),
-    use_bea_dates = FALSE  # Regional data is annual only
+    metadata_cols = c(
+      "geo_fips",
+      "geo_name",
+      "table_name",
+      "line_code",
+      "description",
+      "cl_unit",
+      "unit_mult"
+    ),
+    use_bea_dates = FALSE # Regional data is annual only
   )
 
   # Add series names if geo_fips are named
@@ -436,6 +454,8 @@ get_bea_regional = function(
   } else {
     extract_data(complete_results, bea_regional_data_extractor)
   }
+
+  data_tibble
 }
 
 #' @noRd
@@ -444,7 +464,14 @@ bea_regional_data_extractor = function(series_id, complete_results) {
     series_id,
     complete_results,
     metadata_cols = c("name", "series_id", "series_title", "data"),
-    final_cols = c("name", "series_id", "series_title", "date_frequency", "date", "value")
+    final_cols = c(
+      "name",
+      "series_id",
+      "series_title",
+      "date_frequency",
+      "date",
+      "value"
+    )
   )
 }
 
@@ -546,8 +573,14 @@ get_bea_industry = function(
     series_title_fn = function(group) {
       unique(group$industry_description)
     },
-    metadata_cols = c("table_id", "industry", "industry_description", "cl_unit", "unit_mult"),
-    use_bea_dates = TRUE  # Uses BEA frequency normalization
+    metadata_cols = c(
+      "table_id",
+      "industry",
+      "industry_description",
+      "cl_unit",
+      "unit_mult"
+    ),
+    use_bea_dates = TRUE # Uses BEA frequency normalization
   )
 
   # Add series names if industry codes are named
@@ -566,6 +599,13 @@ bea_industry_data_extractor = function(series_id, complete_results) {
     series_id,
     complete_results,
     metadata_cols = c("name", "series_id", "series_title", "data"),
-    final_cols = c("name", "series_id", "series_title", "date_frequency", "date", "value")
+    final_cols = c(
+      "name",
+      "series_id",
+      "series_title",
+      "date_frequency",
+      "date",
+      "value"
+    )
   )
 }
