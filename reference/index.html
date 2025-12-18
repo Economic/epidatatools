@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +33,9 @@
     <div class="section level2">
       <h2 id="quantiles">Quantiles<a class="anchor" aria-label="anchor" href="#quantiles"></a></h2>
 
+      <div class="section-desc"><p>Calculate weighted percentiles.</p></div>
 
-
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -44,46 +43,48 @@
       <dl><dt>
 
           <code><a href="binipolate.html">binipolate()</a></code>
-
+          <span class="badge lifecycle lifecycle-superseded">superseded</span>
         </dt>
         <dd>Summarize a data frame as binned interpolated percentiles</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="averaged_median.html">averaged_median()</a></code>
 
         </dt>
         <dd>Calculate the averaged (smoothed) median</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="averaged_quantile.html">averaged_quantile()</a></code>
 
         </dt>
         <dd>Calculate the averaged (smoothed) quantile</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="interpolated_median.html">interpolated_median()</a></code>
-
+          <span class="badge lifecycle lifecycle-superseded">superseded</span>
         </dt>
         <dd>Calculate the binned interpolated median</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="interpolated_quantile.html">interpolated_quantile()</a></code>
-
+          <span class="badge lifecycle lifecycle-superseded">superseded</span>
         </dt>
         <dd>Calculate the binned interpolated quantile</dd>
       </dl></div><div class="section level2">
       <h2 id="download-data">Download data<a class="anchor" aria-label="anchor" href="#download-data"></a></h2>
 
+      <div class="section-desc"><p>Helpers to download data from specific APIs</p></div>
 
-
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
       <h3 id="ipums-microdata-extracts">IPUMS microdata extracts<a class="anchor" aria-label="anchor" href="#ipums-microdata-extracts"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -96,11 +97,10 @@
         <dd>Download a selection of IPUMS microdata extracts</dd>
       </dl></div><div class="section level2">
 
-      <h3 id="bls-or-fred-time-series">BLS or FRED time series<a class="anchor" aria-label="anchor" href="#bls-or-fred-time-series"></a></h3>
+      <h3 id="bls-time-series">BLS time series<a class="anchor" aria-label="anchor" href="#bls-time-series"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -111,19 +111,81 @@
 
         </dt>
         <dd>Retrieve data from the BLS API</dd>
-      </dl><dl><dt>
+
+        <dt>
+
+          <code><a href="find_bls.html">find_bls()</a></code>
+
+        </dt>
+        <dd>Find BLS Series by Search String</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="fred-time-series">FRED time series<a class="anchor" aria-label="anchor" href="#fred-time-series"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="get_fred.html">get_fred()</a></code>
 
         </dt>
         <dd>Retrieve data from the FRED API</dd>
+
+        <dt>
+
+          <code><a href="find_fred.html">find_fred()</a></code>
+
+        </dt>
+        <dd>Find FRED Series by Search String</dd>
       </dl></div><div class="section level2">
-      <h2 id="summarizing-data">Summarizing data<a class="anchor" aria-label="anchor" href="#summarizing-data"></a></h2>
+
+      <h3 id="bea-data">BEA data<a class="anchor" aria-label="anchor" href="#bea-data"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
 
 
 
 
-    </div><div class="section level2">
+      <dl><dt>
+
+          <code><a href="get_bea_nipa.html">get_bea_nipa()</a></code>
+
+        </dt>
+        <dd>Retrieve NIPA data from the BEA API</dd>
+
+        <dt>
+
+          <code><a href="get_bea_regional.html">get_bea_regional()</a></code>
+
+        </dt>
+        <dd>Retrieve Regional data from the BEA API</dd>
+      </dl></div><div class="section level2">
+      <h2 id="included-datasets">Included datasets<a class="anchor" aria-label="anchor" href="#included-datasets"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="state_geocodes.html">state_geocodes</a></code>
+
+        </dt>
+        <dd>State Geographic Codes</dd>
+      </dl></div><div class="section level2">
+      <h2 id="other-functions">Other functions<a class="anchor" aria-label="anchor" href="#other-functions"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -134,29 +196,20 @@
 
         </dt>
         <dd>Cross-tabulate one or two variables</dd>
-      </dl><dl><dt>
 
-          <code><a href="summarize_groups.html">summarize_groups()</a></code>
-
-        </dt>
-        <dd>Summarize distinct groups</dd>
-      </dl></div><div class="section level2">
-      <h2 id="other-functions">Other functions<a class="anchor" aria-label="anchor" href="#other-functions"></a></h2>
-
-
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
+        <dt>
 
           <code><a href="merge_status.html">merge_status()</a></code>
 
         </dt>
         <dd>Join data frames and create a merge indicator</dd>
+
+        <dt>
+
+          <code><a href="summarize_groups.html">summarize_groups()</a></code>
+
+        </dt>
+        <dd>Summarize distinct groups</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
@@ -167,7 +220,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
