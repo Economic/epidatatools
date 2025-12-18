@@ -96,11 +96,55 @@ for series matching a search string.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># nzchar(Sys.getenv("BLS_API_KEY"))</span></span></span>
-<span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"unemployment rate"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"unemployment rate"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 20 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    series_id            series_title                                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> LNS14000000          (Seas) Unemployment Rate                                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> LNU04000000          (Unadj) Unemployment Rate                               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> LNS14000006          (Seas) Unemployment Rate - Black or African American    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> LAUCN290950000000003 Unemployment Rate: Jackson County, MO (U)               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> LASST060000000000003 Unemployment Rate: California (S)                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> LASST010000000000003 Unemployment Rate: Alabama (S)                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> LAUST010000000000003 Unemployment Rate: Alabama (U)                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> LAUST060000000000003 Unemployment Rate: California (U)                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> LAUST480000000000003 Unemployment Rate: Texas (U)                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> LAUMT363562000000003 Unemployment Rate: New York-Newark-Jersey City, NY-NJ M…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> LASST260000000000003 Unemployment Rate: Michigan (S)                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> LAUMT482642000000003 Unemployment Rate: Houston-Pasadena-The Woodlands, TX M…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> LASST120000000000003 Unemployment Rate: Florida (S)                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> LASST130000000000003 Unemployment Rate: Georgia (S)                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> LASST480000000000003 Unemployment Rate: Texas (S)                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span> LASST080000000000003 Unemployment Rate: Colorado (S)                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span> LAUMT481910000000003 Unemployment Rate: Dallas-Fort Worth-Arlington, TX Metr…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">18</span> LASST170000000000003 Unemployment Rate: Illinois (S)                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">19</span> LASST040000000000003 Unemployment Rate: Arizona (S)                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">20</span> LAUMT171698000000003 Unemployment Rate: Chicago-Naperville-Elgin, IL-IN Metr…</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"wage"</span>, survey <span class="op">=</span> <span class="st">"cw"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 20 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    series_id      series_title                                                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> CWUR0000SA0    <span style="color: #949494;">"</span>All items in U.S. city average, urban wage earners and cleri…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> CWUR0000SA0L1E <span style="color: #949494;">"</span>All items less food and energy in U.S. city average, urban w…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> CWUR0000AA0    <span style="color: #949494;">"</span>All items - old base in U.S. city average, urban wage earner…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> CWURS49DSA0    <span style="color: #949494;">"</span>All items in Seattle-Tacoma-Bellevue, WA, urban wage earners…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> CWURS49ASA0    <span style="color: #949494;">"</span>All items in Los Angeles-Long Beach-Anaheim, CA, urban wage …</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> CWURS49BSA0    <span style="color: #949494;">"</span>All items in San Francisco-Oakland-Hayward, CA, urban wage e…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> CWSR0000SA0    <span style="color: #949494;">"</span>All items in U.S. city average, urban wage earners and cleri…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> CWUR0400SA0    <span style="color: #949494;">"</span>All items in West urban, urban wage earners and clerical wor…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> CWURS12ASA0    <span style="color: #949494;">"</span>All items in New York-Newark-Jersey City, NY-NJ-PA, urban wa…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> CWUR0000SAM    <span style="color: #949494;">"</span>Medical care in U.S. city average, urban wage earners and cl…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> CWURS23ASA0    <span style="color: #949494;">"</span>All items in Chicago-Naperville-Elgin, IL-IN-WI, urban wage …</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> CWUR0000SAH1   <span style="color: #949494;">"</span>Shelter in U.S. city average, urban wage earners and clerica…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> CWUR0000SA0E   <span style="color: #949494;">"</span>Energy in U.S. city average, urban wage earners and clerical…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> CWUR0300SA0    <span style="color: #949494;">"</span>All items in South urban, urban wage earners and clerical wo…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> CWUR0000SETB01 <span style="color: #949494;">"</span>Gasoline (all types) in U.S. city average, urban wage earner…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span> CWUR0000SEMC01 <span style="color: #949494;">"</span>Physicians\\' services in U.S. city average, urban wage earn…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span> CWUR0000SEMD01 <span style="color: #949494;">"</span>Hospital services in U.S. city average, urban wage earners a…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">18</span> CWUR0200SA0    <span style="color: #949494;">"</span>All items in Midwest urban, urban wage earners and clerical …</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">19</span> CWUR0000SEMF01 <span style="color: #949494;">"</span>Prescription drugs in U.S. city average, urban wage earners …</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">20</span> CWURS49ESA0    <span style="color: #949494;">"</span>All items in San Diego-Carlsbad, CA, urban wage earners and …</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"unemployment rate"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

@@ -78,8 +78,21 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># nzchar(Sys.getenv("BLS_API_KEY"))</span></span></span>
-<span class="r-in"><span><span class="fu">get_bls</span><span class="op">(</span><span class="st">"LNU02300060"</span>, start <span class="op">=</span> <span class="fl">2020</span>, end <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_bls</span><span class="op">(</span><span class="st">"LNU02300060"</span>, start <span class="op">=</span> <span class="fl">2020</span>, end <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 60 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    series_id   series_title          date_frequency date        year month value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> LNU02300060 (Unadj) Employment-P… month          2020-01-01  <span style="text-decoration: underline;">2</span>020     1  80.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> LNU02300060 (Unadj) Employment-P… month          2020-02-01  <span style="text-decoration: underline;">2</span>020     2  80.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> LNU02300060 (Unadj) Employment-P… month          2020-03-01  <span style="text-decoration: underline;">2</span>020     3  79.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> LNU02300060 (Unadj) Employment-P… month          2020-04-01  <span style="text-decoration: underline;">2</span>020     4  69.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> LNU02300060 (Unadj) Employment-P… month          2020-05-01  <span style="text-decoration: underline;">2</span>020     5  71.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> LNU02300060 (Unadj) Employment-P… month          2020-06-01  <span style="text-decoration: underline;">2</span>020     6  73.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> LNU02300060 (Unadj) Employment-P… month          2020-07-01  <span style="text-decoration: underline;">2</span>020     7  73.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> LNU02300060 (Unadj) Employment-P… month          2020-08-01  <span style="text-decoration: underline;">2</span>020     8  75  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> LNU02300060 (Unadj) Employment-P… month          2020-09-01  <span style="text-decoration: underline;">2</span>020     9  75.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> LNU02300060 (Unadj) Employment-P… month          2020-10-01  <span style="text-decoration: underline;">2</span>020    10  76.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 50 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">bls_series_ids</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  emp_fb_2534 <span class="op">=</span> <span class="st">"LNU02073399"</span>,</span></span>
@@ -88,13 +101,46 @@
 <span class="r-in"><span>  <span class="st">"LNU02300060"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">get_bls</span><span class="op">(</span><span class="va">bls_series_ids</span>, start <span class="op">=</span> <span class="fl">2024</span>, end <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 120 × 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    name  series_id series_title date_frequency date        year semiyear quarter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> emp_… LNU02073… (Unadj) Emp… month          2024-01-01  <span style="text-decoration: underline;">2</span>024        1       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> emp_… LNU02073… (Unadj) Emp… month          2024-02-01  <span style="text-decoration: underline;">2</span>024        1       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> emp_… LNU02073… (Unadj) Emp… month          2024-03-01  <span style="text-decoration: underline;">2</span>024        1       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> emp_… LNU02073… (Unadj) Emp… month          2024-04-01  <span style="text-decoration: underline;">2</span>024        1       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> emp_… LNU02073… (Unadj) Emp… month          2024-05-01  <span style="text-decoration: underline;">2</span>024        1       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> emp_… LNU02073… (Unadj) Emp… month          2024-06-01  <span style="text-decoration: underline;">2</span>024        1       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> emp_… LNU02073… (Unadj) Emp… month          2024-07-01  <span style="text-decoration: underline;">2</span>024        2       3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> emp_… LNU02073… (Unadj) Emp… month          2024-08-01  <span style="text-decoration: underline;">2</span>024        2       3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> emp_… LNU02073… (Unadj) Emp… month          2024-09-01  <span style="text-decoration: underline;">2</span>024        2       3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> emp_… LNU02073… (Unadj) Emp… month          2024-10-01  <span style="text-decoration: underline;">2</span>024        2       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 110 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: month &lt;dbl&gt;, value &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">complete_results</span> <span class="op">=</span> <span class="fu">get_bls</span><span class="op">(</span><span class="va">bls_series_ids</span>, start <span class="op">=</span> <span class="fl">2024</span>, end <span class="op">=</span> <span class="fl">2024</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">complete_results</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   name               series_id    metadata          data             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> emp_fb_2534        LNU02073399  <span style="color: #949494;">&lt;tibble [1 × 13]&gt;</span> <span style="color: #949494;">&lt;tibble [12 × 7]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> epop_asianmen_2554 LNU02332330Q <span style="color: #949494;">&lt;tibble [1 × 13]&gt;</span> <span style="color: #949494;">&lt;tibble [4 × 7]&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cpi_semi           CUUS0000SA0  <span style="color: #949494;">&lt;tibble [1 × 7]&gt;</span>  <span style="color: #949494;">&lt;tibble [2 × 7]&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> <span style="color: #BB0000;">NA</span>                 LNU02300060  <span style="color: #949494;">&lt;tibble [1 × 13]&gt;</span> <span style="color: #949494;">&lt;tibble [12 × 7]&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">complete_results</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 18</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   name        series_id series_title seasonality survey_name survey_abbreviation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> emp_fb_2534 LNU02073… (Unadj) Emp… Not Season… Labor Forc… LN                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> epop_asian… LNU02332… (Unadj) Emp… Not Season… Labor Forc… LN                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cpi_semi    CUUS0000… All items i… Not Season… Consumer P… CU                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> <span style="color: #BB0000;">NA</span>          LNU02300… (Unadj) Emp… Not Season… Labor Forc… LN                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 12 more variables: measure_data_type &lt;chr&gt;, commerce_industry &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   occupation &lt;chr&gt;, cps_labor_force_status &lt;chr&gt;, demographic_age &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   demographic_ethnic_origin &lt;chr&gt;, demographic_race &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   demographic_gender &lt;chr&gt;, demographic_education &lt;chr&gt;, area &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   item &lt;chr&gt;, data &lt;list&gt;</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

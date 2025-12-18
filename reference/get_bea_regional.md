@@ -59,9 +59,38 @@ note_text (list column containing all notes from the API response).
 ## Examples
 
 ``` r
-if (FALSE) { # nzchar(Sys.getenv("BEA_API_KEY"))
 get_bea_regional(geo_fips = "STATE", table_name = "SAINC1", line_code = 1)
+#> # A tibble: 300 × 10
+#>    geo_fips geo_name   table_name table_description line_number line_description
+#>    <chr>    <chr>      <chr>      <chr>                   <int> <chr>           
+#>  1 00000    United St… SAINC1     SAINC1 State ann…           1 Personal income 
+#>  2 00000    United St… SAINC1     SAINC1 State ann…           1 Personal income 
+#>  3 00000    United St… SAINC1     SAINC1 State ann…           1 Personal income 
+#>  4 00000    United St… SAINC1     SAINC1 State ann…           1 Personal income 
+#>  5 00000    United St… SAINC1     SAINC1 State ann…           1 Personal income 
+#>  6 01000    Alabama    SAINC1     SAINC1 State ann…           1 Personal income 
+#>  7 01000    Alabama    SAINC1     SAINC1 State ann…           1 Personal income 
+#>  8 01000    Alabama    SAINC1     SAINC1 State ann…           1 Personal income 
+#>  9 01000    Alabama    SAINC1     SAINC1 State ann…           1 Personal income 
+#> 10 01000    Alabama    SAINC1     SAINC1 State ann…           1 Personal income 
+#> # ℹ 290 more rows
+#> # ℹ 4 more variables: date_frequency <chr>, date <date>, year <int>,
+#> #   value <dbl>
 
 get_bea_regional(geo_fips = c("36000", "06000"), table_name = "SAINC1", line_code = 1)
-}
+#> # A tibble: 10 × 10
+#>    geo_fips geo_name   table_name table_description line_number line_description
+#>    <chr>    <chr>      <chr>      <chr>                   <int> <chr>           
+#>  1 06000    California SAINC1     SAINC1 State ann…           1 Personal income 
+#>  2 06000    California SAINC1     SAINC1 State ann…           1 Personal income 
+#>  3 06000    California SAINC1     SAINC1 State ann…           1 Personal income 
+#>  4 06000    California SAINC1     SAINC1 State ann…           1 Personal income 
+#>  5 06000    California SAINC1     SAINC1 State ann…           1 Personal income 
+#>  6 36000    New York   SAINC1     SAINC1 State ann…           1 Personal income 
+#>  7 36000    New York   SAINC1     SAINC1 State ann…           1 Personal income 
+#>  8 36000    New York   SAINC1     SAINC1 State ann…           1 Personal income 
+#>  9 36000    New York   SAINC1     SAINC1 State ann…           1 Personal income 
+#> 10 36000    New York   SAINC1     SAINC1 State ann…           1 Personal income 
+#> # ℹ 4 more variables: date_frequency <chr>, date <date>, year <int>,
+#> #   value <dbl>
 ```
