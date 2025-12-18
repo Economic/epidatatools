@@ -3,6 +3,46 @@ dummy <- function() {
   utils::globalVariables
 }
 
+#' Return empty search result tibble
+#'
+#' Consolidates empty result creation for find_* functions
+#'
+#' @param metadata Logical flag to include metadata column
+#' @returns Empty tibble with correct schema
+#' @noRd
+empty_search_result = function(metadata = FALSE) {
+  if (metadata) {
+    tibble::tibble(
+      series_id = character(),
+      series_title = character(),
+      metadata = list()
+    )
+  } else {
+    tibble::tibble(
+      series_id = character(),
+      series_title = character()
+    )
+  }
+}
+
+#' Validate API key and throw error if not set
+#'
+#' Consolidates API key validation across API functions
+#'
+#' @param api_key Character string of the API key
+#' @param api_name Name of the API (e.g., "BLS", "BEA", "FRED")
+#' @param signup_url URL to sign up for API key
+#' @noRd
+validate_api_key = function(api_key, api_name, signup_url) {
+  if (api_key == "") {
+    stop(
+      api_name,
+      "_API_KEY environment variable not set. Get a free API key at ",
+      signup_url
+    )
+  }
+}
+
 #' @noRd
 add_series_names = function(data, series) {
   series_names = names(series)
@@ -21,48 +61,6 @@ add_series_names = function(data, series) {
   }
 }
 
-#' @noRd
-semiyear = function(date) {
-  ifelse(lubridate::month(date) < 7, 1, 2)
-}
-
-#' @noRd
-add_all_date_components = function(data) {
-  data_with_year = data |>
-    dplyr::mutate(year = lubridate::year(date))
-
-  data_with_year |>
-    dplyr::mutate(year = lubridate::year(date)) |>
-    add_date_component("month") |>
-    add_date_component("quarter") |>
-    add_date_component("semiyear") |>
-    add_date_component("week") |>
-    add_date_component("day")
-}
-
-#' @noRd
-add_date_component = function(data, var) {
-  frequencies = data |>
-    dplyr::distinct(.data$date_frequency) |>
-    dplyr::pull()
-
-  will_add_var = var %in% frequencies
-
-  if (will_add_var) {
-    output = switch(
-      var,
-      "day" = dplyr::mutate(data, day = lubridate::day(date)),
-      "week" = dplyr::mutate(data, week = lubridate::week(date)),
-      "month" = dplyr::mutate(data, month = lubridate::month(date)),
-      "quarter" = dplyr::mutate(data, quarter = lubridate::quarter(date)),
-      "semiyear" = dplyr::mutate(data, semiyear = semiyear(date))
-    )
-  } else {
-    output = data
-  }
-
-  output
-}
 
 #' @noRd
 extract_data = function(data, extractor) {
@@ -90,4 +88,46 @@ extract_data = function(data, extractor) {
   # and not convert if it would introduce missings
   final_data |>
     dplyr::mutate(value = as.numeric(.data$value))
+}
+
+#' Generic data extractor for API results
+#'
+#' Consolidates the common pattern across BLS and FRED API data extractors.
+#' Filters by series_id, unnests metadata and data, and selects final columns.
+#'
+#' @param series_id Character string of the series ID to extract
+#' @param complete_results Tibble with series_id, metadata (list), and data (list) columns
+#' @param metadata_cols Character vector of columns to select after unnesting metadata
+#' @param final_cols Character vector of final columns to select after unnesting data
+#' @param transform_fn Optional function to apply transformations between unnesting metadata and data
+#'
+#' @returns Tibble with extracted and processed data
+#' @noRd
+generic_data_extractor = function(
+  series_id,
+  complete_results,
+  metadata_cols = c("name", "series_id", "series_title", "data"),
+  final_cols = c(
+    "name",
+    "series_id",
+    "series_title",
+    "date_frequency",
+    "date",
+    "value"
+  ),
+  transform_fn = NULL
+) {
+  result = complete_results |>
+    dplyr::filter(.data$series_id == {{ series_id }}) |>
+    tidyr::unnest("metadata") |>
+    dplyr::select(dplyr::any_of(metadata_cols))
+
+  # Apply transformation if provided
+  if (!is.null(transform_fn)) {
+    result = transform_fn(result)
+  }
+
+  result |>
+    tidyr::unnest("data") |>
+    dplyr::select(dplyr::any_of(final_cols))
 }

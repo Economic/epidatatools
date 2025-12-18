@@ -19,7 +19,12 @@ interpolated_median(x, bin_size, w = NULL, na.rm = TRUE)
 numeric vector
 }
 \description{
-Calculate the binned interpolated median
+#' @description
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+}
+\details{
+This function is superceded by EPI's current preferred
+method for interpolating medians, \code{\link[=averaged_median]{averaged_median()}}.
 }
 \examples{
 interpolated_median(x = mtcars$mpg, bin_size = 0.50)

@@ -1,7 +1,7 @@
 Package: epidatatools
 Type: Package
 Title: Data tools used at the Economic Policy Institute
-Version: 0.8.0
+Version: 0.9.0
 Authors@R:
     c(person(given = "Ben",
              family = "Zipperer",
@@ -35,7 +35,8 @@ Imports:
     tibble,
     tidyr,
     tidyselect,
-    utils
+    utils,
+    lifecycle
 Suggests: 
     knitr,
     pkgdown,
@@ -45,3 +46,5 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epidatatools
 BugReports: https://github.com/Economic/epidatatools/issues
+Depends: 
+    R (>= 4.1)

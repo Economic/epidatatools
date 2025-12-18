@@ -23,7 +23,10 @@ binipolate(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL)
 a tibble or data frame
 }
 \description{
-Summarize a data frame as binned interpolated percentiles
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+This function was superseded and EPI insteads uses
+\code{\link[=averaged_quantile]{averaged_quantile()}} to interpolate percentiles.
 }
 \examples{
 binipolate(mtcars, mpg, bin_size = 0.25)

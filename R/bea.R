@@ -16,11 +16,11 @@ get_bea_api = function(
   bea_api_key = Sys.getenv("BEA_API_KEY")
 ) {
   # Check for API key
-  if (bea_api_key == "") {
-    stop(
-      "BEA_API_KEY environment variable not set. Get a free API key at https://www.bea.gov/API/signup/index.cfm"
-    )
-  }
+  validate_api_key(
+    bea_api_key,
+    "BEA",
+    "https://www.bea.gov/API/signup/index.cfm"
+  )
 
   # Build query parameters
   query = list(
@@ -74,21 +74,15 @@ get_bea_api = function(
 #' @returns A tibble with columns: table_name, table_description, line_number, line_description, date_frequency, date, value, and date variables (year, quarter, month) appropriate to the frequency of data returned. Annual data includes only year; quarterly data includes year and quarter; monthly data includes year, quarter, and month. If metadata = TRUE, also includes unit_mult, metric_name, cl_unit, series_code, and note_text (list column). If tables is a named vector, includes a "name" column as the first column.
 #'
 #' @export
-#' @examplesIf FALSE
-#' # Get quarterly GDP data
+#' @examplesIf nzchar(Sys.getenv("BEA_API_KEY"))
 #' get_bea_nipa("T10101", years = 2020:2024, frequency = "quarter")
 #'
-#' # Get annual data for multiple tables
-#' get_bea_nipa(c("T10101", "T20305"), years = "ALL", frequency = "year")
-#'
-#' # Use named vector to add custom names
 #' get_bea_nipa(
 #'   c("gdp" = "T10101", "personal_income" = "T20305"),
 #'   years = 2023:2024,
 #'   frequency = "year"
 #' )
 #'
-#' # Get data with additional metadata
 #' get_bea_nipa("T10101", years = 2023, frequency = "year", metadata = TRUE)
 get_bea_nipa = function(
   tables,
@@ -242,11 +236,11 @@ fetch_bea_nipa_complete = function(
   # Process dates, frequencies, and add year/month/quarter columns
   data_processed = data_tibble |>
     dplyr::mutate(
-      date_frequency = normalize_bea_frequency(.data$time_period),
-      date = date_from_bea_period(.data$time_period),
-      year = extract_year_from_period(.data$time_period),
-      quarter = extract_quarter_from_period(.data$time_period),
-      month = extract_month_from_period(.data$time_period),
+      date_frequency = normalize_api_frequency(.data$time_period, "bea"),
+      date = parse_api_date(.data$time_period),
+      year = extract_period_component(.data$time_period, "year"),
+      quarter = extract_period_component(.data$time_period, "quarter"),
+      month = extract_period_component(.data$time_period, "month"),
       value = as.numeric(gsub(",", "", .data$data_value)),
       note_text = list(all_note_texts)
     )
@@ -272,72 +266,64 @@ fetch_bea_nipa_complete = function(
     )
 }
 
+#' Process BEA series groups into structured result
+#'
+#' Consolidates the common pattern of grouping and processing BEA data
+#' for the Industry dataset.
+#'
+#' @param data_tibble Tibble containing raw BEA data
+#' @param group_vars Character vector of column names to group by
+#' @param series_id_cols Character vector of column names to construct series_id
+#' @param series_title_fn Function to construct series_title from group
+#' @param metadata_cols Character vector of column names for metadata
+#' @param use_bea_dates Logical flag to use BEA date parsing
+#'
+#' @returns Tibble with series_id, series_title, metadata (list), data (list)
 #' @noRd
-normalize_bea_frequency = function(time_period) {
-  # Extract frequency from time period (e.g., "2024Q1" -> "quarter", "2024" -> "year")
-  dplyr::case_when(
-    grepl("Q[1-4]$", time_period) ~ "quarter",
-    grepl("M(0[1-9]|1[0-2])$", time_period) ~ "month",
-    grepl("^[0-9]{4}$", time_period) ~ "year",
-    .default = NA_character_
-  )
-}
+process_bea_series_groups = function(
+  data_tibble,
+  group_vars,
+  series_id_cols,
+  series_title_fn,
+  metadata_cols,
+  use_bea_dates = TRUE
+) {
+  # Group by unique series identifiers
+  series_groups = data_tibble |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) |>
+    dplyr::group_split()
 
-#' @noRd
-date_from_bea_period = function(time_period) {
-  purrr::map(time_period, function(period) {
-    if (grepl("Q[1-4]$", period)) {
-      # Quarterly: "2024Q1" -> 2024-01-01
-      lubridate::yq(period) |> as.Date()
-    } else if (grepl("M(0[1-9]|1[0-2])$", period)) {
-      # Monthly: "2024M01" -> 2024-01-01
-      year = substr(period, 1, 4)
-      month = substr(period, 6, 7)
-      lubridate::ym(paste0(year, "-", month)) |> as.Date()
-    } else if (grepl("^[0-9]{4}$", period)) {
-      # Annual: "2024" -> 2024-01-01
-      as.Date(paste0(period, "-01-01"))
-    } else {
-      NA
-    }
-  }) |>
-    unlist() |>
-    as.Date(origin = "1970-01-01")
-}
+  # Process each series group
+  purrr::map_dfr(series_groups, function(group) {
+    # Construct series_id by joining specified columns with underscore
+    series_id_parts = purrr::map_chr(series_id_cols, ~ unique(group[[.x]]))
+    series_id = paste(series_id_parts, collapse = "_")
 
-#' @noRd
-extract_year_from_period = function(time_period) {
-  purrr::map_int(time_period, function(period) {
-    if (grepl("^[0-9]{4}", period)) {
-      as.integer(substr(period, 1, 4))
-    } else {
-      NA_integer_
-    }
+    # Construct series_title using provided function
+    series_title = series_title_fn(group)
+
+    # Create metadata tibble
+    metadata_tibble = group |>
+      dplyr::select(dplyr::all_of(metadata_cols)) |>
+      dplyr::distinct()
+
+    # Create data tibble with BEA date handling
+    data_only = group |>
+      dplyr::mutate(
+        date_frequency = normalize_api_frequency(.data$time_period, "bea"),
+        date = parse_api_date(.data$time_period),
+        value = .data$data_value
+      ) |>
+      dplyr::select(.data$date_frequency, .data$date, .data$value)
+
+    tibble::tibble(
+      series_id = series_id,
+      series_title = series_title,
+      metadata = list(metadata_tibble),
+      data = list(data_only)
+    )
   })
 }
-
-#' @noRd
-extract_quarter_from_period = function(time_period) {
-  purrr::map_int(time_period, function(period) {
-    if (grepl("Q[1-4]$", period)) {
-      as.integer(substr(period, nchar(period), nchar(period)))
-    } else {
-      NA_integer_
-    }
-  })
-}
-
-#' @noRd
-extract_month_from_period = function(time_period) {
-  purrr::map_int(time_period, function(period) {
-    if (grepl("M(0[1-9]|1[0-2])$", period)) {
-      as.integer(substr(period, 6, 7))
-    } else {
-      NA_integer_
-    }
-  })
-}
-
 
 #' Retrieve Regional data from the BEA API
 #'
@@ -345,162 +331,162 @@ extract_month_from_period = function(time_period) {
 #' \href{https://apps.bea.gov/API/signup/}{Bureau of Economic Analysis API}.
 #' Requires a BEA API key saved in the `BEA_API_KEY` environment variable.
 #'
-#' @param geo_fips Character vector of geographic FIPS codes, or special values: "COUNTY" for all counties, "STATE" for all states, "MSA" for all MSAs, or state abbreviations (e.g., "NY", "CA")
-#' @param tables Character vector of table names (e.g., "CAINC1" for personal income)
-#' @param years Numeric vector of years or "ALL" for all available years
-#' @param line_code Integer or character vector of line codes specifying the statistics/industries to retrieve
-#' @param metadata Logical flag to return additional metadata (default: FALSE)
+#' @param geo_fips Character vector of geographic FIPS codes, or special values:
+#'   "COUNTY" for all counties, "STATE" for all states, "MSA" for all MSAs.
+#'   A single value can also be a state abbreviation (e.g., "NY", "CA").
+#' @param table_name Single table name (e.g., "CAINC1" for personal income)
+#' @param line_code Single line code specifying the statistic to retrieve, or "ALL" for all line codes
+#' @param year Optional numeric vector of years or "ALL" for all available years.
+#'   Defaults to "LAST5".
+#' @param metadata Logical flag to return additional metadata columns (default: FALSE).
+#'   When TRUE, also includes cl_unit, mult_unit, and note_text (list column).
 #' @param bea_api_key BEA API key (defaults to BEA_API_KEY environment variable)
 #'
-#' @returns A tibble with columns series_id (constructed from geo/table/line), series_title, date_frequency, date, and value. If metadata = TRUE, returns a tibble with list columns for metadata and data.
+#' @returns A tibble with columns: geo_fips, geo_name, table_name,
+#'   table_description, line_number, line_description, date_frequency, date, year, value.
+#'   If metadata = TRUE, also includes cl_unit, mult_unit, and note_text (list column
+#'   containing all notes from the API response).
 #'
-# #' @export
-#' @noRd
-#' @examplesIf FALSE
-#' # Get personal income for all states
-#' get_bea_regional("STATE", tables = "SAINC1", years = 2020:2024, line_code = 1)
+#' @export
+#' @examplesIf nzchar(Sys.getenv("BEA_API_KEY"))
+#' get_bea_regional(geo_fips = "STATE", table_name = "SAINC1", line_code = 1)
 #'
-#' # Get data for specific states
-#' get_bea_regional(c("NY", "CA"), tables = "SAINC1", years = "ALL", line_code = 1)
-#'
-#' # Named series
-#' states = c(new_york = "NY", california = "CA")
-#' get_bea_regional(states, tables = "SAINC1", years = 2020:2024, line_code = 1)
+#' get_bea_regional(geo_fips = c("36000", "06000"), table_name = "SAINC1", line_code = 1)
 get_bea_regional = function(
   geo_fips,
-  tables,
-  years,
+  table_name,
   line_code,
+  year = NULL,
   metadata = FALSE,
   bea_api_key = Sys.getenv("BEA_API_KEY")
 ) {
-  # Normalize parameters
-  geo_param = paste(geo_fips, collapse = ",")
-  table_param = paste(tables, collapse = ",")
-
-  if (is.character(years) && toupper(years) == "ALL") {
+  # Normalize year parameter
+  if (is.null(year)) {
+    years_param = "LAST5"
+  } else if (is.character(year) && toupper(year) == "ALL") {
     years_param = "ALL"
   } else {
-    years_param = paste(years, collapse = ",")
+    years_param = paste(year, collapse = ",")
   }
 
-  line_param = paste(line_code, collapse = ",")
+  # Iterate over each geo_fips/line_code combination
+  combinations = tidyr::expand_grid(
+    geo = geo_fips,
+    line = line_code
+  )
 
+  results = purrr::map2(
+    combinations$geo,
+    combinations$line,
+    function(geo, line) {
+      fetch_bea_regional(
+        geo_fips = geo,
+        table_name = table_name,
+        line_code = line,
+        years_param = years_param,
+        bea_api_key = bea_api_key
+      )
+    }
+  ) |>
+    purrr::list_rbind()
+
+  # Sort by geo_fips, table_name, line_number, date
+  results = results |>
+    dplyr::arrange(
+      .data$geo_fips,
+      .data$table_name,
+      .data$line_number,
+      .data$date
+    )
+
+  # Select columns based on metadata flag
+  if (metadata) {
+    results
+  } else {
+    results |>
+      dplyr::select(
+        .data$geo_fips,
+        .data$geo_name,
+        .data$table_name,
+        .data$table_description,
+        .data$line_number,
+        .data$line_description,
+        .data$date_frequency,
+        .data$date,
+        .data$year,
+        .data$value
+      )
+  }
+}
+
+#' Fetch BEA Regional data for a single geo_fips/line_code combination
+#' @noRd
+fetch_bea_regional = function(
+  geo_fips,
+  table_name,
+  line_code,
+  years_param,
+  bea_api_key
+) {
   # Make API call
   result = get_bea_api(
     dataset_name = "Regional",
     params = list(
-      GeoFips = geo_param,
-      TableName = table_param,
-      LineCode = line_param,
+      GeoFips = geo_fips,
+      TableName = table_name,
+      LineCode = line_code,
       Year = years_param
     ),
     bea_api_key = bea_api_key
   )
 
-  # Extract and process data
+  # Extract data and metadata from response
   raw_data = result$BEAAPI$Results$Data
+  raw_notes = result$BEAAPI$Results$Notes
+  public_table = result$BEAAPI$Results$PublicTable %||% NA_character_
+  statistic = result$BEAAPI$Results$Statistic %||% NA_character_
+
+  # Collect all note texts for the note_text list column
+  all_note_texts = if (!is.null(raw_notes) && length(raw_notes) > 0) {
+    purrr::map_chr(raw_notes, ~ .x$NoteText %||% NA_character_)
+  } else {
+    character(0)
+  }
+
+  # Determine if we need to extract line info from each row (when line_code is "ALL")
+  use_row_line_info = is.character(line_code) && toupper(line_code) == "ALL"
 
   # Convert to tibble
-  data_tibble = purrr::map_dfr(raw_data, function(row) {
+  purrr::map_dfr(raw_data, function(row) {
+    # Extract line number and description from row when using "ALL"
+    # Code field format is "TableName-LineNumber" (e.g., "SAINC1-2")
+    if (use_row_line_info) {
+      code_parts = strsplit(row$Code %||% "", "-")[[1]]
+      row_line_number = as.integer(code_parts[length(code_parts)])
+      row_line_description = row$Description %||% NA_character_
+    } else {
+      row_line_number = as.integer(line_code)
+      row_line_description = statistic
+    }
+
+    time_period = row$TimePeriod %||% NA_character_
+
     tibble::tibble(
       geo_fips = row$GeoFips %||% NA_character_,
       geo_name = row$GeoName %||% NA_character_,
-      table_name = row$Code %||% NA_character_,
-      line_code = row$LineCode %||% NA_character_,
-      description = row$Description %||% NA_character_,
-      time_period = row$TimePeriod %||% NA_character_,
+      table_name = table_name,
+      table_description = public_table,
+      line_number = row_line_number,
+      line_description = row_line_description,
+      date_frequency = normalize_api_frequency(time_period, "bea"),
+      date = parse_api_date(time_period),
+      year = extract_period_component(time_period, "year"),
+      value = as.numeric(gsub(",", "", row$DataValue %||% NA_character_)),
       cl_unit = row$CL_UNIT %||% NA_character_,
-      unit_mult = as.integer(row$UNIT_MULT %||% NA),
-      data_value = row$DataValue %||% NA_character_
+      mult_unit = row$UNIT_MULT %||% NA_character_,
+      note_text = list(all_note_texts)
     )
   })
-
-  # Group by unique series (geo_fips + table + line_code)
-  series_groups = data_tibble |>
-    dplyr::group_by(
-      .data$geo_fips,
-      .data$geo_name,
-      .data$table_name,
-      .data$line_code,
-      .data$description
-    ) |>
-    dplyr::group_split()
-
-  # Process each series
-  complete_results = purrr::map_dfr(series_groups, function(group) {
-    series_id = paste0(
-      unique(group$geo_fips),
-      "_",
-      unique(group$table_name),
-      "_",
-      unique(group$line_code)
-    )
-
-    # Create metadata
-    metadata_tibble = group |>
-      dplyr::select(
-        .data$geo_fips,
-        .data$geo_name,
-        .data$table_name,
-        .data$line_code,
-        .data$description,
-        .data$cl_unit,
-        .data$unit_mult
-      ) |>
-      dplyr::distinct()
-
-    # Create data tibble
-    data_only = group |>
-      dplyr::mutate(
-        date_frequency = "year", # Regional data is typically annual
-        date = as.Date(paste0(.data$time_period, "-01-01")),
-        value = .data$data_value
-      ) |>
-      dplyr::select(.data$date_frequency, .data$date, .data$value)
-
-    tibble::tibble(
-      series_id = series_id,
-      series_title = paste(
-        unique(group$geo_name),
-        unique(group$description),
-        sep = " - "
-      ),
-      metadata = list(metadata_tibble),
-      data = list(data_only)
-    )
-  })
-
-  # Add series names if geo_fips are named
-  complete_results = add_series_names(complete_results, geo_fips)
-
-  if (metadata) {
-    complete_results
-  } else {
-    extract_data(complete_results, bea_regional_data_extractor)
-  }
-}
-
-#' @noRd
-bea_regional_data_extractor = function(series_id, complete_results) {
-  complete_results |>
-    dplyr::filter(.data$series_id == {{ series_id }}) |>
-    tidyr::unnest("metadata") |>
-    dplyr::select(dplyr::any_of(c(
-      "name",
-      "series_id",
-      "series_title",
-      "data"
-    ))) |>
-    tidyr::unnest("data") |>
-    dplyr::select(dplyr::any_of(c(
-      "name",
-      "series_id",
-      "series_title",
-      "date_frequency",
-      "date",
-      "value"
-    )))
 }
 
 #' Retrieve Industry GDP data from the BEA API
@@ -522,13 +508,10 @@ bea_regional_data_extractor = function(series_id, complete_results) {
 # #' @export
 #' @noRd
 #' @examplesIf FALSE
-#' # Get quarterly value added for all industries
 #' get_bea_industry("1", years = 2020:2024, frequency = "quarter", industry = "ALL")
 #'
-#' # Get annual data for specific industries
 #' get_bea_industry("1", years = 2020:2024, frequency = "year", industry = c("11", "21"))
 #'
-#' # Named series
 #' industries = c(agriculture = "11", mining = "21")
 #' get_bea_industry("1", years = 2020:2024, frequency = "year", industry = industries)
 get_bea_industry = function(
@@ -593,50 +576,23 @@ get_bea_industry = function(
     )
   })
 
-  # Group by unique series (table + industry)
-  series_groups = data_tibble |>
-    dplyr::group_by(
-      .data$table_id,
-      .data$industry,
-      .data$industry_description
-    ) |>
-    dplyr::group_split()
-
-  # Process each series
-  complete_results = purrr::map_dfr(series_groups, function(group) {
-    series_id = paste0(
-      unique(group$table_id),
-      "_",
-      unique(group$industry)
-    )
-
-    # Create metadata
-    metadata_tibble = group |>
-      dplyr::select(
-        .data$table_id,
-        .data$industry,
-        .data$industry_description,
-        .data$cl_unit,
-        .data$unit_mult
-      ) |>
-      dplyr::distinct()
-
-    # Create data tibble
-    data_only = group |>
-      dplyr::mutate(
-        date_frequency = normalize_bea_frequency(.data$time_period),
-        date = date_from_bea_period(.data$time_period),
-        value = .data$data_value
-      ) |>
-      dplyr::select(.data$date_frequency, .data$date, .data$value)
-
-    tibble::tibble(
-      series_id = series_id,
-      series_title = unique(group$industry_description),
-      metadata = list(metadata_tibble),
-      data = list(data_only)
-    )
-  })
+  # Process series groups using consolidated helper
+  complete_results = process_bea_series_groups(
+    data_tibble,
+    group_vars = c("table_id", "industry", "industry_description"),
+    series_id_cols = c("table_id", "industry"),
+    series_title_fn = function(group) {
+      unique(group$industry_description)
+    },
+    metadata_cols = c(
+      "table_id",
+      "industry",
+      "industry_description",
+      "cl_unit",
+      "unit_mult"
+    ),
+    use_bea_dates = TRUE # Uses BEA frequency normalization
+  )
 
   # Add series names if industry codes are named
   complete_results = add_series_names(complete_results, industry)
@@ -650,22 +606,17 @@ get_bea_industry = function(
 
 #' @noRd
 bea_industry_data_extractor = function(series_id, complete_results) {
-  complete_results |>
-    dplyr::filter(.data$series_id == {{ series_id }}) |>
-    tidyr::unnest("metadata") |>
-    dplyr::select(dplyr::any_of(c(
-      "name",
-      "series_id",
-      "series_title",
-      "data"
-    ))) |>
-    tidyr::unnest("data") |>
-    dplyr::select(dplyr::any_of(c(
+  generic_data_extractor(
+    series_id,
+    complete_results,
+    metadata_cols = c("name", "series_id", "series_title", "data"),
+    final_cols = c(
       "name",
       "series_id",
       "series_title",
       "date_frequency",
       "date",
       "value"
-    )))
+    )
+  )
 }

@@ -19,33 +19,41 @@ authors:
 
 reference:
 - title: Quantiles
+  desc: >
+    Calculate weighted percentiles.
   contents:
   - binipolate
   - averaged_median
   - averaged_quantile
   - interpolated_median
   - interpolated_quantile
-
 - title: Download data
+  desc: >
+    Helpers to download data from specific APIs
 - subtitle: IPUMS microdata extracts
   contents:
   - dl_ipums_acs1
   - dl_ipums_asec
   - dl_ipums_cps
   - dl_ipums_micro
-- subtitle: BLS or FRED time series
+- subtitle: BLS time series
   contents:
   - get_bls
+  - find_bls
+- subtitle: FRED time series
+  contents:
   - get_fred
-- subtitle: BEA time series
+  - find_fred
+- subtitle: BEA data
   contents:
   - get_bea_nipa
-
-- title: Summarizing data
+  - get_bea_regional
+- title: Included datasets
   contents:
-  - crosstab
-  - summarize_groups
-
+  - state_geocodes
 - title: Other functions
   contents:
+  - crosstab
   - merge_status
+  - summarize_groups
+

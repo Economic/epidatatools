@@ -1,119 +1,42 @@
-#' Find FRED Series by Search String
-#'
-#' Searches the \href{https://fred.stlouisfed.org/}{FRED database}
-#' for series matching a search string.
-#'
-#' This function is a wrapper around \href{https://sboysel.github.io/fredr/}{`fredr::fredr_series_search_text()`}
-#' and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}
-#' saved in the `FRED_API_KEY` environment variable.
-#'
-#' @param search_string Character string to search for in series titles
-#' @param max_results Maximum number of results to return (default: 20)
-#' @param metadata Logical flag to retrieve additional metadata (default: FALSE). When FALSE, only series_id and series_title are returned.
-#' @param seasonality Optional filter for seasonal adjustment: NULL (no filter, default), "NSA" (Not Seasonally Adjusted), or "SA" (Seasonally Adjusted)
-#'
-#' @returns A tibble with columns series_id, series_title, and optionally metadata (a list column containing additional metadata when metadata = TRUE)
-#'
-#' @export
-#' @examplesIf FALSE
-#' find_fred("unemployment rate")
-#' find_fred("GDP", max_results = 50)
-#' find_fred("inflation", metadata = TRUE)
-#' find_fred("unemployment", seasonality = "SA")
-#' find_fred("employment", seasonality = "NSA")
-find_fred = function(
-  search_string,
-  max_results = 20,
-  metadata = FALSE,
-  seasonality = NULL
-) {
-  # Determine filter parameters based on seasonality
-  if (!is.null(seasonality)) {
-    # Validate seasonality argument
-    if (!seasonality %in% c("NSA", "SA")) {
-      stop("seasonality must be NULL, 'NSA', or 'SA'")
-    }
-
-    filter_variable = "seasonal_adjustment"
-    filter_value = if (seasonality == "NSA") {
-      "Not Seasonally Adjusted"
-    } else {
-      "Seasonally Adjusted"
-    }
-
-    # Call fredr_series_search_text with filtering
-    search_results = fredr::fredr_series_search_text(
-      search_text = search_string,
-      limit = max_results,
-      filter_variable = filter_variable,
-      filter_value = filter_value
-    )
-  } else {
-    # Call fredr_series_search_text without filtering
-    search_results = fredr::fredr_series_search_text(
-      search_text = search_string,
-      limit = max_results
-    )
-  }
-
-  # If no results, return empty tibble
-  if (nrow(search_results) == 0) {
-    if (metadata) {
-      return(tibble::tibble(
-        series_id = character(),
-        series_title = character(),
-        metadata = list()
-      ))
-    } else {
-      return(tibble::tibble(
-        series_id = character(),
-        series_title = character()
-      ))
-    }
-  }
-
-  # Rename id to series_id and title to series_title
-  if (metadata) {
-    # Create a list column with all other columns as metadata
-    search_results |>
-      dplyr::rename(series_id = .data$id, series_title = .data$title) |>
-      tidyr::nest(metadata = -c(.data$series_id, .data$series_title)) |>
-      dplyr::select(.data$series_id, .data$series_title, .data$metadata)
-  } else {
-    # Return only series_id and series_title
-    search_results |>
-      dplyr::select(series_id = .data$id, series_title = .data$title)
-  }
-}
-
 #' Retrieve data from the FRED API
 #'
-#' This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{`fredr`} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key} saved in the `FRED_API_KEY` environment variable.
+#' This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{`fredr`} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 
 #' @param series FRED series code
 #' @param start Start year or date (numeric year or Date object)
 #' @param end End year or date (numeric year or Date object)
 #' @param metadata Flag for additional metadata
+#' @param fred_api_key FRED API key (defaults to FRED_API_KEY environment variable)
 #'
 #' @returns A tibble
 #' @export
-#' @examplesIf FALSE
+#' @examplesIf nzchar(Sys.getenv("FRED_API_KEY"))
 #' get_fred("UNRATE")
 #'
 #' series = c(
 #'   gdp = "GDP",
 #'   urate = "UNRATE"
 #' )
-#'
 #' get_fred(series, start = as.Date("2024-07-01"), end = 2024)
 #'
-#' # Tibble with list columns including additional metadata
-#' complete_results = get_fred(series, start = 2020, end = 2025, metadata = T)
+#' complete_results = get_fred(series, start = 2020, end = 2025, metadata = TRUE)
 #' complete_results
 #'
 #' complete_results |>
 #'   tidyr::unnest(metadata)
-get_fred = function(series, start = NULL, end = NULL, metadata = F) {
+get_fred = function(
+  series,
+  start = NULL,
+  end = NULL,
+  metadata = FALSE,
+  fred_api_key = Sys.getenv("FRED_API_KEY")
+) {
+  validate_api_key(
+    fred_api_key,
+    "FRED",
+    "https://fred.stlouisfed.org/docs/api/fred/v2/api_key.html"
+  )
+
   # Convert start/end to Date objects if provided
   observation_start = convert_to_date(start, is_start = TRUE)
   observation_end = convert_to_date(end, is_start = FALSE)
@@ -122,7 +45,8 @@ get_fred = function(series, start = NULL, end = NULL, metadata = F) {
   complete_results = fetch_fred_complete(
     series,
     observation_start,
-    observation_end
+    observation_end,
+    fred_api_key
   )
 
   if (metadata) {
@@ -158,22 +82,15 @@ convert_to_date = function(date_input, is_start) {
 }
 
 #' @noRd
-normalize_fred_frequency = function(frequency_short) {
-  # Map FRED frequency codes to standardized names
-  dplyr::case_match(
-    frequency_short,
-    "M" ~ "month",
-    "Q" ~ "quarter",
-    "SA" ~ "semiyear",
-    "A" ~ "year",
-    "D" ~ "day",
-    "W" ~ "week",
-    .default = tolower(frequency_short)
-  )
-}
+fetch_fred_complete = function(
+  series,
+  observation_start,
+  observation_end,
+  fred_api_key
+) {
+  # Set API key once before fetching all series
+  fredr::fredr_set_key(fred_api_key)
 
-#' @noRd
-fetch_fred_complete = function(series, observation_start, observation_end) {
   # Fetch data for all series, creating list columns for metadata and data
   complete_results = seq_along(series) |>
     purrr::map(
@@ -226,39 +143,27 @@ fetch_fred_series_complete = function(
 
 #' @noRd
 fred_series_data_extractor = function(series_id, complete_results) {
-  complete_results |>
-    dplyr::filter(.data$series_id == {{ series_id }}) |>
-    tidyr::unnest("metadata") |>
-    dplyr::mutate(
-      date_frequency = normalize_fred_frequency(.data$frequency_short)
-    ) |>
-    dplyr::rename(series_title = .data$title) |>
-    tidyr::unnest("data") |>
-    dplyr::select(dplyr::any_of(c(
+  # Define transformation to add date_frequency and rename title
+  fred_transform = function(data) {
+    data |>
+      dplyr::mutate(
+        date_frequency = normalize_api_frequency(.data$frequency_short, "fred")
+      ) |>
+      dplyr::rename(series_title = .data$title)
+  }
+
+  generic_data_extractor(
+    series_id,
+    complete_results,
+    metadata_cols = c("name", "series_id", "title", "frequency_short", "data"),
+    final_cols = c(
       "name",
       "series_id",
       "series_title",
       "date_frequency",
       "date",
       "value"
-    )))
-}
-
-# scratchpad
-function() {
-  get_fred("UNRATE")
-
-  series = c(
-    gdp = "GDP",
-    urate = "UNRATE"
+    ),
+    transform_fn = fred_transform
   )
-
-  get_fred(series, start = as.Date("2024-07-01"), end = 2024)
-
-  complete_results = get_fred(series, start = 2020, end = 2025, metadata = T)
-
-  complete_results
-
-  complete_results |>
-    tidyr::unnest(metadata)
 }

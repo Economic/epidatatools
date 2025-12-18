@@ -35,21 +35,15 @@ Retrieves National Income and Product Accounts data from the
 Requires a BEA API key saved in the \code{BEA_API_KEY} environment variable.
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
-# Get quarterly GDP data
+\dontshow{if (nzchar(Sys.getenv("BEA_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bea_nipa("T10101", years = 2020:2024, frequency = "quarter")
 
-# Get annual data for multiple tables
-get_bea_nipa(c("T10101", "T20305"), years = "ALL", frequency = "year")
-
-# Use named vector to add custom names
 get_bea_nipa(
   c("gdp" = "T10101", "personal_income" = "T20305"),
   years = 2023:2024,
   frequency = "year"
 )
 
-# Get data with additional metadata
 get_bea_nipa("T10101", years = 2023, frequency = "year", metadata = TRUE)
 \dontshow{\}) # examplesIf}
 }
