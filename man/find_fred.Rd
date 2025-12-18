@@ -35,7 +35,7 @@ This function is a wrapper around \href{https://sboysel.github.io/fredr/}{\code{
 and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 }
 \examples{
-\dontshow{if (nzchar(Sys.getenv("FRED_API_KEY"))) withAutoprint(\{ # examplesIf}
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 find_fred("unemployment rate")
 
 find_fred("GDP", max_results = 10)
