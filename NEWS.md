@@ -1,6 +1,6 @@
 # epidatatools 0.9.0
-* Allow different API key names for BLS, FRED, and BEA fetchers.
 * New BEA API helper: `get_bea_regional()`
+* Allow different API key names for BLS, FRED, and BEA fetchers.
 
 # epidatatools 0.8.0
 * New BEA API helper: `get_bea_nipa()`
