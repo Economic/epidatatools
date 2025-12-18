@@ -8,10 +8,14 @@
 #' @returns Character vector of standardized frequency names: "year", "quarter",
 #'   "month", "semiyear", "week", or "day"
 #' @noRd
-normalize_api_frequency = function(period_code, api_type = c("bls", "bea", "fred")) {
+normalize_api_frequency = function(
+  period_code,
+  api_type = c("bls", "bea", "fred")
+) {
   api_type = match.arg(api_type)
 
-  switch(api_type,
+  switch(
+    api_type,
     bls = {
       # BLS uses period codes like "M01", "Q01", "A01", "S01"
       period_type = substr(period_code, 1, 1)
@@ -121,10 +125,14 @@ parse_bea_date = function(time_period) {
 #'
 #' @returns Integer vector of the requested component
 #' @noRd
-extract_period_component = function(period, component = c("year", "quarter", "month")) {
+extract_period_component = function(
+  period,
+  component = c("year", "quarter", "month")
+) {
   component = match.arg(component)
 
-  switch(component,
+  switch(
+    component,
     year = {
       purrr::map_int(period, function(p) {
         if (grepl("^[0-9]{4}", p)) {
@@ -153,4 +161,46 @@ extract_period_component = function(period, component = c("year", "quarter", "mo
       })
     }
   )
+}
+
+#' @noRd
+semiyear = function(date) {
+  ifelse(lubridate::month(date) < 7, 1, 2)
+}
+
+#' @noRd
+add_all_date_components = function(data) {
+  data_with_year = data |>
+    dplyr::mutate(year = lubridate::year(date))
+
+  data_with_year |>
+    add_date_component("month") |>
+    add_date_component("quarter") |>
+    add_date_component("semiyear") |>
+    add_date_component("week") |>
+    add_date_component("day")
+}
+
+#' @noRd
+add_date_component = function(data, var) {
+  frequencies = data |>
+    dplyr::distinct(.data$date_frequency) |>
+    dplyr::pull()
+
+  will_add_var = var %in% frequencies
+
+  if (will_add_var) {
+    output = switch(
+      var,
+      "day" = dplyr::mutate(data, day = lubridate::day(date)),
+      "week" = dplyr::mutate(data, week = lubridate::week(date)),
+      "month" = dplyr::mutate(data, month = lubridate::month(date)),
+      "quarter" = dplyr::mutate(data, quarter = lubridate::quarter(date)),
+      "semiyear" = dplyr::mutate(data, semiyear = semiyear(date))
+    )
+  } else {
+    output = data
+  }
+
+  output
 }

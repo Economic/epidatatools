@@ -36,7 +36,9 @@ empty_search_result = function(metadata = FALSE) {
 validate_api_key = function(api_key, api_name, signup_url) {
   if (api_key == "") {
     stop(
-      api_name, "_API_KEY environment variable not set. Get a free API key at ", signup_url
+      api_name,
+      "_API_KEY environment variable not set. Get a free API key at ",
+      signup_url
     )
   }
 }
@@ -59,47 +61,6 @@ add_series_names = function(data, series) {
   }
 }
 
-#' @noRd
-semiyear = function(date) {
-  ifelse(lubridate::month(date) < 7, 1, 2)
-}
-
-#' @noRd
-add_all_date_components = function(data) {
-  data_with_year = data |>
-    dplyr::mutate(year = lubridate::year(date))
-
-  data_with_year |>
-    add_date_component("month") |>
-    add_date_component("quarter") |>
-    add_date_component("semiyear") |>
-    add_date_component("week") |>
-    add_date_component("day")
-}
-
-#' @noRd
-add_date_component = function(data, var) {
-  frequencies = data |>
-    dplyr::distinct(.data$date_frequency) |>
-    dplyr::pull()
-
-  will_add_var = var %in% frequencies
-
-  if (will_add_var) {
-    output = switch(
-      var,
-      "day" = dplyr::mutate(data, day = lubridate::day(date)),
-      "week" = dplyr::mutate(data, week = lubridate::week(date)),
-      "month" = dplyr::mutate(data, month = lubridate::month(date)),
-      "quarter" = dplyr::mutate(data, quarter = lubridate::quarter(date)),
-      "semiyear" = dplyr::mutate(data, semiyear = semiyear(date))
-    )
-  } else {
-    output = data
-  }
-
-  output
-}
 
 #' @noRd
 extract_data = function(data, extractor) {
@@ -131,7 +92,7 @@ extract_data = function(data, extractor) {
 
 #' Generic data extractor for API results
 #'
-#' Consolidates the common pattern across all API data extractors.
+#' Consolidates the common pattern across BLS and FRED API data extractors.
 #' Filters by series_id, unnests metadata and data, and selects final columns.
 #'
 #' @param series_id Character string of the series ID to extract
@@ -146,7 +107,14 @@ generic_data_extractor = function(
   series_id,
   complete_results,
   metadata_cols = c("name", "series_id", "series_title", "data"),
-  final_cols = c("name", "series_id", "series_title", "date_frequency", "date", "value"),
+  final_cols = c(
+    "name",
+    "series_id",
+    "series_title",
+    "date_frequency",
+    "date",
+    "value"
+  ),
   transform_fn = NULL
 ) {
   result = complete_results |>
