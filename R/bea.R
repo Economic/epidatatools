@@ -74,7 +74,7 @@ get_bea_api = function(
 #' @returns A tibble with columns: table_name, table_description, line_number, line_description, date_frequency, date, value, and date variables (year, quarter, month) appropriate to the frequency of data returned. Annual data includes only year; quarterly data includes year and quarter; monthly data includes year, quarter, and month. If metadata = TRUE, also includes unit_mult, metric_name, cl_unit, series_code, and note_text (list column). If tables is a named vector, includes a "name" column as the first column.
 #'
 #' @export
-#' @examplesIf FALSE
+#' @examplesIf nzchar(Sys.getenv("BEA_API_KEY"))
 #' # Get quarterly GDP data
 #' get_bea_nipa("T10101", years = 2020:2024, frequency = "quarter")
 #'
@@ -355,14 +355,9 @@ process_bea_series_groups = function(
 #'
 #' @export
 #' @examplesIf nzchar(Sys.getenv("BEA_API_KEY"))
-#' # Get personal income for all states
 #' get_bea_regional(geo_fips = "STATE", table_name = "SAINC1", line_code = 1)
 #'
-#' # Get data for specific states
 #' get_bea_regional(geo_fips = c("36000", "06000"), table_name = "SAINC1", line_code = 1)
-#'
-#' # Use state abbreviation for single state
-#' get_bea_regional(geo_fips = "NY", table_name = "SAINC1", line_code = 1)
 get_bea_regional = function(
   geo_fips,
   table_name,
@@ -519,13 +514,10 @@ fetch_bea_regional = function(
 # #' @export
 #' @noRd
 #' @examplesIf FALSE
-#' # Get quarterly value added for all industries
 #' get_bea_industry("1", years = 2020:2024, frequency = "quarter", industry = "ALL")
 #'
-#' # Get annual data for specific industries
 #' get_bea_industry("1", years = 2020:2024, frequency = "year", industry = c("11", "21"))
 #'
-#' # Named series
 #' industries = c(agriculture = "11", mining = "21")
 #' get_bea_industry("1", years = 2020:2024, frequency = "year", industry = industries)
 get_bea_industry = function(

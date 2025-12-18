@@ -31,12 +31,9 @@ Searches the \href{https://data.bls.gov/dataQuery/search}{BLS Data Finder}
 for series matching a search string.
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+\dontshow{if (nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
 find_bls("unemployment rate")
-find_bls("employment population ratio", max_results = 50)
-find_bls("unemployment rate", metadata = TRUE)
+
 find_bls("wage", survey = "cw")
-find_bls("unemployment", seasonality = "SA")
-find_bls("unemployment", seasonality = "NSA")
 \dontshow{\}) # examplesIf}
 }

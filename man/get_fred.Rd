@@ -30,17 +30,15 @@ A tibble
 This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{\code{fredr}} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+\dontshow{if (nzchar(Sys.getenv("FRED_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_fred("UNRATE")
 
 series = c(
   gdp = "GDP",
   urate = "UNRATE"
 )
-
 get_fred(series, start = as.Date("2024-07-01"), end = 2024)
 
-# Tibble with list columns including additional metadata
 complete_results = get_fred(series, start = 2020, end = 2025, metadata = T)
 complete_results
 

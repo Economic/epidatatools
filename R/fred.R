@@ -15,12 +15,14 @@
 #' @returns A tibble with columns series_id, series_title, and optionally metadata (a list column containing additional metadata when metadata = TRUE)
 #'
 #' @export
-#' @examplesIf FALSE
+#' @examplesIf nzchar(Sys.getenv("FRED_API_KEY"))
 #' find_fred("unemployment rate")
-#' find_fred("GDP", max_results = 50)
+#'
+#' find_fred("GDP", max_results = 10)
+#'
 #' find_fred("inflation", metadata = TRUE)
-#' find_fred("unemployment", seasonality = "SA")
-#' find_fred("employment", seasonality = "NSA")
+#'
+#' find_fred("employment population ratio", seasonality = "SA")
 find_fred = function(
   search_string,
   max_results = 20,
@@ -97,17 +99,15 @@ find_fred = function(
 #'
 #' @returns A tibble
 #' @export
-#' @examplesIf FALSE
+#' @examplesIf nzchar(Sys.getenv("FRED_API_KEY"))
 #' get_fred("UNRATE")
 #'
 #' series = c(
 #'   gdp = "GDP",
 #'   urate = "UNRATE"
 #' )
-#'
 #' get_fred(series, start = as.Date("2024-07-01"), end = 2024)
 #'
-#' # Tibble with list columns including additional metadata
 #' complete_results = get_fred(series, start = 2020, end = 2025, metadata = T)
 #' complete_results
 #'

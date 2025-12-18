@@ -30,21 +30,18 @@ a tibble
 This function is simply a wrapper around \href{https://github.com/groditi/blsR}{\code{blsR}} and requires you to have an \href{https://www.bls.gov/developers/}{BLS API key} saved in the \code{BLS_API_KEY} environment variable.
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+\dontshow{if (nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bls("LNU02300060", start = 2020, end = 2024)
 
 bls_series_ids = c(
-  "LNU02300060",
   emp_fb_2534 = "LNU02073399",
   epop_asianmen_2554 = "LNU02332330Q",
-  injuries_annual = "ISU00000000031004",
-  cpi_semi = "CUUS0000SA0"
+  cpi_semi = "CUUS0000SA0",
+  "LNU02300060"
 )
+get_bls(bls_series_ids, start = 2024, end = 2024)
 
-get_bls(bls_series_ids, start = 2025, end = 2025)
-
-# Tibble with list columns including additional metadata
-complete_results = get_bls(bls_series_ids, start = 2025, end = 2025, metadata = T)
+complete_results = get_bls(bls_series_ids, start = 2024, end = 2024, metadata = T)
 complete_results
 
 complete_results |>

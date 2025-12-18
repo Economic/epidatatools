@@ -35,11 +35,13 @@ This function is a wrapper around \href{https://sboysel.github.io/fredr/}{\code{
 and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+\dontshow{if (nzchar(Sys.getenv("FRED_API_KEY"))) withAutoprint(\{ # examplesIf}
 find_fred("unemployment rate")
-find_fred("GDP", max_results = 50)
+
+find_fred("GDP", max_results = 10)
+
 find_fred("inflation", metadata = TRUE)
-find_fred("unemployment", seasonality = "SA")
-find_fred("employment", seasonality = "NSA")
+
+find_fred("employment population ratio", seasonality = "SA")
 \dontshow{\}) # examplesIf}
 }

@@ -97,13 +97,10 @@ extract_catalog_data = function(page, series_id) {
 #' @returns A tibble with columns series_id, series_title, and optionally metadata (a list column containing catalog metadata as one-row tibbles when metadata = TRUE)
 #'
 #' @export
-#' @examplesIf FALSE
+#' @examplesIf nzchar(Sys.getenv("BLS_API_KEY"))
 #' find_bls("unemployment rate")
-#' find_bls("employment population ratio", max_results = 50)
-#' find_bls("unemployment rate", metadata = TRUE)
+#'
 #' find_bls("wage", survey = "cw")
-#' find_bls("unemployment", seasonality = "SA")
-#' find_bls("unemployment", seasonality = "NSA")
 find_bls = function(
   search_string,
   max_results = 20,
@@ -248,21 +245,18 @@ find_bls = function(
 #'
 #'
 #' @export
-#' @examplesIf FALSE
+#' @examplesIf nzchar(Sys.getenv("BLS_API_KEY"))
 #' get_bls("LNU02300060", start = 2020, end = 2024)
 #'
 #' bls_series_ids = c(
-#'   "LNU02300060",
 #'   emp_fb_2534 = "LNU02073399",
 #'   epop_asianmen_2554 = "LNU02332330Q",
-#'   injuries_annual = "ISU00000000031004",
-#'   cpi_semi = "CUUS0000SA0"
+#'   cpi_semi = "CUUS0000SA0",
+#'   "LNU02300060"
 #' )
+#' get_bls(bls_series_ids, start = 2024, end = 2024)
 #'
-#' get_bls(bls_series_ids, start = 2025, end = 2025)
-#'
-#' # Tibble with list columns including additional metadata
-#' complete_results = get_bls(bls_series_ids, start = 2025, end = 2025, metadata = T)
+#' complete_results = get_bls(bls_series_ids, start = 2024, end = 2024, metadata = T)
 #' complete_results
 #'
 #' complete_results |>
