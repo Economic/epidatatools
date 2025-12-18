@@ -75,20 +75,14 @@ get_bea_api = function(
 #'
 #' @export
 #' @examplesIf nzchar(Sys.getenv("BEA_API_KEY"))
-#' # Get quarterly GDP data
 #' get_bea_nipa("T10101", years = 2020:2024, frequency = "quarter")
 #'
-#' # Get annual data for multiple tables
-#' get_bea_nipa(c("T10101", "T20305"), years = "ALL", frequency = "year")
-#'
-#' # Use named vector to add custom names
 #' get_bea_nipa(
 #'   c("gdp" = "T10101", "personal_income" = "T20305"),
 #'   years = 2023:2024,
 #'   frequency = "year"
 #' )
 #'
-#' # Get data with additional metadata
 #' get_bea_nipa("T10101", years = 2023, frequency = "year", metadata = TRUE)
 get_bea_nipa = function(
   tables,

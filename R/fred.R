@@ -19,7 +19,7 @@
 #' )
 #' get_fred(series, start = as.Date("2024-07-01"), end = 2024)
 #'
-#' complete_results = get_fred(series, start = 2020, end = 2025, metadata = T)
+#' complete_results = get_fred(series, start = 2020, end = 2025, metadata = TRUE)
 #' complete_results
 #'
 #' complete_results |>
@@ -28,7 +28,7 @@ get_fred = function(
   series,
   start = NULL,
   end = NULL,
-  metadata = F,
+  metadata = FALSE,
   fred_api_key = Sys.getenv("FRED_API_KEY")
 ) {
   validate_api_key(
@@ -166,23 +166,4 @@ fred_series_data_extractor = function(series_id, complete_results) {
     ),
     transform_fn = fred_transform
   )
-}
-
-# scratchpad
-function() {
-  get_fred("UNRATE")
-
-  series = c(
-    gdp = "GDP",
-    urate = "UNRATE"
-  )
-
-  get_fred(series, start = as.Date("2024-07-01"), end = 2024)
-
-  complete_results = get_fred(series, start = 2020, end = 2025, metadata = T)
-
-  complete_results
-
-  complete_results |>
-    tidyr::unnest(metadata)
 }

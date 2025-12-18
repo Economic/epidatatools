@@ -21,7 +21,10 @@ interpolated_quantile(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE)
 a numeric vector
 }
 \description{
-Calculate the binned interpolated quantile
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+This function is superceded by EPI's current preferred
+method for interpolating quantiles, \code{\link[=averaged_quantile]{averaged_quantile()}}.
 }
 \examples{
 interpolated_quantile(x = mtcars$mpg, bin_size = 0.50, probs = c(0.25, 0.5, 0.75))

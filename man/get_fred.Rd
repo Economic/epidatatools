@@ -8,7 +8,7 @@ get_fred(
   series,
   start = NULL,
   end = NULL,
-  metadata = F,
+  metadata = FALSE,
   fred_api_key = Sys.getenv("FRED_API_KEY")
 )
 }
@@ -39,7 +39,7 @@ series = c(
 )
 get_fred(series, start = as.Date("2024-07-01"), end = 2024)
 
-complete_results = get_fred(series, start = 2020, end = 2025, metadata = T)
+complete_results = get_fred(series, start = 2020, end = 2025, metadata = TRUE)
 complete_results
 
 complete_results |>

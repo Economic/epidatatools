@@ -256,7 +256,7 @@ find_bls = function(
 #' )
 #' get_bls(bls_series_ids, start = 2024, end = 2024)
 #'
-#' complete_results = get_bls(bls_series_ids, start = 2024, end = 2024, metadata = T)
+#' complete_results = get_bls(bls_series_ids, start = 2024, end = 2024, metadata = TRUE)
 #' complete_results
 #'
 #' complete_results |>
@@ -265,7 +265,7 @@ get_bls = function(
   series,
   start,
   end,
-  metadata = F,
+  metadata = FALSE,
   bls_api_key = Sys.getenv("BLS_API_KEY")
 ) {
   # Check for API key

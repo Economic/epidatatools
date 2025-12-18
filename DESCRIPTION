@@ -35,7 +35,8 @@ Imports:
     tibble,
     tidyr,
     tidyselect,
-    utils
+    utils,
+    lifecycle
 Suggests: 
     knitr,
     pkgdown,
@@ -46,4 +47,4 @@ RoxygenNote: 7.3.3
 URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epidatatools
 BugReports: https://github.com/Economic/epidatatools/issues
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1)
