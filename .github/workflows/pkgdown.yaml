@@ -19,6 +19,9 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+      BEA_API_KEY: ${{ secrets.BEA_API_KEY }}
     steps:
       - uses: actions/checkout@v3
 
