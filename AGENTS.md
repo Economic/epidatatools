@@ -14,7 +14,6 @@ Here is a list of the main user-facing functions available in this package:
 - `averaged_median(x, w, na.rm, quantiles_n, quantiles_w)`: Calculates the averaged (smoothed) median of a numeric vector.
 - `find_bls(search_string, max_results, metadata, survey, seasonality)`: Searches the BLS Data Finder for series matching a search string and returns series IDs and titles. Can optionally restrict search to a specific BLS survey and filter by seasonal adjustment.
 - `find_fred(search_string, max_results, metadata, seasonality)`: Searches the FRED database for series matching a search string and returns series IDs and titles. Can optionally return additional metadata and filter by seasonal adjustment (NULL, "NSA", or "SA").
-- `get_bea_industry(tables, years, frequency, industry, underlying, metadata, bea_api_key)`: Retrieves GDP by Industry data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Supports both GDPbyIndustry and UnderlyingGDPbyIndustry datasets.
 - `get_bea_nipa(tables, years, frequency, underlying, metadata, bea_api_key)`: Retrieves National Income and Product Accounts (NIPA) data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Supports both NIPA and NIUnderlyingDetail datasets. The `tables` parameter can be a named vector to add custom names (e.g., `c("gdp" = "T10101")`) which adds a "name" column as the first column. Returns a tibble with table_name, table_description, line_number, line_description, date_frequency, date, value, and date variables appropriate to the frequency of data returned (annual data includes only year; quarterly data includes year and quarter; monthly data includes year, quarter, and month). When metadata=TRUE, also includes unit_mult, metric_name, cl_unit, series_code, and note_text (list column containing all notes from the API response).
 - `get_bea_regional(geo_fips, table_name, line_code, year, metadata, bea_api_key)`: Retrieves regional economic data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Takes a single table_name and line_code (or "ALL" for all line codes), but allows multiple geo_fips and years. A single geo_fips can be a state abbreviation (e.g., "NY"). Returns a tibble with geo_fips, geo_name, table_name, table_description, line_number, line_description, date_frequency, date, year, value. When metadata=TRUE, also includes cl_unit, mult_unit, and note_text (list column containing all notes from the API response). Results are sorted by geo_fips, table_name, line_number, date.
 - `get_bls(series, start, end, metadata)`: Retrieves data from the Bureau of Labor Statistics (BLS) API. Requires a BLS API key.
@@ -40,8 +39,35 @@ After any changes to the package (functions, documentation, or data), run the fo
 
 ```r
 devtools::document()  # Regenerate documentation
+devtools::test()      # Run testthat tests
 devtools::check()     # Run R CMD check to verify package integrity
+pkgdown::build_site() # Build the pkgdown documentation site
 ```
+
+All of these commands must be run to verify that the code is ready to be released.
+
+## Testing
+
+The package uses `testthat` for testing. Tests are located in `tests/testthat/`.
+
+### Running Tests
+
+```r
+devtools::test()                              # Run all tests
+devtools::test(filter = "api-no-duplicates") # Run specific test file
+```
+
+### API Tests
+
+Tests for API functions (`get_bls()`, `get_bea_nipa()`, `get_bea_regional()`) require API keys to be set in environment variables:
+- `BLS_API_KEY` for BLS functions
+- `BEA_API_KEY` for BEA functions
+
+Tests will be skipped automatically if the required API keys are not available.
+
+### Key Test File
+
+- `test-api-no-duplicates.R`: Verifies that API functions do not return duplicate data rows. This was added to catch regressions of a bug where multiple series queries returned duplicated observations.
 
 ## Feature Development Workflow
 

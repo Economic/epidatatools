@@ -118,7 +118,7 @@ generic_data_extractor = function(
   transform_fn = NULL
 ) {
   result = complete_results |>
-    dplyr::filter(.data$series_id == {{ series_id }}) |>
+    dplyr::filter(.data$series_id == .env$series_id) |>
     tidyr::unnest("metadata") |>
     dplyr::select(dplyr::any_of(metadata_cols))
 
