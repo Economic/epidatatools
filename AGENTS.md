@@ -44,6 +44,8 @@ devtools::check()     # Run R CMD check to verify package integrity
 pkgdown::build_site() # Build the pkgdown documentation site
 ```
 
+All of these commands must be run to verify that the code is ready to be released.
+
 ## Testing
 
 The package uses `testthat` for testing. Tests are located in `tests/testthat/`.
