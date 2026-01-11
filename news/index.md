@@ -1,5 +1,10 @@
 # Changelog
 
+## epidatatools 1.0.0
+
+- Better error handling for BEA APIs
+- correct bug in get_bls() producing duplicate output
+
 ## epidatatools 0.9.0
 
 - New BEA API helper:

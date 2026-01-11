@@ -69,7 +69,7 @@ bls_series_ids = c(
   "LNU02300060"
 )
 get_bls(bls_series_ids, start = 2024, end = 2024)
-#> # A tibble: 120 × 10
+#> # A tibble: 30 × 10
 #>    name  series_id series_title date_frequency date        year semiyear quarter
 #>    <chr> <chr>     <chr>        <chr>          <date>     <dbl>    <dbl>   <int>
 #>  1 emp_… LNU02073… (Unadj) Emp… month          2024-01-01  2024        1       1
@@ -82,7 +82,7 @@ get_bls(bls_series_ids, start = 2024, end = 2024)
 #>  8 emp_… LNU02073… (Unadj) Emp… month          2024-08-01  2024        2       3
 #>  9 emp_… LNU02073… (Unadj) Emp… month          2024-09-01  2024        2       3
 #> 10 emp_… LNU02073… (Unadj) Emp… month          2024-10-01  2024        2       4
-#> # ℹ 110 more rows
+#> # ℹ 20 more rows
 #> # ℹ 2 more variables: month <dbl>, value <dbl>
 
 complete_results = get_bls(bls_series_ids, start = 2024, end = 2024, metadata = TRUE)

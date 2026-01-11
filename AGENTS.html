@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,8 +50,6 @@
 <li>
 <code>find_fred(search_string, max_results, metadata, seasonality)</code>: Searches the FRED database for series matching a search string and returns series IDs and titles. Can optionally return additional metadata and filter by seasonal adjustment (NULL, “NSA”, or “SA”).</li>
 <li>
-<code>get_bea_industry(tables, years, frequency, industry, underlying, metadata, bea_api_key)</code>: Retrieves GDP by Industry data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Supports both GDPbyIndustry and UnderlyingGDPbyIndustry datasets.</li>
-<li>
 <code>get_bea_nipa(tables, years, frequency, underlying, metadata, bea_api_key)</code>: Retrieves National Income and Product Accounts (NIPA) data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Supports both NIPA and NIUnderlyingDetail datasets. The <code>tables</code> parameter can be a named vector to add custom names (e.g., <code>c("gdp" = "T10101")</code>) which adds a “name” column as the first column. Returns a tibble with table_name, table_description, line_number, line_description, date_frequency, date, value, and date variables appropriate to the frequency of data returned (annual data includes only year; quarterly data includes year and quarter; monthly data includes year, quarter, and month). When metadata=TRUE, also includes unit_mult, metric_name, cl_unit, series_code, and note_text (list column containing all notes from the API response).</li>
 <li>
 <code>get_bea_regional(geo_fips, table_name, line_code, year, metadata, bea_api_key)</code>: Retrieves regional economic data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Takes a single table_name and line_code (or “ALL” for all line codes), but allows multiple geo_fips and years. A single geo_fips can be a state abbreviation (e.g., “NY”). Returns a tibble with geo_fips, geo_name, table_name, table_description, line_number, line_description, date_frequency, date, year, value. When metadata=TRUE, also includes cl_unit, mult_unit, and note_text (list column containing all notes from the API response). Results are sorted by geo_fips, table_name, line_number, date.</li>
@@ -90,7 +88,30 @@
 <p>After any changes to the package (functions, documentation, or data), run the following commands to rebuild and verify:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span>  <span class="co"># Regenerate documentation</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>     <span class="co"># Run R CMD check to verify package integrity</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>      <span class="co"># Run testthat tests</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>     <span class="co"># Run R CMD check to verify package integrity</span></span>
+<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># Build the pkgdown documentation site</span></span></code></pre></div>
+<p>All of these commands must be run to verify that the code is ready to be released.</p>
+</div>
+<div class="section level2">
+<h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h2>
+<p>The package uses <code>testthat</code> for testing. Tests are located in <code>tests/testthat/</code>.</p>
+<div class="section level3">
+<h3 id="running-tests">Running Tests<a class="anchor" aria-label="anchor" href="#running-tests"></a></h3>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>                              <span class="co"># Run all tests</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"api-no-duplicates"</span><span class="op">)</span> <span class="co"># Run specific test file</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="api-tests">API Tests<a class="anchor" aria-label="anchor" href="#api-tests"></a></h3>
+<p>Tests for API functions (<code><a href="reference/get_bls.html">get_bls()</a></code>, <code><a href="reference/get_bea_nipa.html">get_bea_nipa()</a></code>, <code><a href="reference/get_bea_regional.html">get_bea_regional()</a></code>) require API keys to be set in environment variables: - <code>BLS_API_KEY</code> for BLS functions - <code>BEA_API_KEY</code> for BEA functions</p>
+<p>Tests will be skipped automatically if the required API keys are not available.</p>
+</div>
+<div class="section level3">
+<h3 id="key-test-file">Key Test File<a class="anchor" aria-label="anchor" href="#key-test-file"></a></h3>
+<ul><li>
+<code>test-api-no-duplicates.R</code>: Verifies that API functions do not return duplicate data rows. This was added to catch regressions of a bug where multiple series queries returned duplicated observations.</li>
+</ul></div>
 </div>
 <div class="section level2">
 <h2 id="feature-development-workflow">Feature Development Workflow<a class="anchor" aria-label="anchor" href="#feature-development-workflow"></a></h2>

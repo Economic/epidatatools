@@ -24,10 +24,6 @@ package:
   Searches the FRED database for series matching a search string and
   returns series IDs and titles. Can optionally return additional
   metadata and filter by seasonal adjustment (NULL, “NSA”, or “SA”).
-- `get_bea_industry(tables, years, frequency, industry, underlying, metadata, bea_api_key)`:
-  Retrieves GDP by Industry data from the Bureau of Economic Analysis
-  (BEA) API. Requires a BEA API key. Supports both GDPbyIndustry and
-  UnderlyingGDPbyIndustry datasets.
 - `get_bea_nipa(tables, years, frequency, underlying, metadata, bea_api_key)`:
   Retrieves National Income and Product Accounts (NIPA) data from the
   Bureau of Economic Analysis (BEA) API. Requires a BEA API key.
@@ -93,8 +89,43 @@ run the following commands to rebuild and verify:
 
 ``` r
 devtools::document()  # Regenerate documentation
+devtools::test()      # Run testthat tests
 devtools::check()     # Run R CMD check to verify package integrity
+pkgdown::build_site() # Build the pkgdown documentation site
 ```
+
+All of these commands must be run to verify that the code is ready to be
+released.
+
+## Testing
+
+The package uses `testthat` for testing. Tests are located in
+`tests/testthat/`.
+
+### Running Tests
+
+``` r
+devtools::test()                              # Run all tests
+devtools::test(filter = "api-no-duplicates") # Run specific test file
+```
+
+### API Tests
+
+Tests for API functions
+([`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md),
+[`get_bea_nipa()`](https://economic.github.io/epidatatools/reference/get_bea_nipa.md),
+[`get_bea_regional()`](https://economic.github.io/epidatatools/reference/get_bea_regional.md))
+require API keys to be set in environment variables: - `BLS_API_KEY` for
+BLS functions - `BEA_API_KEY` for BEA functions
+
+Tests will be skipped automatically if the required API keys are not
+available.
+
+### Key Test File
+
+- `test-api-no-duplicates.R`: Verifies that API functions do not return
+  duplicate data rows. This was added to catch regressions of a bug
+  where multiple series queries returned duplicated observations.
 
 ## Feature Development Workflow
 

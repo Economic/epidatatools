@@ -15,14 +15,14 @@
 Source:
 [`DESCRIPTION`](https://github.com/Economic/epidatatools/blob/main/DESCRIPTION)
 
-Zipperer B (2025). *epidatatools: Data tools used at the Economic Policy
-Institute*. R package version 0.9.0,
+Zipperer B (2026). *epidatatools: Data tools used at the Economic Policy
+Institute*. R package version 1.0.0,
 <https://economic.github.io/epidatatools/>.
 
     @Manual{,
       title = {epidatatools: Data tools used at the Economic Policy Institute},
       author = {Ben Zipperer},
-      year = {2025},
-      note = {R package version 0.9.0},
+      year = {2026},
+      note = {R package version 1.0.0},
       url = {https://economic.github.io/epidatatools/},
     }
