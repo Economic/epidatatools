@@ -39,8 +39,33 @@ After any changes to the package (functions, documentation, or data), run the fo
 
 ```r
 devtools::document()  # Regenerate documentation
+devtools::test()      # Run testthat tests
 devtools::check()     # Run R CMD check to verify package integrity
+pkgdown::build_site() # Build the pkgdown documentation site
 ```
+
+## Testing
+
+The package uses `testthat` for testing. Tests are located in `tests/testthat/`.
+
+### Running Tests
+
+```r
+devtools::test()                              # Run all tests
+devtools::test(filter = "api-no-duplicates") # Run specific test file
+```
+
+### API Tests
+
+Tests for API functions (`get_bls()`, `get_bea_nipa()`, `get_bea_regional()`) require API keys to be set in environment variables:
+- `BLS_API_KEY` for BLS functions
+- `BEA_API_KEY` for BEA functions
+
+Tests will be skipped automatically if the required API keys are not available.
+
+### Key Test File
+
+- `test-api-no-duplicates.R`: Verifies that API functions do not return duplicate data rows. This was added to catch regressions of a bug where multiple series queries returned duplicated observations.
 
 ## Feature Development Workflow
 

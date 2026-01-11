@@ -348,21 +348,21 @@ fetch_bea_nipa_complete = function(
   # Process dates and values, then select final columns
   process_nipa_dates_and_values(data_tibble) |>
     dplyr::select(
-      .data$table_name,
-      .data$table_description,
-      .data$line_number,
-      .data$line_description,
-      .data$date_frequency,
-      .data$date,
-      .data$year,
-      .data$quarter,
-      .data$month,
-      .data$value,
-      .data$unit_mult,
-      .data$metric_name,
-      .data$cl_unit,
-      .data$series_code,
-      .data$note_text
+      "table_name",
+      "table_description",
+      "line_number",
+      "line_description",
+      "date_frequency",
+      "date",
+      "year",
+      "quarter",
+      "month",
+      "value",
+      "unit_mult",
+      "metric_name",
+      "cl_unit",
+      "series_code",
+      "note_text"
     )
 }
 
@@ -414,7 +414,7 @@ process_bea_series_groups = function(
         date = parse_api_date(.data$time_period),
         value = .data$data_value
       ) |>
-      dplyr::select(.data$date_frequency, .data$date, .data$value)
+      dplyr::select("date_frequency", "date", "value")
 
     tibble::tibble(
       series_id = series_id,
@@ -493,10 +493,10 @@ get_bea_regional = function(
   # Sort by geo_fips, table_name, line_number, date
   results = results |>
     dplyr::arrange(
-      .data$geo_fips,
-      .data$table_name,
-      .data$line_number,
-      .data$date
+      .data[["geo_fips"]],
+      .data[["table_name"]],
+      .data[["line_number"]],
+      .data[["date"]]
     )
 
   # Select columns based on metadata flag
@@ -505,16 +505,16 @@ get_bea_regional = function(
   } else {
     results |>
       dplyr::select(
-        .data$geo_fips,
-        .data$geo_name,
-        .data$table_name,
-        .data$table_description,
-        .data$line_number,
-        .data$line_description,
-        .data$date_frequency,
-        .data$date,
-        .data$year,
-        .data$value
+        "geo_fips",
+        "geo_name",
+        "table_name",
+        "table_description",
+        "line_number",
+        "line_description",
+        "date_frequency",
+        "date",
+        "year",
+        "value"
       )
   }
 }

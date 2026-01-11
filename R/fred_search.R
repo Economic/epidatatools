@@ -77,12 +77,12 @@ find_fred = function(
   if (metadata) {
     # Create a list column with all other columns as metadata
     search_results |>
-      dplyr::rename(series_id = .data$id, series_title = .data$title) |>
-      tidyr::nest(metadata = -c(.data$series_id, .data$series_title)) |>
-      dplyr::select(.data$series_id, .data$series_title, .data$metadata)
+      dplyr::rename(series_id = "id", series_title = "title") |>
+      tidyr::nest(metadata = -c("series_id", "series_title")) |>
+      dplyr::select("series_id", "series_title", "metadata")
   } else {
     # Return only series_id and series_title
     search_results |>
-      dplyr::select(series_id = .data$id, series_title = .data$title)
+      dplyr::select(series_id = "id", series_title = "title")
   }
 }

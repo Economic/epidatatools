@@ -149,7 +149,7 @@ fred_series_data_extractor = function(series_id, complete_results) {
       dplyr::mutate(
         date_frequency = normalize_api_frequency(.data$frequency_short, "fred")
       ) |>
-      dplyr::rename(series_title = .data$title)
+      dplyr::rename(series_title = "title")
   }
 
   generic_data_extractor(

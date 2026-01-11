@@ -36,10 +36,10 @@ summarize_onegroup <- function(.data, .group, ...) {
     data <- data |>
       dplyr::mutate(group_value_label = as.character(haven::as_factor(.data$group_value))) |>
       haven::zap_labels() |>
-      dplyr::relocate(.data$group_name, .data$group_value, .data$group_value_label)
+      dplyr::relocate("group_name", "group_value", "group_value_label")
   }
   else {
-    data <- dplyr::relocate(data, .data$group_name, .data$group_value)
+    data <- dplyr::relocate(data, "group_name", "group_value")
   }
 
   # promote original group variables to the front
