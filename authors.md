@@ -13,7 +13,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/Economic/epidatatools/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/Economic/epidatatools/blob/v1.0.1/DESCRIPTION)
 
 Zipperer B (2026). *epidatatools: Data tools used at the Economic Policy
 Institute*. R package version 1.0.1,
