@@ -35,7 +35,7 @@ interpolated_quantile = function(
     all(probs < 1)
   )
 
-  if (any(is.na(x)) & na.rm == FALSE) {
+  if (anyNA(x) & !na.rm) {
     output = rep(NA_real_, length(probs))
   } else {
     data = tibble::tibble(x = x, w = w) |>

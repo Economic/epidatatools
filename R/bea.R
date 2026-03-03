@@ -12,6 +12,9 @@ handle_bea_api_error = function(result) {
     # Extract all error components
     error_description = error_info$APIErrorDescription %||% "Unknown error"
     error_code = error_info$APIErrorCode %||% NA_character_
+    # Note: ErrorDetail is assumed to be a single JSON object (not an array).
+    # If the BEA API ever returns it as an array, simplifyVector = TRUE would
+    # convert it to a data frame and the is.na() check below would fail.
     error_detail = error_info$ErrorDetail$Description %||% NA_character_
 
     # Build comprehensive error message
@@ -85,7 +88,7 @@ get_bea_api = function(
 
   # Parse JSON response
   content = httr::content(response, as = "text", encoding = "UTF-8")
-  result = jsonlite::fromJSON(content, simplifyVector = FALSE)
+  result = jsonlite::fromJSON(content, simplifyVector = TRUE)
 
   # Check for API errors
   handle_bea_api_error(result)
@@ -100,10 +103,10 @@ get_bea_api = function(
 #' @returns Character vector of note texts
 #' @noRd
 extract_all_note_texts = function(raw_notes) {
-  if (is.null(raw_notes) || length(raw_notes) == 0) {
+  if (is.null(raw_notes) || !is.data.frame(raw_notes) || nrow(raw_notes) == 0) {
     return(character(0))
   }
-  purrr::map_chr(raw_notes, ~ .x$NoteText %||% NA_character_)
+  raw_notes$NoteText
 }
 
 #' Extract table description from BEA API notes
@@ -112,17 +115,16 @@ extract_all_note_texts = function(raw_notes) {
 #' @returns Character string with table description or NA
 #' @noRd
 extract_table_description = function(raw_notes, table_name) {
-  if (is.null(raw_notes) || length(raw_notes) == 0) {
+  if (is.null(raw_notes) || !is.data.frame(raw_notes) || nrow(raw_notes) == 0) {
     return(NA_character_)
   }
 
-  for (note in raw_notes) {
-    if (!is.null(note$NoteRef) && note$NoteRef == table_name) {
-      return(note$NoteText %||% NA_character_)
-    }
+  match_idx = which(raw_notes$NoteRef == table_name)
+  if (length(match_idx) == 0) {
+    return(NA_character_)
   }
 
-  NA_character_
+  raw_notes$NoteText[match_idx[1]]
 }
 
 #' Parse BEA data value string to numeric
@@ -131,29 +133,6 @@ extract_table_description = function(raw_notes, table_name) {
 #' @noRd
 parse_data_value = function(value_string) {
   as.numeric(gsub(",", "", value_string %||% NA_character_))
-}
-
-#' Convert a single NIPA API row to a tibble row
-#' @param row List representing one row from BEA NIPA API
-#' @param table_description Description of the table
-#' @param all_note_texts Character vector of all note texts
-#' @returns One-row tibble with standardized columns
-#' @noRd
-convert_nipa_row_to_tibble = function(row, table_description, all_note_texts) {
-  tibble::tibble(
-    table_name = row$TableName %||% NA_character_,
-    table_description = table_description,
-    series_code = row$SeriesCode %||% NA_character_,
-    line_number = as.integer(row$LineNumber %||% NA),
-    line_description = row$LineDescription %||% NA_character_,
-    time_period = row$TimePeriod %||% NA_character_,
-    metric_name = row$METRIC_NAME %||% NA_character_,
-    cl_unit = row$CL_UNIT %||% NA_character_,
-    unit_mult = as.integer(row$UNIT_MULT %||% NA),
-    data_value = row$DataValue %||% NA_character_,
-    note_ref = row$NoteRef %||% NA_character_,
-    note_text = list(all_note_texts)
-  )
 }
 
 #' Process dates and add frequency/period columns to NIPA data
@@ -170,30 +149,6 @@ process_nipa_dates_and_values = function(data_tibble) {
       month = extract_period_component(.data$time_period, "month"),
       value = parse_data_value(.data$data_value)
     )
-}
-
-#' Extract line number and description from Regional API data
-#' @param code Code string from API (e.g., "SAINC1-2")
-#' @param description Description from API row
-#' @param line_code Original line_code parameter
-#' @param statistic Statistic description from API results
-#' @returns Named list with line_number and line_description
-#' @noRd
-extract_regional_line_info = function(code, description, line_code, statistic) {
-  # When line_code is "ALL", extract from the row's Code field
-  if (is.character(line_code) && toupper(line_code) == "ALL") {
-    code_parts = strsplit(code %||% "", "-")[[1]]
-    list(
-      line_number = as.integer(code_parts[length(code_parts)]),
-      line_description = description %||% NA_character_
-    )
-  } else {
-    # When specific line_code, use the parameter and statistic
-    list(
-      line_number = as.integer(line_code),
-      line_description = statistic
-    )
-  }
 }
 
 #' Retrieve NIPA data from the BEA API
@@ -232,7 +187,7 @@ get_bea_nipa = function(
 ) {
   # Convert frequency to BEA API codes (A=Annual, Q=Quarterly, M=Monthly)
   frequency = match.arg(frequency, several.ok = TRUE)
-  freq_code = dplyr::case_match(
+  freq_code = dplyr::recode_values(
     frequency,
     "year" ~ "A",
     "quarter" ~ "Q",
@@ -339,10 +294,20 @@ fetch_bea_nipa_complete = function(
   table_description = extract_table_description(raw_notes, table_name)
   all_note_texts = extract_all_note_texts(raw_notes)
 
-  # Convert each row to a tibble and combine
-  data_tibble = purrr::map_dfr(
-    raw_data,
-    ~ convert_nipa_row_to_tibble(.x, table_description, all_note_texts)
+  # Construct tibble directly from data frame columns
+  data_tibble = tibble::tibble(
+    table_name       = raw_data$TableName,
+    table_description = table_description,
+    series_code      = raw_data$SeriesCode,
+    line_number      = as.integer(raw_data$LineNumber),
+    line_description = raw_data$LineDescription,
+    time_period      = raw_data$TimePeriod,
+    metric_name      = raw_data$METRIC_NAME,
+    cl_unit          = raw_data$CL_UNIT,
+    unit_mult        = as.integer(raw_data$UNIT_MULT),
+    data_value       = raw_data$DataValue,
+    note_ref         = raw_data$NoteRef,
+    note_text        = list(all_note_texts)
   )
 
   # Process dates and values, then select final columns
@@ -364,65 +329,6 @@ fetch_bea_nipa_complete = function(
       "series_code",
       "note_text"
     )
-}
-
-#' Process BEA series groups into structured result
-#'
-#' Consolidates the common pattern of grouping and processing BEA data
-#' for the Industry dataset.
-#'
-#' @param data_tibble Tibble containing raw BEA data
-#' @param group_vars Character vector of column names to group by
-#' @param series_id_cols Character vector of column names to construct series_id
-#' @param series_title_fn Function to construct series_title from group
-#' @param metadata_cols Character vector of column names for metadata
-#' @param use_bea_dates Logical flag to use BEA date parsing
-#'
-#' @returns Tibble with series_id, series_title, metadata (list), data (list)
-#' @noRd
-process_bea_series_groups = function(
-  data_tibble,
-  group_vars,
-  series_id_cols,
-  series_title_fn,
-  metadata_cols,
-  use_bea_dates = TRUE
-) {
-  # Group by unique series identifiers
-  series_groups = data_tibble |>
-    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) |>
-    dplyr::group_split()
-
-  # Process each series group
-  purrr::map_dfr(series_groups, function(group) {
-    # Construct series_id by joining specified columns with underscore
-    series_id_parts = purrr::map_chr(series_id_cols, ~ unique(group[[.x]]))
-    series_id = paste(series_id_parts, collapse = "_")
-
-    # Construct series_title using provided function
-    series_title = series_title_fn(group)
-
-    # Create metadata tibble
-    metadata_tibble = group |>
-      dplyr::select(dplyr::all_of(metadata_cols)) |>
-      dplyr::distinct()
-
-    # Create data tibble with BEA date handling
-    data_only = group |>
-      dplyr::mutate(
-        date_frequency = normalize_api_frequency(.data$time_period, "bea"),
-        date = parse_api_date(.data$time_period),
-        value = .data$data_value
-      ) |>
-      dplyr::select("date_frequency", "date", "value")
-
-    tibble::tibble(
-      series_id = series_id,
-      series_title = series_title,
-      metadata = list(metadata_tibble),
-      data = list(data_only)
-    )
-  })
 }
 
 #' Retrieve Regional data from the BEA API
@@ -549,32 +455,29 @@ fetch_bea_regional = function(
   # Extract all note texts
   all_note_texts = extract_all_note_texts(raw_notes)
 
-  # Convert each row to tibble
-  purrr::map_dfr(raw_data, function(row) {
-    # Extract line information based on line_code parameter
-    line_info = extract_regional_line_info(
-      row$Code,
-      row$Description,
-      line_code,
-      statistic
-    )
+  # Extract line information based on line_code parameter
+  if (is.character(line_code) && toupper(line_code) == "ALL") {
+    line_numbers = as.integer(sub(".*-", "", raw_data$Code))
+    line_descriptions = raw_data$Description
+  } else {
+    line_numbers = as.integer(line_code)
+    line_descriptions = statistic
+  }
 
-    time_period = row$TimePeriod %||% NA_character_
-
-    tibble::tibble(
-      geo_fips = row$GeoFips %||% NA_character_,
-      geo_name = row$GeoName %||% NA_character_,
-      table_name = table_name,
-      table_description = public_table,
-      line_number = line_info$line_number,
-      line_description = line_info$line_description,
-      date_frequency = normalize_api_frequency(time_period, "bea"),
-      date = parse_api_date(time_period),
-      year = extract_period_component(time_period, "year"),
-      value = parse_data_value(row$DataValue),
-      cl_unit = row$CL_UNIT %||% NA_character_,
-      mult_unit = row$UNIT_MULT %||% NA_character_,
-      note_text = list(all_note_texts)
-    )
-  })
+  # Construct tibble directly from data frame columns
+  tibble::tibble(
+    geo_fips         = raw_data$GeoFips,
+    geo_name         = raw_data$GeoName,
+    table_name       = table_name,
+    table_description = public_table,
+    line_number      = line_numbers,
+    line_description = line_descriptions,
+    date_frequency   = normalize_api_frequency(raw_data$TimePeriod, "bea"),
+    date             = parse_api_date(raw_data$TimePeriod),
+    year             = extract_period_component(raw_data$TimePeriod, "year"),
+    value            = parse_data_value(raw_data$DataValue),
+    cl_unit          = raw_data$CL_UNIT,
+    mult_unit        = raw_data$UNIT_MULT,
+    note_text        = list(all_note_texts)
+  )
 }

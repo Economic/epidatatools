@@ -6,7 +6,7 @@
 ^docs$
 ^pkgdown$
 ^\.github$
-.claude
 AGENTS.md
 CLAUDE.md
 ^data-raw$
+^\.claude$

@@ -1,3 +1,6 @@
+# epidatatools 1.0.1
+* Improve BEA API retrieval performance
+
 # epidatatools 1.0.0
 * Better error handling for BEA APIs
 * correct bug in get_bls() producing duplicate output

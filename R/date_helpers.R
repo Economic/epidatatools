@@ -20,7 +20,7 @@ normalize_api_frequency = function(
       # BLS uses period codes like "M01", "Q01", "A01", "S01"
       period_type = substr(period_code, 1, 1)
 
-      dplyr::case_match(
+      dplyr::recode_values(
         period_type,
         "M" ~ "month",
         "Q" ~ "quarter",
@@ -39,7 +39,7 @@ normalize_api_frequency = function(
     },
     fred = {
       # FRED uses frequency_short codes like "M", "Q", "A", "SA", "D", "W"
-      dplyr::case_match(
+      dplyr::recode_values(
         period_code,
         "M" ~ "month",
         "Q" ~ "quarter",
@@ -47,7 +47,7 @@ normalize_api_frequency = function(
         "A" ~ "year",
         "D" ~ "day",
         "W" ~ "week",
-        .default = tolower(period_code)
+        default = tolower(period_code)
       )
     }
   )
@@ -80,7 +80,7 @@ parse_bls_date = function(date_frequency, year, period) {
   period_num = as.numeric(substr(period, 2, 3))
 
   if (date_frequency == "semiyear") {
-    period_num = dplyr::case_match(period_num, 1 ~ 1, 2 ~ 7)
+    period_num = dplyr::replace_values(period_num, 1 ~ 1, 2 ~ 7)
   }
 
   year_period = paste(year, period_num)
@@ -95,24 +95,29 @@ parse_bls_date = function(date_frequency, year, period) {
 
 #' @noRd
 parse_bea_date = function(time_period) {
-  purrr::map(time_period, function(period) {
-    if (grepl("Q[1-4]$", period)) {
-      # Quarterly: "2024Q1" -> 2024-01-01
-      lubridate::yq(period) |> as.Date()
-    } else if (grepl("M(0[1-9]|1[0-2])$", period)) {
-      # Monthly: "2024M01" -> 2024-01-01
-      year = substr(period, 1, 4)
-      month = substr(period, 6, 7)
-      lubridate::ym(paste0(year, "-", month)) |> as.Date()
-    } else if (grepl("^[0-9]{4}$", period)) {
-      # Annual: "2024" -> 2024-01-01
-      as.Date(paste0(period, "-01-01"))
-    } else {
-      NA
-    }
-  }) |>
-    unlist() |>
-    as.Date(origin = "1970-01-01")
+  result = rep(as.Date(NA), length(time_period))
+
+  is_quarterly = grepl("Q[1-4]$", time_period)
+  is_monthly = grepl("M(0[1-9]|1[0-2])$", time_period)
+  is_annual = grepl("^[0-9]{4}$", time_period)
+
+  if (any(is_quarterly)) {
+    result[is_quarterly] =
+      lubridate::yq(time_period[is_quarterly]) |> as.Date()
+  }
+
+  if (any(is_monthly)) {
+    tp = time_period[is_monthly]
+    result[is_monthly] =
+      lubridate::ym(paste0(substr(tp, 1, 4), "-", substr(tp, 6, 7))) |> as.Date()
+  }
+
+  if (any(is_annual)) {
+    result[is_annual] =
+      as.Date(paste0(time_period[is_annual], "-01-01"))
+  }
+
+  result
 }
 
 
@@ -130,37 +135,25 @@ extract_period_component = function(
   component = c("year", "quarter", "month")
 ) {
   component = match.arg(component)
+  result = rep(NA_integer_, length(period))
 
   switch(
     component,
     year = {
-      purrr::map_int(period, function(p) {
-        if (grepl("^[0-9]{4}", p)) {
-          as.integer(substr(p, 1, 4))
-        } else {
-          NA_integer_
-        }
-      })
+      mask = grepl("^[0-9]{4}", period)
+      result[mask] = as.integer(substr(period[mask], 1, 4))
     },
     quarter = {
-      purrr::map_int(period, function(p) {
-        if (grepl("Q[1-4]$", p)) {
-          as.integer(substr(p, nchar(p), nchar(p)))
-        } else {
-          NA_integer_
-        }
-      })
+      mask = grepl("Q[1-4]$", period)
+      result[mask] = as.integer(substr(period[mask], 6, 6))
     },
     month = {
-      purrr::map_int(period, function(p) {
-        if (grepl("M(0[1-9]|1[0-2])$", p)) {
-          as.integer(substr(p, 6, 7))
-        } else {
-          NA_integer_
-        }
-      })
+      mask = grepl("M(0[1-9]|1[0-2])$", period)
+      result[mask] = as.integer(substr(period[mask], 6, 7))
     }
   )
+
+  result
 }
 
 #' @noRd

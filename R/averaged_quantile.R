@@ -24,7 +24,7 @@ averaged_quantile = function(
   averaged_quantile_arg_check(x, w, probs, quantiles_n, quantiles_w)
 
   # return NA output
-  if (any(is.na(x)) & na.rm == FALSE) {
+  if (anyNA(x) & !na.rm) {
     output = rep(NA_real_, length(probs))
   }
 
