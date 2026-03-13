@@ -50,3 +50,4 @@ URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epida
 BugReports: https://github.com/Economic/epidatatools/issues
 Depends: 
     R (>= 4.1)
+Config/Needs/website: economic/epitemplate

@@ -45,6 +45,7 @@ devtools::test()      # Run testthat tests
 devtools::check()     # Run R CMD check to verify package integrity
 pkgdown::check_pkgdown() # Check the pkgdown documentation site
 ```
+
 Any change to the package requires re-running these commands, even if it seems like the verification goal has been narrowed. All of these commands must be run after any set of changes to the package contents, including changes to NEWS.md or other non-code files.
 
 ### API Tests
