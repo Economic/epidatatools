@@ -46,7 +46,7 @@ A tibble
 
 ``` r
 get_fred("UNRATE")
-#> # A tibble: 937 × 7
+#> # A tibble: 938 × 7
 #>    series_id series_title      date_frequency date        year month value
 #>    <chr>     <chr>             <chr>          <date>     <dbl> <dbl> <dbl>
 #>  1 UNRATE    Unemployment Rate month          1948-01-01  1948     1   3.4
@@ -59,7 +59,7 @@ get_fred("UNRATE")
 #>  8 UNRATE    Unemployment Rate month          1948-08-01  1948     8   3.9
 #>  9 UNRATE    Unemployment Rate month          1948-09-01  1948     9   3.8
 #> 10 UNRATE    Unemployment Rate month          1948-10-01  1948    10   3.7
-#> # ℹ 927 more rows
+#> # ℹ 928 more rows
 
 series = c(
   gdp = "GDP",
@@ -92,8 +92,8 @@ complete_results |>
 #> # A tibble: 2 × 18
 #>   name  series_id id     realtime_start realtime_end title     observation_start
 #>   <chr> <chr>     <chr>  <chr>          <chr>        <chr>     <chr>            
-#> 1 gdp   GDP       GDP    2026-02-20     2026-02-20   Gross Do… 1947-01-01       
-#> 2 urate UNRATE    UNRATE 2026-02-11     2026-02-11   Unemploy… 1948-01-01       
+#> 1 gdp   GDP       GDP    2026-03-13     2026-03-13   Gross Do… 1947-01-01       
+#> 2 urate UNRATE    UNRATE 2026-03-06     2026-03-06   Unemploy… 1948-01-01       
 #> # ℹ 11 more variables: observation_end <chr>, frequency <chr>,
 #> #   frequency_short <chr>, units <chr>, units_short <chr>,
 #> #   seasonal_adjustment <chr>, seasonal_adjustment_short <chr>,

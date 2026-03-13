@@ -8,12 +8,14 @@
 - **[Jori Kandra](https://www.epi.org/people/jori-kandra/)**.
   Contributor.
 
-- **Economic Policy Institute**. Copyright holder, funder.
+- **[![Economic Policy
+  Institute](https://files.epi.org/2016/economic-policy-institute-epi-horizontal-logo.png)](https://www.epi.org)**.
+  Copyright holder, funder.
 
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/Economic/epidatatools/blob/v1.0.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/Economic/epidatatools/blob/main/DESCRIPTION)
 
 Zipperer B (2026). *epidatatools: Data tools used at the Economic Policy
 Institute*. R package version 1.0.1,
