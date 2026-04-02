@@ -1,5 +1,11 @@
 # Changelog
 
+## epidatatools 1.0.2
+
+- Fix
+  [`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
+  errors when catalog data is unavailable
+
 ## epidatatools 1.0.1
 
 - Improve BEA API retrieval performance
