@@ -1,3 +1,6 @@
+# epidatatools 1.0.2
+* Fix `get_bls()` errors when catalog data is unavailable
+
 # epidatatools 1.0.1
 * Improve BEA API retrieval performance
 

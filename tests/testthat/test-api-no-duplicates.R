@@ -70,6 +70,38 @@ test_that("get_bls() with metadata returns no duplicate rows", {
   )
 })
 
+test_that("get_bls() works for series with missing catalog data", {
+  skip_if_not(
+    nzchar(Sys.getenv("BLS_API_KEY")),
+    "BLS_API_KEY not set"
+  )
+
+  # QCEW series do not have catalog data
+  result <- get_bls("ENUUS00020510", start = 2024, end = 2024)
+
+  expect_true(nrow(result) > 0, info = "Should return data even without catalog")
+  expect_true(
+    has_no_duplicates(result, c("series_id", "date")),
+    info = "Missing catalog series should have no duplicate rows"
+  )
+  expect_true(is.na(result$series_title[1]))
+})
+
+test_that("get_bls() with metadata works for series with missing catalog data", {
+  skip_if_not(
+    nzchar(Sys.getenv("BLS_API_KEY")),
+    "BLS_API_KEY not set"
+  )
+
+  result <- get_bls("ENUUS00020510", start = 2024, end = 2024, metadata = TRUE)
+
+  expect_true(nrow(result) > 0)
+  expect_true(
+    has_no_duplicates(result, c("series_id")),
+    info = "Metadata results should have one row per series_id"
+  )
+})
+
 # get_bea_nipa() tests ----
 
 test_that("get_bea_nipa() returns no duplicate rows for single table", {

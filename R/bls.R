@@ -308,10 +308,15 @@ bls_payload_to_tibble = function(payload, series, start, end) {
 
 #' @noRd
 bls_payload_series_to_tibble = function(id, payload, start, end) {
-  metadata = payload |>
-    purrr::pluck(id, "catalog") |>
-    tibble::as_tibble() |>
-    dplyr::select(-c("series_id"))
+  catalog = purrr::pluck(payload, id, "catalog")
+
+  if (is.null(catalog)) {
+    metadata = tibble::tibble(series_title = NA_character_)
+  } else {
+    metadata = catalog |>
+      tibble::as_tibble() |>
+      dplyr::select(-dplyr::any_of("series_id"))
+  }
 
   data = payload |>
     purrr::pluck(id, "data") |>
