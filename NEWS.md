@@ -1,3 +1,6 @@
+# epidatatools 1.0.4
+* Fix `date_frequency` bug in `get_bls()` causing failures on 20+year API requests.
+
 # epidatatools 1.0.3
 * Fix bug with multiple same table IDs used in `get_bea_nipa()`
 

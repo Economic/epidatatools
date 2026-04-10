@@ -79,18 +79,26 @@ parse_api_date = function(period, frequency = NULL, year = NULL) {
 parse_bls_date = function(date_frequency, year, period) {
   period_num = as.numeric(substr(period, 2, 3))
 
-  if (date_frequency == "semiyear") {
-    period_num = dplyr::replace_values(period_num, 1 ~ 1, 2 ~ 7)
-  }
+  period_num = dplyr::if_else(
+    date_frequency == "semiyear" & period_num == 1, 1,
+    dplyr::if_else(
+      date_frequency == "semiyear" & period_num == 2, 7,
+      period_num
+    )
+  )
 
   year_period = paste(year, period_num)
+  result = rep(as.Date(NA), length(year_period))
 
-  ifelse(
-    date_frequency == "quarter",
-    lubridate::yq(year_period),
-    lubridate::ym(year_period)
-  ) |>
-    as.Date()
+  is_quarterly = date_frequency == "quarter"
+  if (any(is_quarterly)) {
+    result[is_quarterly] = as.Date(lubridate::yq(year_period[is_quarterly]))
+  }
+  if (any(!is_quarterly)) {
+    result[!is_quarterly] = as.Date(lubridate::ym(year_period[!is_quarterly]))
+  }
+
+  result
 }
 
 #' @noRd

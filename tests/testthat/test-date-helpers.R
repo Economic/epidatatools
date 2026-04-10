@@ -54,6 +54,36 @@ test_that("extract_period_component handles empty input", {
   expect_equal(result, integer(0))
 })
 
+test_that("parse_bls_date produces no warnings for monthly data", {
+  expect_no_warning(
+    parse_bls_date(
+      date_frequency = rep("month", 12),
+      year = rep(2020, 12),
+      period = sprintf("M%02d", 1:12)
+    )
+  )
+})
+
+test_that("parse_bls_date works with vector date_frequency (multi-chunk)", {
+  result = parse_bls_date(
+    date_frequency = c("month", "month", "quarter", "quarter"),
+    year = c(2020, 2020, 2021, 2021),
+    period = c("M01", "M06", "Q01", "Q03")
+  )
+  expect_equal(result, as.Date(c("2020-01-01", "2020-06-01", "2021-01-01", "2021-07-01")))
+  expect_s3_class(result, "Date")
+})
+
+test_that("parse_bls_date handles semiyear in vector context", {
+  result = parse_bls_date(
+    date_frequency = c("month", "semiyear", "semiyear"),
+    year = c(2020, 2021, 2021),
+    period = c("M03", "S01", "S02")
+  )
+  expect_equal(result, as.Date(c("2020-03-01", "2021-01-01", "2021-07-01")))
+  expect_s3_class(result, "Date")
+})
+
 test_that("normalize_api_frequency classifies BEA periods", {
   result = normalize_api_frequency(c("2024Q1", "2024M06", "2024"), "bea")
   expect_equal(result, c("quarter", "month", "year"))
