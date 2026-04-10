@@ -1,5 +1,11 @@
 # Changelog
 
+## epidatatools 1.0.4
+
+- Fix `date_frequency` bug in
+  [`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
+  causing failures on 20+year API requests.
+
 ## epidatatools 1.0.3
 
 - Fix bug with multiple same table IDs used in
