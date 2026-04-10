@@ -206,31 +206,31 @@ get_bea_nipa = function(
   dataset_name = if (underlying) "NIUnderlyingDetail" else "NIPA"
 
   # Fetch data for each table and combine results
+  table_names = names(tables)
   all_results = seq_along(tables) |>
     purrr::map(
-      ~ fetch_bea_nipa_complete(
-        .x,
-        tables,
-        years_param,
-        freq_param,
-        dataset_name,
-        bea_api_key
-      )
+      function(idx) {
+        result = fetch_bea_nipa_complete(
+          idx,
+          tables,
+          years_param,
+          freq_param,
+          dataset_name,
+          bea_api_key
+        )
+        # Add custom name column if tables parameter was a named vector
+        if (!is.null(table_names)) {
+          nm = table_names[idx]
+          result = result |>
+            dplyr::mutate(
+              name = dplyr::if_else(nm == "", NA_character_, nm),
+              .before = 1
+            )
+        }
+        result
+      }
     ) |>
     purrr::list_rbind()
-
-  # Add custom names if tables parameter was a named vector
-  table_names = names(tables)
-  if (!is.null(table_names)) {
-    all_results = all_results |>
-      dplyr::mutate(
-        name = table_names[match(.data$table_name, tables)],
-        .before = 1
-      ) |>
-      dplyr::mutate(
-        name = dplyr::if_else(.data$name == "", NA_character_, .data$name)
-      )
-  }
 
   # Determine which date columns to include based on actual data frequencies
   unique_frequencies = unique(all_results$date_frequency)

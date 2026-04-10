@@ -1,3 +1,6 @@
+# epidatatools 1.0.3
+* Fix bug with multiple same table IDs used in `get_bea_nipa()`
+
 # epidatatools 1.0.2
 * Fix `get_bls()` errors when catalog data is unavailable
 
@@ -6,7 +9,7 @@
 
 # epidatatools 1.0.0
 * Better error handling for BEA APIs
-* correct bug in get_bls() producing duplicate output
+* correct bug in `get_bls()` producing duplicate output
 
 # epidatatools 0.9.0
 * New BEA API helper: `get_bea_regional()`

@@ -141,6 +141,28 @@ test_that("get_bea_nipa() returns no duplicate rows for multiple tables", {
   expect_equal(n_tables, 2)
 })
 
+test_that("get_bea_nipa() assigns correct names when same table appears multiple times", {
+  skip_if_not(
+    nzchar(Sys.getenv("BEA_API_KEY")),
+    "BEA_API_KEY not set"
+  )
+
+  result <- get_bea_nipa(
+    c("comp" = "T11400", "surp" = "T11400"),
+    years = 2001,
+    frequency = "quarter"
+  ) |>
+    dplyr::filter(line_number == 1)
+
+  # Both names should appear
+  expect_true("comp" %in% result$name, info = "Should have 'comp' name")
+  expect_true("surp" %in% result$name, info = "Should have 'surp' name")
+
+  # Each name should have the same number of rows
+  name_counts <- table(result$name)
+  expect_equal(unname(name_counts[["comp"]]), unname(name_counts[["surp"]]))
+})
+
 test_that("get_bea_nipa() returns no duplicate rows for quarterly data", {
   skip_if_not(
     nzchar(Sys.getenv("BEA_API_KEY")),
