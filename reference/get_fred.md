@@ -92,7 +92,7 @@ complete_results |>
 #> # A tibble: 2 × 18
 #>   name  series_id id     realtime_start realtime_end title     observation_start
 #>   <chr> <chr>     <chr>  <chr>          <chr>        <chr>     <chr>            
-#> 1 gdp   GDP       GDP    2026-03-13     2026-03-13   Gross Do… 1947-01-01       
+#> 1 gdp   GDP       GDP    2026-04-09     2026-04-09   Gross Do… 1947-01-01       
 #> 2 urate UNRATE    UNRATE 2026-04-03     2026-04-03   Unemploy… 1948-01-01       
 #> # ℹ 11 more variables: observation_end <chr>, frequency <chr>,
 #> #   frequency_short <chr>, units <chr>, units_short <chr>,

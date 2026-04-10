@@ -1,5 +1,10 @@
 # Changelog
 
+## epidatatools 1.0.3
+
+- Fix bug with multiple same table IDs used in
+  [`get_bea_nipa()`](https://economic.github.io/epidatatools/reference/get_bea_nipa.md)
+
 ## epidatatools 1.0.2
 
 - Fix
@@ -13,7 +18,9 @@
 ## epidatatools 1.0.0
 
 - Better error handling for BEA APIs
-- correct bug in get_bls() producing duplicate output
+- correct bug in
+  [`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
+  producing duplicate output
 
 ## epidatatools 0.9.0
 
