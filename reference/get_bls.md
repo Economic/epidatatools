@@ -90,10 +90,10 @@ complete_results
 #> # A tibble: 4 × 4
 #>   name               series_id    metadata          data             
 #>   <chr>              <chr>        <list>            <list>           
-#> 1 emp_fb_2534        LNU02073399  <tibble [1 × 13]> <tibble [12 × 7]>
-#> 2 epop_asianmen_2554 LNU02332330Q <tibble [1 × 13]> <tibble [4 × 7]> 
-#> 3 cpi_semi           CUUS0000SA0  <tibble [1 × 7]>  <tibble [2 × 7]> 
-#> 4 NA                 LNU02300060  <tibble [1 × 13]> <tibble [12 × 7]>
+#> 1 emp_fb_2534        LNU02073399  <tibble [1 × 13]> <tibble [12 × 6]>
+#> 2 epop_asianmen_2554 LNU02332330Q <tibble [1 × 13]> <tibble [4 × 6]> 
+#> 3 cpi_semi           CUUS0000SA0  <tibble [1 × 7]>  <tibble [2 × 6]> 
+#> 4 NA                 LNU02300060  <tibble [1 × 13]> <tibble [12 × 6]>
 
 complete_results |>
   tidyr::unnest(metadata)

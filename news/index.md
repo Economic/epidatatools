@@ -1,5 +1,12 @@
 # Changelog
 
+## epidatatools 1.0.5
+
+- Fix bug in
+  [`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
+  that duplicated rows when the BLS API call retrieves sublists of
+  footnotes.
+
 ## epidatatools 1.0.4
 
 - Fix `date_frequency` bug in
