@@ -320,7 +320,7 @@ bls_payload_series_to_tibble = function(id, payload, start, end) {
 
   data = payload |>
     purrr::pluck(id, "data") |>
-    purrr::map(tibble::as_tibble) |>
+    purrr::map(function(x) { x$footnotes <- NULL; tibble::as_tibble(x) }) |>
     purrr::map(add_dates_to_bls_tibble) |>
     purrr::list_rbind()
 

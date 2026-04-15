@@ -1,3 +1,6 @@
+# epidatatools 1.0.5
+* Fix bug in `get_bls()` that duplicated rows when the BLS API call retrieves sublists of footnotes.
+
 # epidatatools 1.0.4
 * Fix `date_frequency` bug in `get_bls()` causing failures on 20+year API requests.
 
