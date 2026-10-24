@@ -45,9 +45,9 @@ Suggests:
     tidyverse
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epidatatools
 BugReports: https://github.com/Economic/epidatatools/issues
 Depends: 
     R (>= 4.1)
 Config/Needs/website: economic/epitemplate
+Config/roxygen2/version: 8.1.1
