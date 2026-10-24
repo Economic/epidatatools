@@ -1,3 +1,6 @@
+# epidatatools (development version)
+* Fix BEA API error handling so errors returned under `Results` (e.g., from `GetData` calls) are reported instead of failing later with an unrelated message (#22).
+
 # epidatatools 1.0.5
 * Fix bug in `get_bls()` that duplicated rows when the BLS API call retrieves sublists of footnotes.
 
