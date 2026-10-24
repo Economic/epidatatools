@@ -1,3 +1,6 @@
+# epidatatools (development version)
+* `get_bls()` now calls the BLS API directly instead of through the blsR package, which is no longer a dependency. Results are unchanged.
+
 # epidatatools 1.0.5
 * Fix bug in `get_bls()` that duplicated rows when the BLS API call retrieves sublists of footnotes.
 
