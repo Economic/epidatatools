@@ -4,7 +4,7 @@
 # version users can install. Pull requests build the site without deploying.
 on:
   pull_request:
-    branches: [main, master]
+    branches: [main, master, dev]
   release:
     types: [published]
   workflow_dispatch:
