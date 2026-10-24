@@ -171,8 +171,26 @@ get_fred(fred_series_ids, start = as.Date("2024-06-01"), end = 2024)
 
 ## Installation
 
-Install the latest version from R-Universe:
+Install epidatatools from r-universe:
 
 ``` r
-install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
+install.packages(
+  "epidatatools",
+  repos = c("https://economic.r-universe.dev", getOption("repos"))
+)
+```
+
+If you add the EPI r-universe repository to your `.Rprofile` with
+
+``` r
+# Example .Rprofile
+options(repos = c(
+  EPI = "https://economic.r-universe.dev",
+  getOption("repos")
+))
+```
+then you can simply
+
+``` r
+install.packages("epidatatools")
 ```
