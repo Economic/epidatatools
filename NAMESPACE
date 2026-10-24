@@ -20,5 +20,8 @@ export(interpolated_quantile)
 export(merge_status)
 export(summarize_groups)
 importFrom(lifecycle,deprecated)
-importFrom(rlang,":=")
-importFrom(rlang,.data)
+importFrom(rlang,
+  "%||%",
+  ":=",
+  .data
+)
