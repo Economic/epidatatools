@@ -382,10 +382,12 @@ get_bls_payload = function(series, start, end, catalog, bls_api_key) {
     years = bls_year_spans(start, end)
   )
 
-  responses = purrr::map2(
+  # Base Map() rather than purrr::map2(), which would wrap a bls_api_error in
+  # purrr_error_indexed and hide its class and fields from callers
+  responses = Map(
+    function(ids, years) get_bls_api(ids, years[1], years[2], catalog, bls_api_key),
     requests$ids,
-    requests$years,
-    ~ get_bls_api(.x, .y[1], .y[2], catalog, bls_api_key)
+    requests$years
   ) |>
     purrr::list_flatten()
 
@@ -403,6 +405,93 @@ get_bls_payload = function(series, start, end, catalog, bls_api_key) {
     })
 }
 
+#' Retrieve BLS catalog metadata without letting catalog failures block data
+#'
+#' The BLS API sometimes rejects any request that asks for catalog data and
+#' includes certain series (`REQUEST_FAILED`), even though the same request
+#' succeeds without the catalog. Data is therefore requested separately, and
+#' this function requests catalogs on their own, splitting a failing batch in
+#' half until the series that fail are isolated.
+#'
+#' @param series_ids Character vector of BLS series IDs
+#' @param year Year to request; catalog data does not depend on the year
+#' @param bls_api_key BLS API key
+#'
+#' @returns List with `catalogs` (named by series ID; NULL where unavailable)
+#'   and `failed` (IDs whose catalog request failed)
+#' @noRd
+get_bls_catalogs = function(series_ids, year, bls_api_key) {
+  # Base lapply() so a bls_api_error reaches callers unwrapped (see
+  # get_bls_payload())
+  results = series_ids |>
+    bls_series_batches() |>
+    lapply(get_bls_catalog_batch, year = year, bls_api_key = bls_api_key)
+
+  list(
+    catalogs = purrr::list_flatten(purrr::map(results, "catalogs")),
+    failed = purrr::list_c(purrr::map(results, "failed"), ptype = character())
+  )
+}
+
+#' @noRd
+get_bls_catalog_batch = function(series_ids, year, bls_api_key) {
+  # The data requests already pass along BLS's notes (such as "Unable to get
+  # Catalog Data"), which BLS repeats on catalog requests
+  result = tryCatch(
+    suppressMessages(
+      get_bls_api(series_ids, year, year, catalog = TRUE, bls_api_key = bls_api_key)
+    ),
+    bls_api_error = function(e) {
+      # Only REQUEST_FAILED is worth splitting; anything else (such as an
+      # exceeded daily limit) would fail again, so stop now
+      if (!identical(e$status, "REQUEST_FAILED")) {
+        stop(e)
+      }
+      e
+    }
+  )
+
+  if (!inherits(result, "bls_api_error")) {
+    catalogs = series_ids |>
+      purrr::set_names() |>
+      purrr::map(~ purrr::detect(result, function(s) identical(s$seriesID, .x))$catalog)
+    return(list(catalogs = catalogs, failed = character()))
+  }
+
+  if (length(series_ids) == 1) {
+    return(list(
+      catalogs = purrr::set_names(list(NULL), series_ids),
+      failed = series_ids
+    ))
+  }
+
+  half = ceiling(length(series_ids) / 2)
+  first = get_bls_catalog_batch(series_ids[seq_len(half)], year, bls_api_key)
+  second = get_bls_catalog_batch(series_ids[-seq_len(half)], year, bls_api_key)
+
+  list(
+    catalogs = c(first$catalogs, second$catalogs),
+    failed = c(first$failed, second$failed)
+  )
+}
+
+#' @noRd
+warn_bls_catalog_unavailable = function(failed) {
+  rlang::warn(
+    c(
+      paste0(
+        "BLS could not return catalog metadata for ",
+        length(failed),
+        " series, so `series_title` and metadata are missing for them."
+      ),
+      i = paste("Series:", paste(failed, collapse = ", ")),
+      i = "Their data was retrieved. Catalog failures are usually temporary; try again later."
+    ),
+    class = "bls_catalog_unavailable",
+    series_ids = failed
+  )
+}
+
 #' Retrieve data from the BLS API
 #'
 #' Requires you to have an \href{https://www.bls.gov/developers/}{BLS API key} saved in the `BLS_API_KEY` environment variable.
@@ -415,6 +504,13 @@ get_bls_payload = function(series, start, end, catalog, bls_api_key) {
 #'
 #' @returns a tibble
 #'
+#' @details
+#' Series titles and other metadata come from the BLS series catalog, which is
+#' requested separately from the data. If BLS cannot return the catalog for
+#' some series, their data is still returned, but `series_title` is `NA` and
+#' their metadata is missing. A warning of class `bls_catalog_unavailable`
+#' lists those series. Series that BLS has no catalog for get `NA` titles
+#' without a warning.
 #'
 #' @export
 #' @examplesIf nzchar(Sys.getenv("BLS_API_KEY"))
@@ -447,13 +543,25 @@ get_bls = function(
     "https://data.bls.gov/registrationEngine/"
   )
 
+  # Request data and catalogs separately, so a catalog failure cannot block
+  # the data
   raw_results = get_bls_payload(
     series,
     start = start,
     end = end,
-    catalog = TRUE,
+    catalog = FALSE,
     bls_api_key = bls_api_key
   )
+
+  catalogs = get_bls_catalogs(names(raw_results), end, bls_api_key)
+  raw_results = purrr::imap(raw_results, function(x, id) {
+    x$catalog = catalogs$catalogs[[id]]
+    x
+  })
+
+  if (length(catalogs$failed) > 0) {
+    warn_bls_catalog_unavailable(catalogs$failed)
+  }
 
   complete_results = bls_payload_to_tibble(
     raw_results,

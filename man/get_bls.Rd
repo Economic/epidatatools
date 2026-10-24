@@ -29,6 +29,14 @@ a tibble
 \description{
 Requires you to have an \href{https://www.bls.gov/developers/}{BLS API key} saved in the \code{BLS_API_KEY} environment variable.
 }
+\details{
+Series titles and other metadata come from the BLS series catalog, which is
+requested separately from the data. If BLS cannot return the catalog for
+some series, their data is still returned, but \code{series_title} is \code{NA} and
+their metadata is missing. A warning of class \code{bls_catalog_unavailable}
+lists those series. Series that BLS has no catalog for get \code{NA} titles
+without a warning.
+}
 \examples{
 \dontshow{if (nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bls("LNU02300060", start = 2020, end = 2024)
