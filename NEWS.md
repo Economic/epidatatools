@@ -1,4 +1,5 @@
 # epidatatools (development version)
+* `get_bls()` now returns data even when BLS fails to return series catalog metadata, which used to make the whole request fail. Affected series get an `NA` `series_title`, and a `bls_catalog_unavailable` warning lists them (#23).
 * `get_bls()` now calls the BLS API directly instead of through the blsR package, which is no longer a dependency. Results are unchanged.
 * Fix BEA and BLS functions on R versions before 4.4, which lack base R's `%||%` operator; it is now imported from rlang.
 
