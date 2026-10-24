@@ -1,4 +1,5 @@
 # epidatatools (development version)
+* Fix BEA API error handling so errors returned under `Results` (e.g., from `GetData` calls) are reported instead of failing later with an unrelated message (#22).
 * `get_bls()` now calls the BLS API directly instead of through the blsR package, which is no longer a dependency. Results are unchanged.
 * Fix BEA and BLS functions on R versions before 4.4, which lack base R's `%||%` operator; it is now imported from rlang.
 
