@@ -1,5 +1,6 @@
 # epidatatools (development version)
 * `get_bls()` now calls the BLS API directly instead of through the blsR package, which is no longer a dependency. Results are unchanged.
+* Fix BEA and BLS functions on R versions before 4.4, which lack base R's `%||%` operator; it is now imported from rlang.
 
 # epidatatools 1.0.5
 * Fix bug in `get_bls()` that duplicated rows when the BLS API call retrieves sublists of footnotes.

@@ -21,6 +21,7 @@ export(merge_status)
 export(summarize_groups)
 importFrom(lifecycle,deprecated)
 importFrom(rlang,
+  "%||%",
   ":=",
   .data
 )
