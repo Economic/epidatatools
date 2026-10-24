@@ -7,6 +7,7 @@ R package ecosystem.
 ## One and two-way cross-tabulations
 
 ``` r
+
 library(epidatatools)
 
 crosstab(mtcars, cyl)
@@ -38,6 +39,7 @@ crosstab(mtcars, cyl, gear, w = mpg, percent = "column")
 ## Summarize across several distinct groups
 
 ``` r
+
 summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
 #> # A tibble: 12 × 4
 #>    group_name group_value   p50   avg
@@ -59,6 +61,7 @@ summarize_groups(mtcars, cyl|gear|carb, p50 = median(mpg), avg = mean(hp))
 ## Calculate averaged (smoothed) quantiles
 
 ``` r
+
 averaged_median(mtcars$mpg)
 #> [1] 19.2
 
@@ -80,6 +83,7 @@ mtcars |>
 Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
 
 ``` r
+
 # First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.
 
 # CPS ASEC microdata
@@ -111,6 +115,7 @@ Requires valid BLS or FRED API keys stored in the .Renviron as
 `IPUMS_API_KEY`.
 
 ``` r
+
 # To run this example you will need a BLS API key 
 # in your .Renviron file named BLS_API_KEY
 
@@ -141,6 +146,7 @@ get_bls(bls_series_ids, start = 2023, end = 2023)
 ## Get data from the FRED API
 
 ``` r
+
 # To run this example you will need a FRED API key 
 # in your .Renviron named FRED_API_KEY
 
@@ -171,5 +177,6 @@ get_fred(fred_series_ids, start = as.Date("2024-06-01"), end = 2024)
 Install the latest version from R-Universe:
 
 ``` r
+
 install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
 ```

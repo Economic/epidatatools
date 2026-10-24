@@ -92,6 +92,7 @@ After any changes to this package, run the following commands to rebuild
 and verify:
 
 ``` r
+
 devtools::document()  # Regenerate documentation
 devtools::test()      # Run testthat tests
 devtools::check()     # Run R CMD check to verify package integrity

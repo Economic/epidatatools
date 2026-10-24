@@ -47,7 +47,7 @@ A tibble with columns series_id, series_title, and optionally metadata
 ## Details
 
 This function is a wrapper around
-[[`fredr::fredr_series_search_text()`](https://rdrr.io/pkg/fredr/man/fredr_series_search.html)](https://sboysel.github.io/fredr/)
+[`fredr::fredr_series_search_text()`](https://sboysel.github.io/fredr/)
 and requires you to have an [FRED API
 key](https://fred.stlouisfed.org/docs/api/api_key.html).
 
