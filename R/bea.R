@@ -5,10 +5,9 @@
 #' @param result Parsed JSON response from the BEA API
 #' @noRd
 handle_bea_api_error = function(result) {
-  # Check for API errors
-  if (!is.null(result$BEAAPI$Error)) {
-    error_info = result$BEAAPI$Error
-
+  # Check for API errors; GetData calls return them under Results
+  error_info = result$BEAAPI$Error %||% result$BEAAPI$Results$Error
+  if (!is.null(error_info)) {
     # Extract all error components
     error_description = error_info$APIErrorDescription %||% "Unknown error"
     error_code = error_info$APIErrorCode %||% NA_character_
