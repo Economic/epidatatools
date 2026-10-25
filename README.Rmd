@@ -59,7 +59,7 @@ Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
 # First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.
 
 # CPS ASEC microdata
-dl_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
+get_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
 
 #> DDI codebook file saved to /tmp/RtmpGaUUhf/cps_00161.xml
 #> Data file saved to /tmp/RtmpGaUUhf/cps_00161.dat.gz

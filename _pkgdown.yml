@@ -24,10 +24,10 @@ reference:
     Helpers to download data from specific APIs
 - subtitle: IPUMS microdata extracts
   contents:
-  - dl_ipums_acs1
-  - dl_ipums_asec
-  - dl_ipums_cps
-  - dl_ipums_micro
+  - get_ipums_acs1
+  - get_ipums_asec
+  - get_ipums_cps
+  - get_ipums_micro
 - subtitle: BLS time series
   contents:
   - get_bls
