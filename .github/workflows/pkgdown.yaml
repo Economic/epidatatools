@@ -44,6 +44,26 @@ jobs:
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
+      # pkgdown writes an example's error into the page instead of failing. API
+      # examples run only here, so check for errors: a release or manual build fails,
+      # so error output is never deployed; a pull request gets a warning, so an API
+      # outage does not block it.
+      - name: Check examples ran without errors
+        run: |
+          pages = list.files("docs/reference", pattern = "[.]html$", full.names = TRUE)
+          has_error = vapply(pages, function(page) {
+            any(grepl('class="r-err', readLines(page, warn = FALSE), fixed = TRUE))
+          }, logical(1))
+          if (any(has_error)) {
+            msg = paste("Examples with errors:", paste(basename(pages[has_error]), collapse = ", "))
+            if (Sys.getenv("GITHUB_EVENT_NAME") == "pull_request") {
+              cat("::warning::", msg, "\n", sep = "")
+            } else {
+              stop(msg, call. = FALSE)
+            }
+          }
+        shell: Rscript {0}
+
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@fa24774553152dd7873cd16ebd8d959b010c5445 # v4.9.0

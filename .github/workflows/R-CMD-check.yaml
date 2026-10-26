@@ -31,7 +31,9 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      # Empty for jobs without api-keys, so the API tests and examples skip
+      # Empty for jobs without api-keys, so the live API tests skip (see
+      # tests/testthat/helper-live-api.R). API examples run only in the pkgdown build.
+      EPIDATATOOLS_LIVE_TESTS: ${{ matrix.config.api-keys && 'true' || '' }}
       BLS_API_KEY: ${{ matrix.config.api-keys && secrets.BLS_API_KEY || '' }}
       BEA_API_KEY: ${{ matrix.config.api-keys && secrets.BEA_API_KEY || '' }}
       FRED_API_KEY: ${{ matrix.config.api-keys && secrets.FRED_API_KEY || '' }}

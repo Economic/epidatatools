@@ -35,7 +35,7 @@ Retrieves National Income and Product Accounts data from the
 Requires a BEA API key saved in the \code{BEA_API_KEY} environment variable.
 }
 \examples{
-\dontshow{if (nzchar(Sys.getenv("BEA_API_KEY"))) withAutoprint(\{ # examplesIf}
+\dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BEA_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bea_nipa("T10101", years = 2020:2024, frequency = "quarter")
 
 get_bea_nipa(

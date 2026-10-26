@@ -10,7 +10,7 @@
 #'
 #' @returns A tibble
 #' @export
-#' @examplesIf nzchar(Sys.getenv("FRED_API_KEY"))
+#' @examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("FRED_API_KEY"))
 #' get_fred("UNRATE")
 #'
 #' series = c(

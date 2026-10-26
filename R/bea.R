@@ -166,7 +166,7 @@ process_nipa_dates_and_values = function(data_tibble) {
 #' @returns A tibble with columns: table_name, table_description, line_number, line_description, date_frequency, date, value, and date variables (year, quarter, month) appropriate to the frequency of data returned. Annual data includes only year; quarterly data includes year and quarter; monthly data includes year, quarter, and month. If metadata = TRUE, also includes unit_mult, metric_name, cl_unit, series_code, and note_text (list column). If tables is a named vector, includes a "name" column as the first column.
 #'
 #' @export
-#' @examplesIf nzchar(Sys.getenv("BEA_API_KEY"))
+#' @examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BEA_API_KEY"))
 #' get_bea_nipa("T10101", years = 2020:2024, frequency = "quarter")
 #'
 #' get_bea_nipa(
@@ -353,7 +353,7 @@ fetch_bea_nipa_complete = function(
 #'   containing all notes from the API response).
 #'
 #' @export
-#' @examplesIf nzchar(Sys.getenv("BEA_API_KEY"))
+#' @examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BEA_API_KEY"))
 #' get_bea_regional(geo_fips = "STATE", table_name = "SAINC1", line_code = 1)
 #'
 #' get_bea_regional(geo_fips = c("36000", "06000"), table_name = "SAINC1", line_code = 1)
