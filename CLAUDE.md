@@ -26,7 +26,7 @@ Here is a list of the main user-facing functions available in this package:
 - `get_ipums_acs1(years, variables, description, ...)`: Retrieves IPUMS ACS 1-year files.
 - `get_ipums_asec(years, variables, description, ...)`: Retrieves IPUMS CPS ASEC files.
 - `get_ipums_cps(months, variables, description, ...)`: Retrieves IPUMS Monthly CPS files.
-- `dl_ipums_micro()`, `dl_ipums_acs1()`, `dl_ipums_asec()` and `dl_ipums_cps()`: deprecated in 2.0.0 (`lifecycle::deprecate_soft()`), and kept as wrappers that call the `get_ipums_*()` functions. Their docs are `@keywords internal`.
+- `dl_ipums_micro()`, `dl_ipums_acs1()`, `dl_ipums_asec()` and `dl_ipums_cps()`: deprecated in 2.0.0 (`lifecycle::deprecate_soft()`), and kept as wrappers that call the `get_ipums_*()` functions. Their shared help page (`ipums_micro_deprecated`) is listed with the other deprecated functions in the "Deprecated" section of `_pkgdown.yml`.
 - `merge_status(x, y, ...)`: Joins two data frames and creates a `_merge` indicator column to show the merge status (left_only, right_only, both).
 - `summarize_groups(.data, .groups, ...)`: Summarizes distinct groups in a data frame.
 

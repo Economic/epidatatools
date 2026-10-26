@@ -13,7 +13,6 @@
 #'
 #' @inheritParams get_ipums_micro
 #' @return a tibble of microdata from the IPUMS API
-#' @keywords internal
 #' @name ipums_micro_deprecated
 NULL
 
