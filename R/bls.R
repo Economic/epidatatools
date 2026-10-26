@@ -242,9 +242,21 @@ get_bls_catalog_batch = function(series_ids, year, bls_api_key) {
   )
 }
 
+# Warn with cli, which wraps each bullet to the console width and indents its
+# continuation lines. Braces are escaped because cli reads {...} as code, and BLS
+# footnotes and series IDs are plain text.
+#' @noRd
+bls_warn = function(message, class, ...) {
+  message = purrr::set_names(
+    gsub("([{}])", "\\1\\1", message),
+    names(message)
+  )
+  cli::cli_warn(message, class = class, ...)
+}
+
 #' @noRd
 warn_bls_catalog_unavailable = function(failed) {
-  rlang::warn(
+  bls_warn(
     c(
       paste0(
         "BLS could not return catalog metadata for ",
@@ -484,7 +496,7 @@ warn_bls_missing_values = function(explained) {
   bullets = purrr::imap_chr(groups, function(g, note) {
     paste0(sub("\\.$", "", note), " (", bls_describe_periods(g), ")")
   })
-  rlang::warn(
+  bls_warn(
     c(
       paste0(
         "BLS has no value for ", n, " observation", if (n > 1) "s",
@@ -505,7 +517,7 @@ warn_bls_unexpected_values = function(unexplained) {
   bullets = paste0(
     shown$series_id, ", ", shown$period, ": ", encodeString(shown$value, quote = '"')
   )
-  rlang::warn(
+  bls_warn(
     c(
       paste0(
         "BLS returned ", n, " value", if (n > 1) "s", " that ",

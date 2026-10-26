@@ -22,6 +22,9 @@ bls_obs = function(year, period, period_name, value, notes = character()) {
   )
 }
 
+# Warnings are wrapped to the console width, so compare their text on one line
+warning_text = function(w) gsub("\\s+", " ", conditionMessage(w))
+
 # A fake get_bls_api() serving `series`, a list of observation lists named by ID
 fake_bls_series_api = function(series) {
   function(series_ids, start, end, catalog = FALSE, bls_api_key = "") {
@@ -54,7 +57,7 @@ test_that("missing values are NA, with BLS's explanation instead of a coercion w
     result <- get_bls(c("MONTHLY", "QUARTERLY"), 2025, 2025, bls_api_key = "fake"),
     class = "bls_missing_values"
   )
-  msg = conditionMessage(w)
+  msg = warning_text(w)
   expect_match(msg, "no value for 2 observations", fixed = TRUE)
   expect_match(msg, "lapse in appropriations (October 2025 for MONTHLY)", fixed = TRUE)
   expect_match(msg, "4th Quarter 2025 for QUARTERLY", fixed = TRUE)
@@ -78,7 +81,7 @@ test_that("many series with one footnote are listed briefly", {
   )
   local_mocked_bindings(get_bls_api = fake_bls_series_api(series))
   w = expect_warning(get_bls(ids, 2025, 2025, bls_api_key = "fake"), class = "bls_missing_values")
-  expect_match(conditionMessage(w), "October 2025 for S01, S02, S03, S04, S05 and 3 more", fixed = TRUE)
+  expect_match(warning_text(w), "October 2025 for S01, S02, S03, S04, S05 and 3 more", fixed = TRUE)
 })
 
 test_that("options(epidatatools.warn_missing = FALSE) turns off the warning", {
@@ -98,7 +101,7 @@ test_that("values that are not numbers and have no footnote get their own warnin
     result <- get_bls("ODD", 2025, 2025, bls_api_key = "fake"),
     class = "bls_unexpected_values"
   )
-  expect_match(conditionMessage(w), 'ODD, January 2025: "N.A."', fixed = TRUE)
+  expect_match(warning_text(w), 'ODD, January 2025: "N.A."', fixed = TRUE)
   expect_equal(result$value, c(NA, 3))
 })
 
