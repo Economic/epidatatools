@@ -15,7 +15,7 @@ get_bls()."><meta property="og:image" content="https://economic.github.io/epidat
 
     <a class="navbar-brand me-2" href="../index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@ get_bls()."><meta property="og:image" content="https://economic.github.io/epidat
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Find BLS Series by Search String</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Economic/epidatatools/blob/v2.0.0/R/find_bls.R" class="external-link"><code>R/find_bls.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Economic/epidatatools/blob/v2.1.0/R/find_bls.R" class="external-link"><code>R/find_bls.R</code></a></small>
       <div class="d-none name"><code>find_bls.Rd</code></div>
     </div>
 
@@ -133,13 +133,58 @@ environment variable: the catalog manifest to read</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># interactive()</span></span></span>
-<span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"unemployment rate"</span>, survey <span class="op">=</span> <span class="st">"ln"</span>, seasonality <span class="op">=</span> <span class="st">"SA"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"unemployment rate"</span>, survey <span class="op">=</span> <span class="st">"ln"</span>, seasonality <span class="op">=</span> <span class="st">"SA"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 184 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    series_id    series_title    program survey_name seasonal begin_year end_year</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> LNS14000000  (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>948     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> LNS14000000Q (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>948     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> LNS14000001  (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>948     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> LNS14000001Q (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>948     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> LNS14032183  (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">2</span>003     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> LNS14032183Q (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">2</span>010     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> LNS14000003  (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>954     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> LNS14000003Q (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>954     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> LNS14000002  (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>948     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> LNS14000002Q (Seas) Unemplo… ln      Labor Forc… SA             <span style="text-decoration: underline;">1</span>948     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 174 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: end_period &lt;chr&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"registered nurses wages"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 18,897 matches; showing the first 1,000. Narrow the search, or use `limit = Inf`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> By survey: oe 12,674, wm 6,206, le 10, cm 6, ep 1.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    series_id       series_title program survey_name seasonal begin_year end_year</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> EPU291141TE1200 Registered … ep      Employment… NSA            <span style="text-decoration: underline;">2</span>025     <span style="text-decoration: underline;">2</span>025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> WMU39000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> WMU49000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> WMU23000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> WMU02000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> WMU15000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> WMU32000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> WMU41000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> WMU19000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> WMU39000001020… Average hou… wm      Modeled Wa… NSA            <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">2</span>023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 990 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: end_period &lt;chr&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">find_bls</span><span class="op">(</span><span class="st">"all items"</span>, survey <span class="op">=</span> <span class="st">"cu"</span>, titles_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 702 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    series_id   series_title     program survey_name seasonal begin_year end_year</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> CUUR0490SA0 All items in Pa… cu      Consumer P… NSA            <span style="text-decoration: underline;">2</span>017     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> CUUS0490SA0 All items in Pa… cu      Consumer P… NSA            <span style="text-decoration: underline;">2</span>018     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> CUUR0480SA0 All items in Mo… cu      Consumer P… NSA            <span style="text-decoration: underline;">2</span>017     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> CUUS0480SA0 All items in Mo… cu      Consumer P… NSA            <span style="text-decoration: underline;">2</span>018     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> CUUR0400SA0 All items in We… cu      Consumer P… NSA            <span style="text-decoration: underline;">1</span>966     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> CUUS0400SA0 All items in We… cu      Consumer P… NSA            <span style="text-decoration: underline;">1</span>984     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> CUUR0110SA0 All items in Ne… cu      Consumer P… NSA            <span style="text-decoration: underline;">2</span>017     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> CUUS0110SA0 All items in Ne… cu      Consumer P… NSA            <span style="text-decoration: underline;">2</span>018     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> CUUR0300SA0 All items in So… cu      Consumer P… NSA            <span style="text-decoration: underline;">1</span>966     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> CUUS0300SA0 All items in So… cu      Consumer P… NSA            <span style="text-decoration: underline;">1</span>984     <span style="text-decoration: underline;">2</span>026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 692 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: end_period &lt;chr&gt;</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -50,6 +50,19 @@ for some series, their data is still returned, but `series_title` is
 `bls_catalog_unavailable` lists those series. Series that BLS has no
 catalog for get `NA` titles without a warning.
 
+When BLS has no data for an observation, it sends a value that is not a
+number, usually with a footnote that explains why. For example, most
+series have no October 2025 value because of the 2025 lapse in
+appropriations. These values are `NA`, and a warning of class
+`bls_missing_values` lists them with BLS's explanation. Turn it off with
+`options(epidatatools.warn_missing = FALSE)`, or for one call with
+`suppressWarnings(get_bls(...), classes = "bls_missing_values")`. A
+value that is not a number and has no footnote gives a separate warning
+of class `bls_unexpected_values`, which the option does not turn off.
+
+With `metadata = TRUE`, each series' `data` has numeric values and a
+`footnotes` column with BLS's footnotes for each observation.
+
 ## Examples
 
 ``` r
@@ -97,10 +110,10 @@ complete_results
 #> # A tibble: 4 × 4
 #>   name               series_id    metadata          data             
 #>   <chr>              <chr>        <list>            <list>           
-#> 1 emp_fb_2534        LNU02073399  <tibble [1 × 13]> <tibble [12 × 6]>
-#> 2 epop_asianmen_2554 LNU02332330Q <tibble [1 × 13]> <tibble [4 × 6]> 
-#> 3 cpi_semi           CUUS0000SA0  <tibble [1 × 7]>  <tibble [2 × 6]> 
-#> 4 NA                 LNU02300060  <tibble [1 × 13]> <tibble [12 × 6]>
+#> 1 emp_fb_2534        LNU02073399  <tibble [1 × 13]> <tibble [12 × 7]>
+#> 2 epop_asianmen_2554 LNU02332330Q <tibble [1 × 13]> <tibble [4 × 7]> 
+#> 3 cpi_semi           CUUS0000SA0  <tibble [1 × 7]>  <tibble [2 × 7]> 
+#> 4 NA                 LNU02300060  <tibble [1 × 13]> <tibble [12 × 7]>
 
 complete_results |>
   tidyr::unnest(metadata)

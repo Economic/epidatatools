@@ -98,11 +98,56 @@ Searching needs the arrow package, which `find_bls()` offers to install.
 ## Examples
 
 ``` r
-if (FALSE) { # interactive()
 find_bls("unemployment rate", survey = "ln", seasonality = "SA")
+#> # A tibble: 184 × 8
+#>    series_id    series_title    program survey_name seasonal begin_year end_year
+#>    <chr>        <chr>           <chr>   <chr>       <chr>         <int>    <int>
+#>  1 LNS14000000  (Seas) Unemplo… ln      Labor Forc… SA             1948     2026
+#>  2 LNS14000000Q (Seas) Unemplo… ln      Labor Forc… SA             1948     2026
+#>  3 LNS14000001  (Seas) Unemplo… ln      Labor Forc… SA             1948     2026
+#>  4 LNS14000001Q (Seas) Unemplo… ln      Labor Forc… SA             1948     2026
+#>  5 LNS14032183  (Seas) Unemplo… ln      Labor Forc… SA             2003     2026
+#>  6 LNS14032183Q (Seas) Unemplo… ln      Labor Forc… SA             2010     2026
+#>  7 LNS14000003  (Seas) Unemplo… ln      Labor Forc… SA             1954     2026
+#>  8 LNS14000003Q (Seas) Unemplo… ln      Labor Forc… SA             1954     2026
+#>  9 LNS14000002  (Seas) Unemplo… ln      Labor Forc… SA             1948     2026
+#> 10 LNS14000002Q (Seas) Unemplo… ln      Labor Forc… SA             1948     2026
+#> # ℹ 174 more rows
+#> # ℹ 1 more variable: end_period <chr>
 
 find_bls("registered nurses wages")
+#> 18,897 matches; showing the first 1,000. Narrow the search, or use `limit = Inf`.
+#> By survey: oe 12,674, wm 6,206, le 10, cm 6, ep 1.
+#> # A tibble: 1,000 × 8
+#>    series_id       series_title program survey_name seasonal begin_year end_year
+#>    <chr>           <chr>        <chr>   <chr>       <chr>         <int>    <int>
+#>  1 EPU291141TE1200 Registered … ep      Employment… NSA            2025     2025
+#>  2 WMU39000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#>  3 WMU49000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#>  4 WMU23000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#>  5 WMU02000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#>  6 WMU15000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#>  7 WMU32000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#>  8 WMU41000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#>  9 WMU19000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#> 10 WMU39000001020… Average hou… wm      Modeled Wa… NSA            2023     2023
+#> # ℹ 990 more rows
+#> # ℹ 1 more variable: end_period <chr>
 
 find_bls("all items", survey = "cu", titles_only = TRUE)
-}
+#> # A tibble: 702 × 8
+#>    series_id   series_title     program survey_name seasonal begin_year end_year
+#>    <chr>       <chr>            <chr>   <chr>       <chr>         <int>    <int>
+#>  1 CUUR0490SA0 All items in Pa… cu      Consumer P… NSA            2017     2026
+#>  2 CUUS0490SA0 All items in Pa… cu      Consumer P… NSA            2018     2026
+#>  3 CUUR0480SA0 All items in Mo… cu      Consumer P… NSA            2017     2026
+#>  4 CUUS0480SA0 All items in Mo… cu      Consumer P… NSA            2018     2026
+#>  5 CUUR0400SA0 All items in We… cu      Consumer P… NSA            1966     2026
+#>  6 CUUS0400SA0 All items in We… cu      Consumer P… NSA            1984     2026
+#>  7 CUUR0110SA0 All items in Ne… cu      Consumer P… NSA            2017     2026
+#>  8 CUUS0110SA0 All items in Ne… cu      Consumer P… NSA            2018     2026
+#>  9 CUUR0300SA0 All items in So… cu      Consumer P… NSA            1966     2026
+#> 10 CUUS0300SA0 All items in So… cu      Consumer P… NSA            1984     2026
+#> # ℹ 692 more rows
+#> # ℹ 1 more variable: end_period <chr>
 ```

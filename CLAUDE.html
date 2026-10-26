@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="logo.png" class="logo" alt=""><h1>AGENTS.md</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Economic/epidatatools/blob/v2.0.0/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Economic/epidatatools/blob/v2.1.0/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
     </div>
 
 <div id="agentsmd" class="section level1">
@@ -54,7 +54,7 @@
 <li>
 <code>get_bea_regional(geo_fips, table_name, line_code, year, metadata, bea_api_key)</code>: Retrieves regional economic data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Takes a single table_name and line_code (or “ALL” for all line codes), but allows multiple geo_fips and years. A single geo_fips can be a state abbreviation (e.g., “NY”). Returns a tibble with geo_fips, geo_name, table_name, table_description, line_number, line_description, date_frequency, date, year, value. When metadata=TRUE, also includes cl_unit, mult_unit, and note_text (list column containing all notes from the API response). Results are sorted by geo_fips, table_name, line_number, date.</li>
 <li>
-<code>get_bls(series, start, end, metadata)</code>: Retrieves data from the Bureau of Labor Statistics (BLS) API. Requires a BLS API key. Calls the BLS API directly, splitting requests into batches of 50 series and spans of 20 years. Data and series catalogs (the source of <code>series_title</code> and metadata) are requested separately; if BLS fails to return a catalog, the data is still returned with an <code>NA</code> title and a <code>bls_catalog_unavailable</code> warning. API failures raise errors of class <code>bls_api_error</code>.</li>
+<code>get_bls(series, start, end, metadata)</code>: Retrieves data from the Bureau of Labor Statistics (BLS) API. Requires a BLS API key. Calls the BLS API directly, splitting requests into batches of 50 series and spans of 20 years. Data and series catalogs (the source of <code>series_title</code> and metadata) are requested separately; if BLS fails to return a catalog, the data is still returned with an <code>NA</code> title and a <code>bls_catalog_unavailable</code> warning. API failures raise errors of class <code>bls_api_error</code>. Values that are not numbers (BLS sends “-” for missing data, such as October 2025) become <code>NA</code>: with a BLS footnote, one <code>bls_missing_values</code> warning gives the footnote text (off with <code>options(epidatatools.warn_missing = FALSE)</code>); without one, a <code>bls_unexpected_values</code> warning shows the raw values. With <code>metadata = TRUE</code>, each series’ data has numeric values and a <code>footnotes</code> column.</li>
 <li>
 <code>crosstab(data, ..., w, percent)</code>: Creates a cross-tabulation of one or two variables in a data frame.</li>
 <li>
@@ -98,12 +98,15 @@
 <div class="section level3">
 <h3 id="api-tests">API Tests<a class="anchor" aria-label="anchor" href="#api-tests"></a></h3>
 <p>Tests for API functions (<code><a href="reference/get_bls.html">get_bls()</a></code>, <code><a href="reference/get_bea_nipa.html">get_bea_nipa()</a></code>, <code><a href="reference/get_bea_regional.html">get_bea_regional()</a></code>) require API keys to be set in environment variables: - <code>BLS_API_KEY</code> for BLS functions - <code>BEA_API_KEY</code> for BEA functions</p>
-<p>Tests will be skipped automatically if the required API keys are not available.</p>
+<p>Live API tests run only when <code>EPIDATATOOLS_LIVE_TESTS=true</code> and the key is set (see <code>tests/testthat/helper-live-api.R</code>), so a local <code>devtools::test()</code> or <code>devtools::check()</code> makes no API requests by default. CI sets it for its one R CMD check job with API keys. Run them locally with <code>Sys.setenv(EPIDATATOOLS_LIVE_TESTS = "true")</code>. A live test skips when the API is unavailable: BLS’s daily limit of 500 requests (<code>REQUEST_NOT_PROCESSED</code>), or HTTP 429 or 5xx. Each <code><a href="reference/get_bls.html">get_bls()</a></code> call makes 2 BLS requests (data and catalog).</p>
+<p>Examples for <code><a href="reference/get_bls.html">get_bls()</a></code>, <code><a href="reference/get_fred.html">get_fred()</a></code>, <code>get_bea_*()</code> and <code><a href="reference/find_bls.html">find_bls()</a></code> run only while the pkgdown site is built (<code>@examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true")</code>), not in <code>R CMD check</code>. The pkgdown workflow fails a release build if any reference page has an example error, and warns on pull requests.</p>
 </div>
 <div class="section level3">
 <h3 id="key-test-file">Key Test File<a class="anchor" aria-label="anchor" href="#key-test-file"></a></h3>
 <ul><li>
 <code>test-api-no-duplicates.R</code>: Verifies that API functions do not return duplicate data rows. This was added to catch regressions of a bug where multiple series queries returned duplicated observations.</li>
+<li>
+<code>test-bls-missing-values.R</code>: Tests <code><a href="reference/get_bls.html">get_bls()</a></code> missing-value warnings and footnotes with a mocked <code>get_bls_api()</code>.</li>
 <li>
 <code>test-bls-internals.R</code>: Tests <code><a href="reference/get_bls.html">get_bls()</a></code> internals with a mocked <code>get_bls_api()</code> (no API calls), including request splitting and the catalog-failure fallback.</li>
 </ul></div>

@@ -67,7 +67,13 @@ package:
   `series_title` and metadata) are requested separately; if BLS fails to
   return a catalog, the data is still returned with an `NA` title and a
   `bls_catalog_unavailable` warning. API failures raise errors of class
-  `bls_api_error`.
+  `bls_api_error`. Values that are not numbers (BLS sends “-” for
+  missing data, such as October 2025) become `NA`: with a BLS footnote,
+  one `bls_missing_values` warning gives the footnote text (off with
+  `options(epidatatools.warn_missing = FALSE)`); without one, a
+  `bls_unexpected_values` warning shows the raw values. With
+  `metadata = TRUE`, each series’ data has numeric values and a
+  `footnotes` column.
 - `crosstab(data, ..., w, percent)`: Creates a cross-tabulation of one
   or two variables in a data frame.
 - `get_fred(series, start, end, metadata)`: Retrieves data from the
@@ -151,14 +157,34 @@ Tests for API functions
 require API keys to be set in environment variables: - `BLS_API_KEY` for
 BLS functions - `BEA_API_KEY` for BEA functions
 
-Tests will be skipped automatically if the required API keys are not
-available.
+Live API tests run only when `EPIDATATOOLS_LIVE_TESTS=true` and the key
+is set (see `tests/testthat/helper-live-api.R`), so a local
+`devtools::test()` or `devtools::check()` makes no API requests by
+default. CI sets it for its one R CMD check job with API keys. Run them
+locally with `Sys.setenv(EPIDATATOOLS_LIVE_TESTS = "true")`. A live test
+skips when the API is unavailable: BLS’s daily limit of 500 requests
+(`REQUEST_NOT_PROCESSED`), or HTTP 429 or 5xx. Each
+[`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
+call makes 2 BLS requests (data and catalog).
+
+Examples for
+[`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md),
+[`get_fred()`](https://economic.github.io/epidatatools/reference/get_fred.md),
+`get_bea_*()` and
+[`find_bls()`](https://economic.github.io/epidatatools/reference/find_bls.md)
+run only while the pkgdown site is built
+(`@examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true")`), not in
+`R CMD check`. The pkgdown workflow fails a release build if any
+reference page has an example error, and warns on pull requests.
 
 ### Key Test File
 
 - `test-api-no-duplicates.R`: Verifies that API functions do not return
   duplicate data rows. This was added to catch regressions of a bug
   where multiple series queries returned duplicated observations.
+- `test-bls-missing-values.R`: Tests
+  [`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
+  missing-value warnings and footnotes with a mocked `get_bls_api()`.
 - `test-bls-internals.R`: Tests
   [`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
   internals with a mocked `get_bls_api()` (no API calls), including

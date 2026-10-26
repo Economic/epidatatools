@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,9 +28,17 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/Economic/epidatatools/blob/v2.0.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/Economic/epidatatools/blob/v2.1.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.1.0" id="epidatatools-210">epidatatools 2.1.0<a class="anchor" aria-label="anchor" href="#epidatatools-210"></a></h2>
+<ul><li>
+<code><a href="../reference/get_bls.html">get_bls()</a></code> now explains missing values, such as October 2025 during the 2025 lapse in appropriations, in a warning of class <code>bls_missing_values</code> that gives BLS’s footnote. Turn it off with <code>options(epidatatools.warn_missing = FALSE)</code> (<a href="https://github.com/Economic/epidatatools/issues/13" class="external-link">#13</a>).</li>
+<li>With <code>get_bls(metadata = TRUE)</code>, <code>value</code> in each series’ nested <code>data</code> is now numeric (it was text, with <code>"-"</code> for missing values), and a new <code>footnotes</code> column gives BLS’s footnotes.</li>
+<li>
+<code><a href="../reference/get_bls.html">get_bls()</a></code> errors and messages no longer show your BLS API key, which BLS includes in its daily-limit message.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="epidatatools-200">epidatatools 2.0.0<a class="anchor" aria-label="anchor" href="#epidatatools-200"></a></h2>
 <div class="section level3">
