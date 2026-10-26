@@ -44,4 +44,3 @@ data functions, such as \code{\link[=get_bls]{get_bls()}} and \code{\link[=get_f
 \item \code{dl_ipums_cps()} is now \code{\link[=get_ipums_cps]{get_ipums_cps()}}
 }
 }
-\keyword{internal}
