@@ -23,10 +23,15 @@ binipolate(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL)
 a tibble or data frame
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
-This function was superseded and EPI insteads uses
-\code{\link[=averaged_quantile]{averaged_quantile()}} to interpolate percentiles.
+This function was deprecated in epidatatools 2.0.0. Use \code{\link[=averaged_quantile]{averaged_quantile()}},
+EPI's preferred method for interpolating percentiles, with \code{\link[dplyr:reframe]{dplyr::reframe()}}
+instead. It uses a different method, so its results differ:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{dplyr::reframe(mtcars, probs = c(0.25, 0.75),
+  value = averaged_quantile(mpg, wt, probs), .by = cyl)
+}\if{html}{\out{</div>}}
 }
 \examples{
 binipolate(mtcars, mpg, bin_size = 0.25)

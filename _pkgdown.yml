@@ -14,11 +14,8 @@ reference:
   desc: >
     Calculate weighted percentiles.
   contents:
-  - binipolate
   - averaged_median
   - averaged_quantile
-  - interpolated_median
-  - interpolated_quantile
 - title: Download data
   desc: >
     Helpers to download data from specific APIs
@@ -48,4 +45,11 @@ reference:
   - crosstab
   - merge_status
   - summarize_groups
+- title: Deprecated
+  desc: >
+    Use averaged_quantile() and averaged_median() instead.
+  contents:
+  - binipolate
+  - interpolated_median
+  - interpolated_quantile
 

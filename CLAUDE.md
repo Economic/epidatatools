@@ -19,9 +19,9 @@ Here is a list of the main user-facing functions available in this package:
 - `get_bls(series, start, end, metadata)`: Retrieves data from the Bureau of Labor Statistics (BLS) API. Requires a BLS API key. Calls the BLS API directly, splitting requests into batches of 50 series and spans of 20 years. Data and series catalogs (the source of `series_title` and metadata) are requested separately; if BLS fails to return a catalog, the data is still returned with an `NA` title and a `bls_catalog_unavailable` warning. API failures raise errors of class `bls_api_error`.
 - `crosstab(data, ..., w, percent)`: Creates a cross-tabulation of one or two variables in a data frame.
 - `get_fred(series, start, end, metadata)`: Retrieves data from the Federal Reserve Economic Data (FRED) API. Requires a FRED API key.
-- `interpolated_quantile(x, bin_size, probs, w, na.rm)`: Calculates the binned interpolated quantile of a numeric vector.
-- `interpolated_median(x, bin_size, w, na.rm)`: Calculates the binned interpolated median of a numeric vector.
-- `binipolate(data, x, probs, bin_size, .by, w)`: Summarizes a data frame as binned interpolated percentiles.
+- `interpolated_quantile(x, bin_size, probs, w, na.rm)`: Calculates the binned interpolated quantile of a numeric vector. Deprecated in 2.0.0 (`lifecycle::deprecate_soft()`) in favor of `averaged_quantile()`.
+- `interpolated_median(x, bin_size, w, na.rm)`: Calculates the binned interpolated median of a numeric vector. Deprecated in 2.0.0 in favor of `averaged_median()`.
+- `binipolate(data, x, probs, bin_size, .by, w)`: Summarizes a data frame as binned interpolated percentiles. Deprecated in 2.0.0 in favor of `averaged_quantile()` inside `dplyr::reframe()`. All three deprecated functions call the internal `interpolated_quantile_impl()`, so each call warns once.
 - `get_ipums_micro(extract)`: Retrieves a selection of IPUMS microdata extracts and returns them as a tibble. Requires an IPUMS API key.
 - `get_ipums_acs1(years, variables, description, ...)`: Retrieves IPUMS ACS 1-year files.
 - `get_ipums_asec(years, variables, description, ...)`: Retrieves IPUMS CPS ASEC files.
