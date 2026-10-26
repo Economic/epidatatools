@@ -1,3 +1,8 @@
+# epidatatools (development version)
+
+* `get_bls()` errors and messages no longer show your BLS API key, which BLS includes
+  in its daily-limit message.
+
 # epidatatools 2.0.0
 
 ## Breaking changes

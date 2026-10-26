@@ -72,6 +72,24 @@ get_bls_api = function(
   content = httr::content(response, as = "text", encoding = "UTF-8")
   result = jsonlite::fromJSON(content, simplifyVector = FALSE)
 
+  process_bls_response(result, bls_api_key)
+}
+
+#' Check a parsed BLS API response and return its series
+#'
+#' @param result Parsed JSON response from the BLS API
+#' @param bls_api_key BLS API key used for the request
+#' @noRd
+process_bls_response = function(result, bls_api_key) {
+  # Some BLS messages quote the API key (for example, the daily limit message),
+  # so hide it before it reaches an error or note that a user might share
+  if (nzchar(bls_api_key)) {
+    result$message = lapply(
+      result$message,
+      function(m) gsub(bls_api_key, "***", m, fixed = TRUE)
+    )
+  }
+
   # Check for API errors
   handle_bls_api_error(result)
 

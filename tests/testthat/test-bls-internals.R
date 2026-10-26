@@ -183,3 +183,25 @@ test_that("bls_api_error reaches callers unwrapped", {
   )
   expect_equal(caught, "REQUEST_NOT_PROCESSED")
 })
+
+test_that("BLS messages never show the API key", {
+  key = "0123456789abcdef0123456789abcdef"
+  limit = list(
+    status = "REQUEST_NOT_PROCESSED",
+    message = list(paste(
+      "Request could not be serviced, as the daily threshold for total number of",
+      "requests allocated to the user with registration key", key, "has been reached."
+    ))
+  )
+  err = expect_error(process_bls_response(limit, key), class = "bls_api_error")
+  expect_false(grepl(key, conditionMessage(err), fixed = TRUE))
+  expect_false(any(grepl(key, err$messages, fixed = TRUE)))
+  expect_match(conditionMessage(err), "registration key *** has been reached", fixed = TRUE)
+
+  note = list(
+    status = "REQUEST_SUCCEEDED",
+    message = list(paste("A note mentioning", key)),
+    Results = list(series = list())
+  )
+  expect_message(process_bls_response(note, key), "A note mentioning \\*\\*\\*")
+})
