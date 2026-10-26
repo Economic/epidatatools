@@ -50,7 +50,7 @@ With \code{metadata = TRUE}, each series' \code{data} has numeric values and a \
 column with BLS's footnotes for each observation.
 }
 \examples{
-\dontshow{if (nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
+\dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bls("LNU02300060", start = 2020, end = 2024)
 
 bls_series_ids = c(

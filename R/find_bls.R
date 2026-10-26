@@ -72,7 +72,7 @@ bls_index_columns = c(
 #'   `begin_year`, `end_year` and `end_period`.
 #'
 #' @export
-#' @examplesIf interactive()
+#' @examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true")
 #' find_bls("unemployment rate", survey = "ln", seasonality = "SA")
 #'
 #' find_bls("registered nurses wages")

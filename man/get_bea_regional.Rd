@@ -42,7 +42,7 @@ Retrieves regional economic data from the
 Requires a BEA API key saved in the \code{BEA_API_KEY} environment variable.
 }
 \examples{
-\dontshow{if (nzchar(Sys.getenv("BEA_API_KEY"))) withAutoprint(\{ # examplesIf}
+\dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BEA_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bea_regional(geo_fips = "STATE", table_name = "SAINC1", line_code = 1)
 
 get_bea_regional(geo_fips = c("36000", "06000"), table_name = "SAINC1", line_code = 1)

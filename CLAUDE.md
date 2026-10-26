@@ -55,7 +55,9 @@ Tests for API functions (`get_bls()`, `get_bea_nipa()`, `get_bea_regional()`) re
 - `BLS_API_KEY` for BLS functions
 - `BEA_API_KEY` for BEA functions
 
-Tests will be skipped automatically if the required API keys are not available.
+Live API tests run only when `EPIDATATOOLS_LIVE_TESTS=true` and the key is set (see `tests/testthat/helper-live-api.R`), so a local `devtools::test()` or `devtools::check()` makes no API requests by default. CI sets it for its one R CMD check job with API keys. Run them locally with `Sys.setenv(EPIDATATOOLS_LIVE_TESTS = "true")`. A live test skips when the API is unavailable: BLS's daily limit of 500 requests (`REQUEST_NOT_PROCESSED`), or HTTP 429 or 5xx. Each `get_bls()` call makes 2 BLS requests (data and catalog).
+
+Examples for `get_bls()`, `get_fred()`, `get_bea_*()` and `find_bls()` run only while the pkgdown site is built (`@examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true")`), not in `R CMD check`. The pkgdown workflow fails a release build if any reference page has an example error, and warns on pull requests.
 
 ### Key Test File
 
