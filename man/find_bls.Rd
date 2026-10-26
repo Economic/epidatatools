@@ -49,9 +49,11 @@ string. The catalog is built weekly from the BLS flat files by
 \section{Searching}{
 
 Every word in \code{search_string} must match, ignoring case, in the series title, the
-survey name or a survey alias (such as "CPI" or "JOLTS"). Words match by their
-English stem, so "nurses" also finds "nursing". Words shorter than four letters
-after stemming must match whole words, so "CES" does not match "services".
+survey name or a survey alias (such as "CPI" or "JOLTS"). Words match by the part
+they share with their English stem, so "nurses" also finds "nursing" and
+"industries" also finds "industry". When that part is shorter than four letters,
+the word must match a whole word, so "CES" does not match "services". A short word
+ending in "y" or "ies" also matches its other form, so "city" finds "cities".
 
 Results are sorted by the number of words that match the title or a survey alias,
 then by title length (shortest first), then by title and series ID. Short titles
@@ -68,7 +70,7 @@ built more than 10 days ago is reported as possibly out of date.
 
 Settings, for testing or mirrors:
 \itemize{
-\item \code{options(bls_index.manifest_url = ...)} or the \code{BLS_INDEX_MANIFEST_URL}
+\item \code{options(bls_index.manifest_url = ...)}, or else the \code{BLS_INDEX_MANIFEST_URL}
 environment variable: the catalog manifest to read
 \item \code{options(bls_index.cache_dir = ...)}: where to keep the catalog
 }

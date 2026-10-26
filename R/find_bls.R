@@ -1,7 +1,9 @@
 # find_bls() searches the bls-index catalog of BLS series, published weekly by
 # https://github.com/Economic/bls-index. It is a port of that repository's reference
 # client (examples/find_bls.R), whose rules are in the "Clients" section of its
-# design.md. Change the search rules there first.
+# design.md. Change the search rules there first. One difference: the stemming rule
+# for words ending in "-y" or "-ies" (bls_index_word_pattern()), proposed upstream in
+# https://github.com/Economic/bls-index/issues/24.
 
 bls_index_default_manifest =
   "https://github.com/Economic/bls-index/releases/latest/download/latest.json"
@@ -26,9 +28,11 @@ bls_index_columns = c(
 #'
 #' @section Searching:
 #' Every word in `search_string` must match, ignoring case, in the series title, the
-#' survey name or a survey alias (such as "CPI" or "JOLTS"). Words match by their
-#' English stem, so "nurses" also finds "nursing". Words shorter than four letters
-#' after stemming must match whole words, so "CES" does not match "services".
+#' survey name or a survey alias (such as "CPI" or "JOLTS"). Words match by the part
+#' they share with their English stem, so "nurses" also finds "nursing" and
+#' "industries" also finds "industry". When that part is shorter than four letters,
+#' the word must match a whole word, so "CES" does not match "services". A short word
+#' ending in "y" or "ies" also matches its other form, so "city" finds "cities".
 #'
 #' Results are sorted by the number of words that match the title or a survey alias,
 #' then by title length (shortest first), then by title and series ID. Short titles
@@ -42,7 +46,7 @@ bls_index_columns = c(
 #' built more than 10 days ago is reported as possibly out of date.
 #'
 #' Settings, for testing or mirrors:
-#' * `options(bls_index.manifest_url = ...)` or the `BLS_INDEX_MANIFEST_URL`
+#' * `options(bls_index.manifest_url = ...)`, or else the `BLS_INDEX_MANIFEST_URL`
 #'   environment variable: the catalog manifest to read
 #' * `options(bls_index.cache_dir = ...)`: where to keep the catalog
 #'
@@ -83,9 +87,23 @@ find_bls = function(
   refresh = FALSE
 ) {
   rlang::check_installed("arrow", reason = "to search the BLS catalog.")
+  # Check arguments before reading the catalog, which can mean a 33 MB download
   words = bls_index_search_words(search_string)
-  stopifnot(is.numeric(limit), length(limit) == 1, limit >= 1)
-  stopifnot(is.logical(titles_only), length(titles_only) == 1, !is.na(titles_only))
+  stopifnot(
+    "`limit` must be a whole number of at least 1, or `Inf`" = is.numeric(limit) &&
+      length(limit) == 1 && !is.na(limit) && limit >= 1 &&
+      (is.infinite(limit) || limit == round(limit)),
+    "`titles_only` must be `TRUE` or `FALSE`" = rlang::is_bool(titles_only),
+    "`refresh` must be `TRUE` or `FALSE`" = rlang::is_bool(refresh),
+    "`survey` must be a character vector" = is.null(survey) || is.character(survey)
+  )
+  if (!is.null(seasonality)) {
+    seasonality = bls_index_check_values(
+      seasonality,
+      c("SA", "NSA", "unknown"),
+      "seasonality"
+    )
+  }
   ds = arrow::open_dataset(bls_index_catalog(refresh))
 
   # Survey names and aliases are fixed per program, so match them against the small
@@ -101,7 +119,6 @@ find_bls = function(
     in_title = rlang::expr(grepl(!!p, series_title, ignore.case = TRUE))
     if (titles_only) {
       query = query |> dplyr::filter(!!in_title)
-      hits = c(hits, list(in_title))
       next
     }
     by_alias = programs$program[grepl(p, aliases, ignore.case = TRUE, perl = TRUE)]
@@ -117,17 +134,18 @@ find_bls = function(
     query = query |> dplyr::filter(program %in% !!codes)
   }
   if (!is.null(seasonality)) {
-    values = bls_index_check_values(
-      seasonality,
-      c("SA", "NSA", "unknown"),
-      "seasonality"
-    )
-    query = query |> dplyr::filter(seasonal %in% !!values)
+    query = query |> dplyr::filter(seasonal %in% !!seasonality)
   }
-  hit_count = Reduce(
-    function(a, b) rlang::expr(!!a + !!b),
-    lapply(hits, function(h) rlang::expr(as.integer(!!h)))
-  )
+  hit_count = if (titles_only) {
+    # Every row left matched every word in its title, so the count is known; testing
+    # the titles again would repeat each word's regex on every match
+    length(words)
+  } else {
+    Reduce(
+      function(a, b) rlang::expr(!!a + !!b),
+      lapply(hits, function(h) rlang::expr(as.integer(!!h)))
+    )
+  }
 
   # Scan the catalog once, keeping the matches in arrow memory (not R). Counts by
   # program, rank and title length show where the first `limit` rows end, so only those
@@ -209,15 +227,20 @@ bls_index_search_words = function(search_string) {
   words
 }
 
-# A word matches the start of any word beginning with the part it shares with its stem
-# ("nurses" -> "nurs"). A stem is not always the start of its word ("city" -> "citi"),
-# hence the shared part. If that part is under 4 characters, the word must match as a
-# whole word, so short words such as "ces", "oes" or "city" stay exact.
+# A word matches the start of any word beginning with its root: the part it shares
+# with its stem ("nurses" -> "nurs"). The stemmer turns a final "y" or "ies" into "i"
+# ("industry" and "industries" -> "industri"), so a final "i" is dropped from the stem
+# first; otherwise "industries" would give "industri", which misses "industry".
+# If the root is under 4 characters, the word must match as a whole word, so short
+# words such as "ces" and "oes" stay exact. A short "-y" or "-ies" word matches both
+# forms ("city" and "cities") without matching longer words ("citizen").
 bls_index_word_pattern = function(word) {
   stem = SnowballC::wordStem(word, language = "english")
-  shared = bls_index_shared_prefix(word, stem)
-  if (nchar(shared) >= 4) {
-    paste0("\\b", bls_index_escape_regex(shared))
+  root = bls_index_shared_prefix(word, sub("i$", "", stem))
+  if (nchar(root) >= 4) {
+    paste0("\\b", bls_index_escape_regex(root))
+  } else if (grepl("i$", stem) && grepl("(y|ies)$", word)) {
+    paste0("\\b", bls_index_escape_regex(root), "(y|ies)\\b")
   } else {
     paste0("\\b", bls_index_escape_regex(word), "\\b")
   }
@@ -277,15 +300,11 @@ bls_index_catalog = function(refresh = FALSE) {
   )
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   state_file = file.path(dir, "bls_index_state.json")
-  state = if (file.exists(state_file)) {
-    jsonlite::read_json(state_file)
-  } else {
-    NULL
-  }
+  state = bls_index_read_state(state_file)
   cached = if (is.null(state)) NA_character_ else file.path(dir, state$file)
   have = !is.na(cached) && file.exists(cached)
 
-  if (have && !refresh && bls_index_days_since(state$checked_at) < 7) {
+  if (have && !refresh && isTRUE(bls_index_days_since(state$checked_at) < 7)) {
     return(bls_index_warn_if_stale(cached, state))
   }
   manifest = tryCatch(bls_index_read_manifest(), error = function(e) e)
@@ -349,7 +368,21 @@ bls_index_catalog = function(refresh = FALSE) {
       bls_index_record_check(state, state_file)
       return(bls_index_warn_if_stale(cached, state))
     }
-    file.rename(partial, file.path(dir, file))
+    # Delete the old catalog only once the new one is in place
+    if (!bls_index_rename(partial, file.path(dir, file))) {
+      if (!have) {
+        rlang::abort(paste0("Could not save the BLS catalog to ", dir, "."))
+      }
+      rlang::inform(paste0(
+        "Could not save the newer BLS catalog to ",
+        dir,
+        "; using the cached one built ",
+        state$built_at,
+        "."
+      ))
+      bls_index_record_check(state, state_file)
+      return(bls_index_warn_if_stale(cached, state))
+    }
     if (have && basename(cached) != file) {
       unlink(cached)
     }
@@ -362,26 +395,70 @@ bls_index_catalog = function(refresh = FALSE) {
     built_at = manifest$built_at,
     checked_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
   )
-  jsonlite::write_json(state, state_file, auto_unbox = TRUE, pretty = TRUE)
+  bls_index_write_state(state, state_file)
   bls_index_warn_if_stale(cached, state)
+}
+
+# A separate function so tests can make the rename fail. Callers report a failure
+# themselves, so file.rename()'s own warning is dropped.
+bls_index_rename = function(from, to) suppressWarnings(file.rename(from, to))
+
+# Read the state file, treating one that is unreadable or incomplete (for example
+# after an interrupted write) as missing, so the catalog is fetched again.
+bls_index_read_state = function(state_file) {
+  if (!file.exists(state_file)) {
+    return(NULL)
+  }
+  state = tryCatch(
+    suppressWarnings(jsonlite::read_json(state_file)),
+    error = function(e) NULL
+  )
+  is_string = function(x) is.character(x) && length(x) == 1 && !is.na(x)
+  fields = c("file", "sha256", "built_at", "checked_at")
+  if (!is.list(state) || !all(vapply(state[fields], is_string, logical(1)))) {
+    return(NULL)
+  }
+  state
+}
+
+# Best effort: an unwritable cache must not stop a search that has a cached catalog.
+# Writing to a temporary file and renaming it means a reader never sees a partial file.
+bls_index_write_state = function(state, state_file) {
+  temp = tempfile("bls_index_state-", tmpdir = dirname(state_file), fileext = ".json")
+  on.exit(unlink(temp))
+  try(
+    {
+      suppressWarnings(
+        jsonlite::write_json(state, temp, auto_unbox = TRUE, pretty = TRUE)
+      )
+      bls_index_rename(temp, state_file)
+    },
+    silent = TRUE
+  )
+  invisible(NULL)
 }
 
 # Record a check attempt, keeping the cached catalog's details. A failed check counts
 # too, so searches do not retry the network every time; `refresh = TRUE` retries now.
 bls_index_record_check = function(state, state_file) {
   state$checked_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-  # Best effort: an unwritable cache must not stop a search that has a cached catalog.
-  try(
-    jsonlite::write_json(state, state_file, auto_unbox = TRUE, pretty = TRUE),
-    silent = TRUE
-  )
+  bls_index_write_state(state, state_file)
+}
+
+# The option takes precedence over the environment variable; an empty variable is unset.
+bls_index_manifest_url = function() {
+  url = getOption("bls_index.manifest_url")
+  if (is.null(url)) {
+    url = Sys.getenv("BLS_INDEX_MANIFEST_URL")
+  }
+  if (!nzchar(url)) {
+    url = bls_index_default_manifest
+  }
+  url
 }
 
 bls_index_read_manifest = function() {
-  url = Sys.getenv(
-    "BLS_INDEX_MANIFEST_URL",
-    getOption("bls_index.manifest_url", bls_index_default_manifest)
-  )
+  url = bls_index_manifest_url()
   path = tempfile(fileext = ".json")
   on.exit(unlink(path))
   bls_index_download(url, path)
