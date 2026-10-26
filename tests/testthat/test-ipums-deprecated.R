@@ -28,3 +28,32 @@ test_that("dl_ipums_*() are deprecated and call get_ipums_*()", {
   lifecycle::expect_deprecated(cps <- dl_ipums_cps(months, "AGE"))
   expect_equal(cps, list("cps", months, "AGE", NULL, list()))
 })
+
+test_that("get_ipums_*() build their extract without deprecation warnings", {
+  # deprecate_soft() stays silent when the caller is package code, even with
+  # lifecycle_verbosity = "warning". "error" applies to every caller, so a
+  # get_ipums_*() that still called a dl_ipums_*() function would fail this test
+  rlang::local_options(lifecycle_verbosity = "error")
+  # Mock the IPUMS calls but not the get_ipums_*() functions, so their bodies run
+  local_mocked_bindings(
+    refine_ipums_extract = function(collection, sample_filter, dates, variables,
+                                    frequency, description, ...) {
+      list(collection = collection, sample_filter = sample_filter, dates = dates,
+           frequency = frequency, description = description)
+    },
+    get_ipums_micro = function(extract) extract
+  )
+
+  expect_no_error(acs1 <- get_ipums_acs1(2022, "AGE"))
+  expect_equal(acs1$collection, "usa")
+  expect_equal(acs1$description, "ACS extract")
+
+  expect_no_error(asec <- get_ipums_asec(2022, "AGE"))
+  expect_equal(asec$sample_filter, "ASEC")
+  expect_equal(asec$description, "CPS ASEC extract")
+
+  months = as.Date("2024-01-01")
+  expect_no_error(cps <- get_ipums_cps(months, "AGE", "my extract"))
+  expect_equal(cps$frequency, "monthly")
+  expect_equal(cps$description, "my extract")
+})

@@ -41,11 +41,11 @@ These functions are simply wrappers around \href{https://tech.popdata.org/ipumsr
 \itemize{
 \item \code{get_ipums_micro()}: base function group
 
-\item \code{get_ipums_acs1()}: Download IPUMS ACS 1-year files
+\item \code{get_ipums_acs1()}: Get IPUMS ACS 1-year files
 
-\item \code{get_ipums_asec()}: Download IPUMS CPS ASEC
+\item \code{get_ipums_asec()}: Get IPUMS CPS ASEC files
 
-\item \code{get_ipums_cps()}: Download IPUMS Monthly CPS
+\item \code{get_ipums_cps()}: Get IPUMS Monthly CPS files
 
 }}
 \examples{

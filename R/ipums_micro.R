@@ -37,7 +37,7 @@ get_ipums_micro = function(extract) {
 }
 
 #' @export
-#' @describeIn ipums_micro Download IPUMS ACS 1-year files
+#' @describeIn ipums_micro Get IPUMS ACS 1-year files
 #' @param variables a vector of variable names, or a list of detailed variable specifications as created by [ipumsr::var_spec()]
 #' @param years a vector of years
 #' @param description description for the extract
@@ -64,7 +64,7 @@ get_ipums_acs1 = function(
 }
 
 #' @export
-#' @describeIn ipums_micro Download IPUMS CPS ASEC
+#' @describeIn ipums_micro Get IPUMS CPS ASEC files
 get_ipums_asec = function(
   years = NULL,
   variables,
@@ -87,7 +87,7 @@ get_ipums_asec = function(
 }
 
 #' @export
-#' @describeIn ipums_micro Download IPUMS Monthly CPS
+#' @describeIn ipums_micro Get IPUMS Monthly CPS files
 #' @param months a vector of dates representing months of CPS samples.
 get_ipums_cps = function(
   months = NULL,

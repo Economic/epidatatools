@@ -22,10 +22,10 @@ Here is a list of the main user-facing functions available in this package:
 - `interpolated_quantile(x, bin_size, probs, w, na.rm)`: Calculates the binned interpolated quantile of a numeric vector.
 - `interpolated_median(x, bin_size, w, na.rm)`: Calculates the binned interpolated median of a numeric vector.
 - `binipolate(data, x, probs, bin_size, .by, w)`: Summarizes a data frame as binned interpolated percentiles.
-- `get_ipums_micro(extract)`: Downloads a selection of IPUMS microdata extracts and returns them as a tibble. Requires an IPUMS API key.
-- `get_ipums_acs1(years, variables, description, ...)`: Downloads IPUMS ACS 1-year files.
-- `get_ipums_asec(years, variables, description, ...)`: Downloads IPUMS CPS ASEC files.
-- `get_ipums_cps(months, variables, description, ...)`: Downloads IPUMS Monthly CPS files.
+- `get_ipums_micro(extract)`: Retrieves a selection of IPUMS microdata extracts and returns them as a tibble. Requires an IPUMS API key.
+- `get_ipums_acs1(years, variables, description, ...)`: Retrieves IPUMS ACS 1-year files.
+- `get_ipums_asec(years, variables, description, ...)`: Retrieves IPUMS CPS ASEC files.
+- `get_ipums_cps(months, variables, description, ...)`: Retrieves IPUMS Monthly CPS files.
 - `dl_ipums_micro()`, `dl_ipums_acs1()`, `dl_ipums_asec()` and `dl_ipums_cps()`: deprecated in 2.0.0 (`lifecycle::deprecate_soft()`), and kept as wrappers that call the `get_ipums_*()` functions. Their docs are `@keywords internal`.
 - `merge_status(x, y, ...)`: Joins two data frames and creates a `_merge` indicator column to show the merge status (left_only, right_only, both).
 - `summarize_groups(.data, .groups, ...)`: Summarizes distinct groups in a data frame.
