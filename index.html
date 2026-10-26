@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,7 +137,7 @@
 <code class="sourceCode R"><span><span class="co"># First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.</span></span>
 <span></span>
 <span><span class="co"># CPS ASEC microdata</span></span>
-<span><span class="fu"><a href="reference/ipums_micro.html">dl_ipums_asec</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2022</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"YEAR"</span>, <span class="st">"OFFPOV"</span>, <span class="st">"ASECWT"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ipums_micro.html">get_ipums_asec</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2022</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"YEAR"</span>, <span class="st">"OFFPOV"</span>, <span class="st">"ASECWT"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#&gt; DDI codebook file saved to /tmp/RtmpGaUUhf/cps_00161.xml</span></span>
 <span><span class="co">#&gt; Data file saved to /tmp/RtmpGaUUhf/cps_00161.dat.gz</span></span>
@@ -220,9 +220,22 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the latest version from R-Universe:</p>
+<p>Install epidatatools from r-universe:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"epidatatools"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://economic.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
+<span>  <span class="st">"epidatatools"</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://economic.r-universe.dev"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>If you add the EPI r-universe repository to your <code>.Rprofile</code> with</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Example .Rprofile</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  EPI <span class="op">=</span> <span class="st">"https://economic.r-universe.dev"</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>then you can simply</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"epidatatools"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

@@ -16,10 +16,22 @@ package:
   Calculates the averaged (smoothed) quantile of a numeric vector.
 - `averaged_median(x, w, na.rm, quantiles_n, quantiles_w)`: Calculates
   the averaged (smoothed) median of a numeric vector.
-- `find_bls(search_string, max_results, metadata, survey, seasonality)`:
-  Searches the BLS Data Finder for series matching a search string and
-  returns series IDs and titles. Can optionally restrict search to a
-  specific BLS survey and filter by seasonal adjustment.
+- `find_bls(search_string, survey, seasonality, limit, titles_only, refresh)`:
+  Searches the weekly bls-index catalog of every BLS series
+  (<https://github.com/Economic/bls-index>) and returns series_id,
+  series_title, program, survey_name, seasonal, begin_year, end_year and
+  end_period. Every search word must match the title, survey name or a
+  survey alias, by English stem. `survey` and `seasonality` filter by
+  one or more values; `limit` (default 1000, `Inf` for all) caps the
+  rows. The catalog is cached in
+  `tools::R_user_dir("epidatatools", "cache")` and checked for updates
+  weekly (`refresh = TRUE` checks now). Needs the arrow package (in
+  Suggests). The code is a port of bls-index’s reference client
+  (`examples/find_bls.R`); its search rules live in bls-index’s
+  design.md, except that `bls_index_word_pattern()` also matches a word
+  ending in “-y” with its “-ies” plural (proposed upstream in
+  Economic/bls-index#24). Tests use a fixture catalog in
+  `tests/testthat/fixtures/`.
 - `find_fred(search_string, max_results, metadata, seasonality)`:
   Searches the FRED database for series matching a search string and
   returns series IDs and titles. Can optionally return additional
@@ -49,25 +61,51 @@ package:
   API response). Results are sorted by geo_fips, table_name,
   line_number, date.
 - `get_bls(series, start, end, metadata)`: Retrieves data from the
-  Bureau of Labor Statistics (BLS) API. Requires a BLS API key.
+  Bureau of Labor Statistics (BLS) API. Requires a BLS API key. Calls
+  the BLS API directly, splitting requests into batches of 50 series and
+  spans of 20 years. Data and series catalogs (the source of
+  `series_title` and metadata) are requested separately; if BLS fails to
+  return a catalog, the data is still returned with an `NA` title and a
+  `bls_catalog_unavailable` warning. API failures raise errors of class
+  `bls_api_error`.
 - `crosstab(data, ..., w, percent)`: Creates a cross-tabulation of one
   or two variables in a data frame.
 - `get_fred(series, start, end, metadata)`: Retrieves data from the
   Federal Reserve Economic Data (FRED) API. Requires a FRED API key.
 - `interpolated_quantile(x, bin_size, probs, w, na.rm)`: Calculates the
-  binned interpolated quantile of a numeric vector.
+  binned interpolated quantile of a numeric vector. Deprecated in 2.0.0
+  ([`lifecycle::deprecate_soft()`](https://lifecycle.r-lib.org/reference/deprecate_soft.html))
+  in favor of
+  [`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md).
 - `interpolated_median(x, bin_size, w, na.rm)`: Calculates the binned
-  interpolated median of a numeric vector.
+  interpolated median of a numeric vector. Deprecated in 2.0.0 in favor
+  of
+  [`averaged_median()`](https://economic.github.io/epidatatools/reference/averaged_median.md).
 - `binipolate(data, x, probs, bin_size, .by, w)`: Summarizes a data
-  frame as binned interpolated percentiles.
-- `dl_ipums_micro(extract)`: Downloads a selection of IPUMS microdata
-  extracts. Requires an IPUMS API key.
-- `dl_ipums_acs1(years, variables, description, ...)`: Downloads IPUMS
+  frame as binned interpolated percentiles. Deprecated in 2.0.0 in favor
+  of
+  [`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md)
+  inside
+  [`dplyr::reframe()`](https://dplyr.tidyverse.org/reference/reframe.html).
+  All three deprecated functions call the internal
+  `interpolated_quantile_impl()`, so each call warns once.
+- `get_ipums_micro(extract)`: Retrieves a selection of IPUMS microdata
+  extracts and returns them as a tibble. Requires an IPUMS API key.
+- `get_ipums_acs1(years, variables, description, ...)`: Retrieves IPUMS
   ACS 1-year files.
-- `dl_ipums_asec(years, variables, description, ...)`: Downloads IPUMS
+- `get_ipums_asec(years, variables, description, ...)`: Retrieves IPUMS
   CPS ASEC files.
-- `dl_ipums_cps(months, variables, description, ...)`: Downloads IPUMS
+- `get_ipums_cps(months, variables, description, ...)`: Retrieves IPUMS
   Monthly CPS files.
+- [`dl_ipums_micro()`](https://economic.github.io/epidatatools/reference/ipums_micro_deprecated.md),
+  [`dl_ipums_acs1()`](https://economic.github.io/epidatatools/reference/ipums_micro_deprecated.md),
+  [`dl_ipums_asec()`](https://economic.github.io/epidatatools/reference/ipums_micro_deprecated.md)
+  and
+  [`dl_ipums_cps()`](https://economic.github.io/epidatatools/reference/ipums_micro_deprecated.md):
+  deprecated in 2.0.0
+  ([`lifecycle::deprecate_soft()`](https://lifecycle.r-lib.org/reference/deprecate_soft.html)),
+  and kept as wrappers that call the `get_ipums_*()` functions. Their
+  docs are `@keywords internal`.
 - `merge_status(x, y, ...)`: Joins two data frames and creates a
   `_merge` indicator column to show the merge status (left_only,
   right_only, both).
@@ -121,6 +159,10 @@ available.
 - `test-api-no-duplicates.R`: Verifies that API functions do not return
   duplicate data rows. This was added to catch regressions of a bug
   where multiple series queries returned duplicated observations.
+- `test-bls-internals.R`: Tests
+  [`get_bls()`](https://economic.github.io/epidatatools/reference/get_bls.md)
+  internals with a mocked `get_bls_api()` (no API calls), including
+  request splitting and the catalog-failure fallback.
 
 ## Feature Development Workflow
 

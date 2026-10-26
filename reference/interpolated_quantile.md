@@ -1,10 +1,11 @@
 # Calculate the binned interpolated quantile
 
-**\[superseded\]**
+**\[deprecated\]**
 
-This function is superceded by EPI's current preferred method for
-interpolating quantiles,
-[`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md).
+This function was deprecated in epidatatools 2.0.0. Use
+[`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md),
+EPI's preferred method for interpolating quantiles, instead. It uses a
+different method, so its results differ.
 
 ## Usage
 
@@ -44,5 +45,7 @@ a numeric vector
 
 ``` r
 interpolated_quantile(x = mtcars$mpg, bin_size = 0.50, probs = c(0.25, 0.5, 0.75))
+#> Warning: `interpolated_quantile()` was deprecated in epidatatools 2.0.0.
+#> ℹ Please use `averaged_quantile()` instead.
 #> [1] 15.25 19.00 22.50
 ```

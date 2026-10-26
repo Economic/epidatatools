@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,9 +28,32 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/Economic/epidatatools/blob/v1.0.5/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/Economic/epidatatools/blob/v2.0.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.0" id="epidatatools-200">epidatatools 2.0.0<a class="anchor" aria-label="anchor" href="#epidatatools-200"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-2-0-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-0-0"></a></h3>
+<ul><li>
+<code><a href="../reference/find_bls.html">find_bls()</a></code> now searches a weekly catalog of every BLS series (8.3 million series from 33 programs), built by <a href="https://github.com/Economic/bls-index" class="external-link">bls-index</a>, instead of scraping the BLS Data Finder (<a href="https://github.com/Economic/epidatatools/issues/29" class="external-link">#29</a>).
+<ul><li>The first search downloads the catalog (about 33 MB) into a cache, and later searches check for a newer one at most once a week. <code>refresh = TRUE</code> checks now.</li>
+<li>Searching needs the arrow package, which <code><a href="../reference/find_bls.html">find_bls()</a></code> offers to install.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecations-2-0-0">Deprecations<a class="anchor" aria-label="anchor" href="#deprecations-2-0-0"></a></h3>
+<ul><li>
+<code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_micro()</a></code>, <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_acs1()</a></code>, <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_asec()</a></code> and <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_cps()</a></code> are renamed <code><a href="../reference/ipums_micro.html">get_ipums_micro()</a></code>, <code><a href="../reference/ipums_micro.html">get_ipums_acs1()</a></code>, <code><a href="../reference/ipums_micro.html">get_ipums_asec()</a></code> and <code><a href="../reference/ipums_micro.html">get_ipums_cps()</a></code>, to match the package’s other data functions (<a href="https://github.com/Economic/epidatatools/issues/30" class="external-link">#30</a>). The old names still work, but are deprecated: calling one directly warns, and they will be removed in a future release.</li>
+<li>
+<code><a href="../reference/interpolated_quantile.html">interpolated_quantile()</a></code>, <code><a href="../reference/interpolated_median.html">interpolated_median()</a></code> and <code><a href="../reference/binipolate.html">binipolate()</a></code> are deprecated. Use <code><a href="../reference/averaged_quantile.html">averaged_quantile()</a></code> and <code><a href="../reference/averaged_median.html">averaged_median()</a></code> instead.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-2-0-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-2-0-0"></a></h3>
+<ul><li>
+<code><a href="../reference/get_bls.html">get_bls()</a></code> now returns data even when BLS fails to return series catalog metadata, which used to make the whole request fail. Affected series get an <code>NA</code> <code>series_title</code>, and a <code>bls_catalog_unavailable</code> warning lists them (<a href="https://github.com/Economic/epidatatools/issues/23" class="external-link">#23</a>).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.5" id="epidatatools-105">epidatatools 1.0.5<a class="anchor" aria-label="anchor" href="#epidatatools-105"></a></h2>
 <ul><li>Fix bug in <code><a href="../reference/get_bls.html">get_bls()</a></code> that duplicated rows when the BLS API call retrieves sublists of footnotes.</li>
@@ -80,11 +103,11 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.1" id="epidatatools-061">epidatatools 0.6.1<a class="anchor" aria-label="anchor" href="#epidatatools-061"></a></h2>
-<ul><li>corrected error in <code><a href="../reference/ipums_micro.html">dl_ipums_asec()</a></code> resulting in no downloaded data</li>
+<ul><li>corrected error in <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_asec()</a></code> resulting in no downloaded data</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="epidatatools-060">epidatatools 0.6.0<a class="anchor" aria-label="anchor" href="#epidatatools-060"></a></h2>
-<ul><li>added passthrough options <code>...</code> to IPUMS microdata extract download helpers <code><a href="../reference/ipums_micro.html">dl_ipums_acs1()</a></code>, <code><a href="../reference/ipums_micro.html">dl_ipums_asec()</a></code>, <code><a href="../reference/ipums_micro.html">dl_ipums_cps()</a></code>
+<ul><li>added passthrough options <code>...</code> to IPUMS microdata extract download helpers <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_acs1()</a></code>, <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_asec()</a></code>, <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_cps()</a></code>
 </li>
 </ul></div>
     <div class="section level2">
@@ -96,7 +119,7 @@
 <h2 class="pkg-version" data-toc-text="0.4.0" id="epidatatools-040">epidatatools 0.4.0<a class="anchor" aria-label="anchor" href="#epidatatools-040"></a></h2>
 <ul><li>added interpolated binned quantile functions: <code><a href="../reference/binipolate.html">binipolate()</a></code>, <code><a href="../reference/interpolated_quantile.html">interpolated_quantile()</a></code>, <code><a href="../reference/interpolated_median.html">interpolated_median()</a></code>
 </li>
-<li>added IPUMS microdata extract download helpers: <code><a href="../reference/ipums_micro.html">dl_ipums_micro()</a></code>, <code><a href="../reference/ipums_micro.html">dl_ipums_acs1()</a></code>, <code><a href="../reference/ipums_micro.html">dl_ipums_asec()</a></code>, <code><a href="../reference/ipums_micro.html">dl_ipums_cps()</a></code>
+<li>added IPUMS microdata extract download helpers: <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_micro()</a></code>, <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_acs1()</a></code>, <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_asec()</a></code>, <code><a href="../reference/ipums_micro_deprecated.html">dl_ipums_cps()</a></code>
 </li>
 </ul></div>
     <div class="section level2">

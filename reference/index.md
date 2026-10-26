@@ -4,17 +4,10 @@
 
 Calculate weighted percentiles.
 
-- [`binipolate()`](https://economic.github.io/epidatatools/reference/binipolate.md)
-  **\[superseded\]** : Summarize a data frame as binned interpolated
-  percentiles
 - [`averaged_median()`](https://economic.github.io/epidatatools/reference/averaged_median.md)
   : Calculate the averaged (smoothed) median
 - [`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md)
   : Calculate the averaged (smoothed) quantile
-- [`interpolated_median()`](https://economic.github.io/epidatatools/reference/interpolated_median.md)
-  **\[superseded\]** : Calculate the binned interpolated median
-- [`interpolated_quantile()`](https://economic.github.io/epidatatools/reference/interpolated_quantile.md)
-  **\[superseded\]** : Calculate the binned interpolated quantile
 
 ## Download data
 
@@ -22,11 +15,11 @@ Helpers to download data from specific APIs
 
 ### IPUMS microdata extracts
 
-- [`dl_ipums_micro()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  [`dl_ipums_acs1()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  [`dl_ipums_asec()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  [`dl_ipums_cps()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  : Download a selection of IPUMS microdata extracts
+- [`get_ipums_micro()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  [`get_ipums_acs1()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  [`get_ipums_asec()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  [`get_ipums_cps()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  : Get a selection of IPUMS microdata extracts
 
 ### BLS time series
 
@@ -62,3 +55,15 @@ Helpers to download data from specific APIs
   : Join data frames and create a merge indicator
 - [`summarize_groups()`](https://economic.github.io/epidatatools/reference/summarize_groups.md)
   : Summarize distinct groups
+
+## Deprecated
+
+Use averaged_quantile() and averaged_median() instead.
+
+- [`binipolate()`](https://economic.github.io/epidatatools/reference/binipolate.md)
+  **\[deprecated\]** : Summarize a data frame as binned interpolated
+  percentiles
+- [`interpolated_median()`](https://economic.github.io/epidatatools/reference/interpolated_median.md)
+  **\[deprecated\]** : Calculate the binned interpolated median
+- [`interpolated_quantile()`](https://economic.github.io/epidatatools/reference/interpolated_quantile.md)
+  **\[deprecated\]** : Calculate the binned interpolated quantile

@@ -1,9 +1,7 @@
 # Retrieve data from the BLS API
 
-This function is simply a wrapper around
-[`blsR`](https://github.com/groditi/blsR) and requires you to have an
-[BLS API key](https://www.bls.gov/developers/) saved in the
-`BLS_API_KEY` environment variable.
+Requires you to have an [BLS API key](https://www.bls.gov/developers/)
+saved in the `BLS_API_KEY` environment variable.
 
 ## Usage
 
@@ -42,6 +40,15 @@ get_bls(
 ## Value
 
 a tibble
+
+## Details
+
+Series titles and other metadata come from the BLS series catalog, which
+is requested separately from the data. If BLS cannot return the catalog
+for some series, their data is still returned, but `series_title` is
+`NA` and their metadata is missing. A warning of class
+`bls_catalog_unavailable` lists those series. Series that BLS has no
+catalog for get `NA` titles without a warning.
 
 ## Examples
 

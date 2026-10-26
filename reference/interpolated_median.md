@@ -1,6 +1,11 @@
 # Calculate the binned interpolated median
 
-\#' @description **\[superseded\]**
+**\[deprecated\]**
+
+This function was deprecated in epidatatools 2.0.0. Use
+[`averaged_median()`](https://economic.github.io/epidatatools/reference/averaged_median.md),
+EPI's preferred method for interpolating medians, instead. It uses a
+different method, so its results differ.
 
 ## Usage
 
@@ -32,15 +37,11 @@ interpolated_median(x, bin_size, w = NULL, na.rm = TRUE)
 
 numeric vector
 
-## Details
-
-This function is superceded by EPI's current preferred method for
-interpolating medians,
-[`averaged_median()`](https://economic.github.io/epidatatools/reference/averaged_median.md).
-
 ## Examples
 
 ``` r
 interpolated_median(x = mtcars$mpg, bin_size = 0.50)
+#> Warning: `interpolated_median()` was deprecated in epidatatools 2.0.0.
+#> ℹ Please use `averaged_median()` instead.
 #> [1] 19
 ```

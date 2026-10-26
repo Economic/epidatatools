@@ -16,6 +16,10 @@ Useful links:
 
 **Maintainer**: Ben Zipperer <benzipperer@gmail.com>
 
+Authors:
+
+- Ben Zipperer <benzipperer@gmail.com>
+
 Other contributors:
 
 - Jori Kandra <jkandra@epi.org> \[contributor\]

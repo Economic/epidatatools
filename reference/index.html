@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,13 +42,6 @@
 
       <dl><dt>
 
-          <code><a href="binipolate.html">binipolate()</a></code>
-          <span class="badge lifecycle lifecycle-superseded">superseded</span>
-        </dt>
-        <dd>Summarize a data frame as binned interpolated percentiles</dd>
-
-        <dt>
-
           <code><a href="averaged_median.html">averaged_median()</a></code>
 
         </dt>
@@ -60,20 +53,6 @@
 
         </dt>
         <dd>Calculate the averaged (smoothed) quantile</dd>
-
-        <dt>
-
-          <code><a href="interpolated_median.html">interpolated_median()</a></code>
-          <span class="badge lifecycle lifecycle-superseded">superseded</span>
-        </dt>
-        <dd>Calculate the binned interpolated median</dd>
-
-        <dt>
-
-          <code><a href="interpolated_quantile.html">interpolated_quantile()</a></code>
-          <span class="badge lifecycle lifecycle-superseded">superseded</span>
-        </dt>
-        <dd>Calculate the binned interpolated quantile</dd>
       </dl></div><div class="section level2">
       <h2 id="download-data">Download data<a class="anchor" aria-label="anchor" href="#download-data"></a></h2>
 
@@ -91,10 +70,10 @@
 
       <dl><dt>
 
-          <code><a href="ipums_micro.html">dl_ipums_micro()</a></code> <code><a href="ipums_micro.html">dl_ipums_acs1()</a></code> <code><a href="ipums_micro.html">dl_ipums_asec()</a></code> <code><a href="ipums_micro.html">dl_ipums_cps()</a></code>
+          <code><a href="ipums_micro.html">get_ipums_micro()</a></code> <code><a href="ipums_micro.html">get_ipums_acs1()</a></code> <code><a href="ipums_micro.html">get_ipums_asec()</a></code> <code><a href="ipums_micro.html">get_ipums_cps()</a></code>
 
         </dt>
-        <dd>Download a selection of IPUMS microdata extracts</dd>
+        <dd>Get a selection of IPUMS microdata extracts</dd>
       </dl></div><div class="section level2">
 
       <h3 id="bls-time-series">BLS time series<a class="anchor" aria-label="anchor" href="#bls-time-series"></a></h3>
@@ -210,6 +189,36 @@
 
         </dt>
         <dd>Summarize distinct groups</dd>
+      </dl></div><div class="section level2">
+      <h2 id="deprecated">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated"></a></h2>
+
+      <div class="section-desc"><p>Use averaged_quantile() and averaged_median() instead.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="binipolate.html">binipolate()</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+        </dt>
+        <dd>Summarize a data frame as binned interpolated percentiles</dd>
+
+        <dt>
+
+          <code><a href="interpolated_median.html">interpolated_median()</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+        </dt>
+        <dd>Calculate the binned interpolated median</dd>
+
+        <dt>
+
+          <code><a href="interpolated_quantile.html">interpolated_quantile()</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+        </dt>
+        <dd>Calculate the binned interpolated quantile</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

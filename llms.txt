@@ -87,7 +87,7 @@ Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
 # First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.
 
 # CPS ASEC microdata
-dl_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
+get_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
 
 #> DDI codebook file saved to /tmp/RtmpGaUUhf/cps_00161.xml
 #> Data file saved to /tmp/RtmpGaUUhf/cps_00161.dat.gz
@@ -174,11 +174,32 @@ get_fred(fred_series_ids, start = as.Date("2024-06-01"), end = 2024)
 
 ## Installation
 
-Install the latest version from R-Universe:
+Install epidatatools from r-universe:
 
 ``` r
 
-install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
+install.packages(
+  "epidatatools",
+  repos = c("https://economic.r-universe.dev", getOption("repos"))
+)
+```
+
+If you add the EPI r-universe repository to your `.Rprofile` with
+
+``` r
+
+# Example .Rprofile
+options(repos = c(
+  EPI = "https://economic.r-universe.dev",
+  getOption("repos")
+))
+```
+
+then you can simply
+
+``` r
+
+install.packages("epidatatools")
 ```
 
 # Package index
@@ -187,17 +208,10 @@ install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "h
 
 Calculate weighted percentiles.
 
-- [`binipolate()`](https://economic.github.io/epidatatools/reference/binipolate.md)
-  **\[superseded\]** : Summarize a data frame as binned interpolated
-  percentiles
 - [`averaged_median()`](https://economic.github.io/epidatatools/reference/averaged_median.md)
   : Calculate the averaged (smoothed) median
 - [`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md)
   : Calculate the averaged (smoothed) quantile
-- [`interpolated_median()`](https://economic.github.io/epidatatools/reference/interpolated_median.md)
-  **\[superseded\]** : Calculate the binned interpolated median
-- [`interpolated_quantile()`](https://economic.github.io/epidatatools/reference/interpolated_quantile.md)
-  **\[superseded\]** : Calculate the binned interpolated quantile
 
 ## Download data
 
@@ -205,11 +219,11 @@ Helpers to download data from specific APIs
 
 ### IPUMS microdata extracts
 
-- [`dl_ipums_micro()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  [`dl_ipums_acs1()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  [`dl_ipums_asec()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  [`dl_ipums_cps()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
-  : Download a selection of IPUMS microdata extracts
+- [`get_ipums_micro()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  [`get_ipums_acs1()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  [`get_ipums_asec()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  [`get_ipums_cps()`](https://economic.github.io/epidatatools/reference/ipums_micro.md)
+  : Get a selection of IPUMS microdata extracts
 
 ### BLS time series
 
@@ -245,4 +259,16 @@ Helpers to download data from specific APIs
   : Join data frames and create a merge indicator
 - [`summarize_groups()`](https://economic.github.io/epidatatools/reference/summarize_groups.md)
   : Summarize distinct groups
+
+## Deprecated
+
+Use averaged_quantile() and averaged_median() instead.
+
+- [`binipolate()`](https://economic.github.io/epidatatools/reference/binipolate.md)
+  **\[deprecated\]** : Summarize a data frame as binned interpolated
+  percentiles
+- [`interpolated_median()`](https://economic.github.io/epidatatools/reference/interpolated_median.md)
+  **\[deprecated\]** : Calculate the binned interpolated median
+- [`interpolated_quantile()`](https://economic.github.io/epidatatools/reference/interpolated_quantile.md)
+  **\[deprecated\]** : Calculate the binned interpolated quantile
 

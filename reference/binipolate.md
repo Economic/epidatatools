@@ -1,10 +1,15 @@
 # Summarize a data frame as binned interpolated percentiles
 
-**\[superseded\]**
+**\[deprecated\]**
 
-This function was superseded and EPI insteads uses
-[`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md)
-to interpolate percentiles.
+This function was deprecated in epidatatools 2.0.0. Use
+[`averaged_quantile()`](https://economic.github.io/epidatatools/reference/averaged_quantile.md),
+EPI's preferred method for interpolating percentiles, with
+[`dplyr::reframe()`](https://dplyr.tidyverse.org/reference/reframe.html)
+instead. It uses a different method, so its results differ:
+
+    dplyr::reframe(mtcars, probs = c(0.25, 0.75),
+      value = averaged_quantile(mpg, wt, probs), .by = cyl)
 
 ## Usage
 
@@ -47,6 +52,11 @@ a tibble or data frame
 
 ``` r
 binipolate(mtcars, mpg, bin_size = 0.25)
+#> Warning: `binipolate()` was deprecated in epidatatools 2.0.0.
+#> ℹ Please use `averaged_quantile()` instead.
+#> ℹ For example: `dplyr::reframe(data, probs = probs, value =
+#>   averaged_quantile(x, w, probs), .by = group)`. averaged_quantile() uses a
+#>   different method, so its results differ.
 #> # A tibble: 1 × 2
 #>   probs value
 #>   <dbl> <dbl>

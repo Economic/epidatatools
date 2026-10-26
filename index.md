@@ -87,7 +87,7 @@ Requires valid IPUMS API key stored in the .Renviron as `IPUMS_API_KEY`.
 # First make sure you have a valid IPUMS API key stored in your .Renviron file as `IPUMS_API_KEY`.
 
 # CPS ASEC microdata
-dl_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
+get_ipums_asec(2021:2022, c("YEAR", "OFFPOV", "ASECWT"))
 
 #> DDI codebook file saved to /tmp/RtmpGaUUhf/cps_00161.xml
 #> Data file saved to /tmp/RtmpGaUUhf/cps_00161.dat.gz
@@ -174,9 +174,30 @@ get_fred(fred_series_ids, start = as.Date("2024-06-01"), end = 2024)
 
 ## Installation
 
-Install the latest version from R-Universe:
+Install epidatatools from r-universe:
 
 ``` r
 
-install.packages("epidatatools", repos = c("https://economic.r-universe.dev", "https://cloud.r-project.org"))
+install.packages(
+  "epidatatools",
+  repos = c("https://economic.r-universe.dev", getOption("repos"))
+)
+```
+
+If you add the EPI r-universe repository to your `.Rprofile` with
+
+``` r
+
+# Example .Rprofile
+options(repos = c(
+  EPI = "https://economic.r-universe.dev",
+  getOption("repos")
+))
+```
+
+then you can simply
+
+``` r
+
+install.packages("epidatatools")
 ```

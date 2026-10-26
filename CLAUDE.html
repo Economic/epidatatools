@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">epidatatools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="logo.png" class="logo" alt=""><h1>AGENTS.md</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Economic/epidatatools/blob/v1.0.5/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Economic/epidatatools/blob/v2.0.0/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
     </div>
 
 <div id="agentsmd" class="section level1">
@@ -46,7 +46,7 @@
 <li>
 <code>averaged_median(x, w, na.rm, quantiles_n, quantiles_w)</code>: Calculates the averaged (smoothed) median of a numeric vector.</li>
 <li>
-<code>find_bls(search_string, max_results, metadata, survey, seasonality)</code>: Searches the BLS Data Finder for series matching a search string and returns series IDs and titles. Can optionally restrict search to a specific BLS survey and filter by seasonal adjustment.</li>
+<code>find_bls(search_string, survey, seasonality, limit, titles_only, refresh)</code>: Searches the weekly bls-index catalog of every BLS series (<a href="https://github.com/Economic/bls-index" class="external-link uri">https://github.com/Economic/bls-index</a>) and returns series_id, series_title, program, survey_name, seasonal, begin_year, end_year and end_period. Every search word must match the title, survey name or a survey alias, by English stem. <code>survey</code> and <code>seasonality</code> filter by one or more values; <code>limit</code> (default 1000, <code>Inf</code> for all) caps the rows. The catalog is cached in <code>tools::R_user_dir("epidatatools", "cache")</code> and checked for updates weekly (<code>refresh = TRUE</code> checks now). Needs the arrow package (in Suggests). The code is a port of bls-index’s reference client (<code>examples/find_bls.R</code>); its search rules live in bls-index’s design.md, except that <code>bls_index_word_pattern()</code> also matches a word ending in “-y” with its “-ies” plural (proposed upstream in Economic/bls-index#24). Tests use a fixture catalog in <code>tests/testthat/fixtures/</code>.</li>
 <li>
 <code>find_fred(search_string, max_results, metadata, seasonality)</code>: Searches the FRED database for series matching a search string and returns series IDs and titles. Can optionally return additional metadata and filter by seasonal adjustment (NULL, “NSA”, or “SA”).</li>
 <li>
@@ -54,25 +54,27 @@
 <li>
 <code>get_bea_regional(geo_fips, table_name, line_code, year, metadata, bea_api_key)</code>: Retrieves regional economic data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Takes a single table_name and line_code (or “ALL” for all line codes), but allows multiple geo_fips and years. A single geo_fips can be a state abbreviation (e.g., “NY”). Returns a tibble with geo_fips, geo_name, table_name, table_description, line_number, line_description, date_frequency, date, year, value. When metadata=TRUE, also includes cl_unit, mult_unit, and note_text (list column containing all notes from the API response). Results are sorted by geo_fips, table_name, line_number, date.</li>
 <li>
-<code>get_bls(series, start, end, metadata)</code>: Retrieves data from the Bureau of Labor Statistics (BLS) API. Requires a BLS API key.</li>
+<code>get_bls(series, start, end, metadata)</code>: Retrieves data from the Bureau of Labor Statistics (BLS) API. Requires a BLS API key. Calls the BLS API directly, splitting requests into batches of 50 series and spans of 20 years. Data and series catalogs (the source of <code>series_title</code> and metadata) are requested separately; if BLS fails to return a catalog, the data is still returned with an <code>NA</code> title and a <code>bls_catalog_unavailable</code> warning. API failures raise errors of class <code>bls_api_error</code>.</li>
 <li>
 <code>crosstab(data, ..., w, percent)</code>: Creates a cross-tabulation of one or two variables in a data frame.</li>
 <li>
 <code>get_fred(series, start, end, metadata)</code>: Retrieves data from the Federal Reserve Economic Data (FRED) API. Requires a FRED API key.</li>
 <li>
-<code>interpolated_quantile(x, bin_size, probs, w, na.rm)</code>: Calculates the binned interpolated quantile of a numeric vector.</li>
+<code>interpolated_quantile(x, bin_size, probs, w, na.rm)</code>: Calculates the binned interpolated quantile of a numeric vector. Deprecated in 2.0.0 (<code><a href="https://lifecycle.r-lib.org/reference/deprecate_soft.html" class="external-link">lifecycle::deprecate_soft()</a></code>) in favor of <code><a href="reference/averaged_quantile.html">averaged_quantile()</a></code>.</li>
 <li>
-<code>interpolated_median(x, bin_size, w, na.rm)</code>: Calculates the binned interpolated median of a numeric vector.</li>
+<code>interpolated_median(x, bin_size, w, na.rm)</code>: Calculates the binned interpolated median of a numeric vector. Deprecated in 2.0.0 in favor of <code><a href="reference/averaged_median.html">averaged_median()</a></code>.</li>
 <li>
-<code>binipolate(data, x, probs, bin_size, .by, w)</code>: Summarizes a data frame as binned interpolated percentiles.</li>
+<code>binipolate(data, x, probs, bin_size, .by, w)</code>: Summarizes a data frame as binned interpolated percentiles. Deprecated in 2.0.0 in favor of <code><a href="reference/averaged_quantile.html">averaged_quantile()</a></code> inside <code><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">dplyr::reframe()</a></code>. All three deprecated functions call the internal <code>interpolated_quantile_impl()</code>, so each call warns once.</li>
 <li>
-<code>dl_ipums_micro(extract)</code>: Downloads a selection of IPUMS microdata extracts. Requires an IPUMS API key.</li>
+<code>get_ipums_micro(extract)</code>: Retrieves a selection of IPUMS microdata extracts and returns them as a tibble. Requires an IPUMS API key.</li>
 <li>
-<code>dl_ipums_acs1(years, variables, description, ...)</code>: Downloads IPUMS ACS 1-year files.</li>
+<code>get_ipums_acs1(years, variables, description, ...)</code>: Retrieves IPUMS ACS 1-year files.</li>
 <li>
-<code>dl_ipums_asec(years, variables, description, ...)</code>: Downloads IPUMS CPS ASEC files.</li>
+<code>get_ipums_asec(years, variables, description, ...)</code>: Retrieves IPUMS CPS ASEC files.</li>
 <li>
-<code>dl_ipums_cps(months, variables, description, ...)</code>: Downloads IPUMS Monthly CPS files.</li>
+<code>get_ipums_cps(months, variables, description, ...)</code>: Retrieves IPUMS Monthly CPS files.</li>
+<li>
+<code><a href="reference/ipums_micro_deprecated.html">dl_ipums_micro()</a></code>, <code><a href="reference/ipums_micro_deprecated.html">dl_ipums_acs1()</a></code>, <code><a href="reference/ipums_micro_deprecated.html">dl_ipums_asec()</a></code> and <code><a href="reference/ipums_micro_deprecated.html">dl_ipums_cps()</a></code>: deprecated in 2.0.0 (<code><a href="https://lifecycle.r-lib.org/reference/deprecate_soft.html" class="external-link">lifecycle::deprecate_soft()</a></code>), and kept as wrappers that call the <code>get_ipums_*()</code> functions. Their docs are <code>@keywords internal</code>.</li>
 <li>
 <code>merge_status(x, y, ...)</code>: Joins two data frames and creates a <code>_merge</code> indicator column to show the merge status (left_only, right_only, both).</li>
 <li>
@@ -102,6 +104,8 @@
 <h3 id="key-test-file">Key Test File<a class="anchor" aria-label="anchor" href="#key-test-file"></a></h3>
 <ul><li>
 <code>test-api-no-duplicates.R</code>: Verifies that API functions do not return duplicate data rows. This was added to catch regressions of a bug where multiple series queries returned duplicated observations.</li>
+<li>
+<code>test-bls-internals.R</code>: Tests <code><a href="reference/get_bls.html">get_bls()</a></code> internals with a mocked <code>get_bls_api()</code> (no API calls), including request splitting and the catalog-failure fallback.</li>
 </ul></div>
 </div>
 <div class="section level2">
