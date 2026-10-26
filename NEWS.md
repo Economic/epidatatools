@@ -1,5 +1,22 @@
 # epidatatools (development version)
 
+## Breaking changes
+
+* `find_bls()` now searches a weekly catalog of every BLS series (8.3 million series
+  from 33 programs), built by [bls-index](https://github.com/Economic/bls-index), instead
+  of scraping the BLS Data Finder. Its arguments are now `search_string`, `survey`,
+  `seasonality`, `limit`, `titles_only` and `refresh`:
+  * `max_results` is gone. Use `limit`, which defaults to 1,000.
+  * `metadata` is gone. Results always include `series_id`, `series_title`, `program`,
+    `survey_name`, `seasonal`, `begin_year`, `end_year` and `end_period`.
+  * `survey` and `seasonality` take several values, such as `survey = c("la", "ln")`.
+  * The first search downloads the catalog (about 33 MB) into a cache, and later
+    searches check for a newer one at most once a week. `refresh = TRUE` checks now.
+  * Searching needs the arrow package, which `find_bls()` offers to install.
+* rvest is no longer a dependency.
+
+## Deprecations
+
 * `dl_ipums_micro()`, `dl_ipums_acs1()`, `dl_ipums_asec()` and `dl_ipums_cps()` are
   renamed `get_ipums_micro()`, `get_ipums_acs1()`, `get_ipums_asec()` and
   `get_ipums_cps()`, to match the package's other data functions (#30). The old names
