@@ -79,7 +79,7 @@ Searching needs the arrow package, which \code{find_bls()} offers to install.
 }
 
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
+\dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 find_bls("unemployment rate", survey = "ln", seasonality = "SA")
 
 find_bls("registered nurses wages")

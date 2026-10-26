@@ -30,7 +30,7 @@ A tibble
 This function is simply a wrapper around \href{https://sboysel.github.io/fredr/}{\code{fredr}} and requires you to have an \href{https://fred.stlouisfed.org/docs/api/api_key.html}{FRED API key}.
 }
 \examples{
-\dontshow{if (nzchar(Sys.getenv("FRED_API_KEY"))) withAutoprint(\{ # examplesIf}
+\dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("FRED_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_fred("UNRATE")
 
 series = c(

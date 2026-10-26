@@ -280,7 +280,7 @@ warn_bls_catalog_unavailable = function(failed) {
 #' without a warning.
 #'
 #' @export
-#' @examplesIf nzchar(Sys.getenv("BLS_API_KEY"))
+#' @examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BLS_API_KEY"))
 #' get_bls("LNU02300060", start = 2020, end = 2024)
 #'
 #' bls_series_ids = c(

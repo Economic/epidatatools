@@ -38,7 +38,7 @@ lists those series. Series that BLS has no catalog for get \code{NA} titles
 without a warning.
 }
 \examples{
-\dontshow{if (nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
+\dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bls("LNU02300060", start = 2020, end = 2024)
 
 bls_series_ids = c(
