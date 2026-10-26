@@ -16,6 +16,8 @@
   `get_ipums_cps()`, to match the package's other data functions (#30). The old names
   still work, but are deprecated: calling one directly warns, and they will be removed
   in a future release.
+* `interpolated_quantile()`, `interpolated_median()` and `binipolate()` are
+  deprecated. Use `averaged_quantile()` and `averaged_median()` instead.
 
 ## Improvements
 
