@@ -24,24 +24,28 @@ Imports:
     httr,
     ipumsr,
     jsonlite,
+    openssl,
     purrr,
     lubridate,
     MetricsWeighted,
     rlang,
-    rvest,
+    SnowballC,
     stats,
     stringr,
     tibble,
     tidyr,
     tidyselect,
+    tools,
     utils,
     lifecycle
 Suggests:
+    arrow,
     knitr,
     pkgdown,
     rmarkdown,
     testthat (>= 3.0.0),
-    tidyverse
+    tidyverse,
+    withr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 URL: https://economic.github.io/epidatatools/, https://github.com/Economic/epidatatools
