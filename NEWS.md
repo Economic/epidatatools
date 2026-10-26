@@ -15,6 +15,14 @@
   * Searching needs the arrow package, which `find_bls()` offers to install.
 * rvest is no longer a dependency.
 
+## Deprecations
+
+* `dl_ipums_micro()`, `dl_ipums_acs1()`, `dl_ipums_asec()` and `dl_ipums_cps()` are
+  renamed `get_ipums_micro()`, `get_ipums_acs1()`, `get_ipums_asec()` and
+  `get_ipums_cps()`, to match the package's other data functions (#30). The old names
+  still work, but are deprecated: calling one directly warns, and they will be removed
+  in a future release.
+
 # epidatatools 1.1.0
 * Fix BEA API error handling so errors returned under `Results` (e.g., from `GetData` calls) are reported instead of failing later with an unrelated message (#22).
 * `get_bls()` now returns data even when BLS fails to return series catalog metadata, which used to make the whole request fail. Affected series get an `NA` `series_title`, and a `bls_catalog_unavailable` warning lists them (#23).
