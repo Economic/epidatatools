@@ -36,6 +36,18 @@ some series, their data is still returned, but \code{series_title} is \code{NA} 
 their metadata is missing. A warning of class \code{bls_catalog_unavailable}
 lists those series. Series that BLS has no catalog for get \code{NA} titles
 without a warning.
+
+When BLS has no data for an observation, it sends a value that is not a number,
+usually with a footnote that explains why. For example, most series have no
+October 2025 value because of the 2025 lapse in appropriations. These values are
+\code{NA}, and a warning of class \code{bls_missing_values} lists them with BLS's
+explanation. Turn it off with \code{options(epidatatools.warn_missing = FALSE)}, or for
+one call with \code{suppressWarnings(get_bls(...), classes = "bls_missing_values")}.
+A value that is not a number and has no footnote gives a separate warning of class
+\code{bls_unexpected_values}, which the option does not turn off.
+
+With \code{metadata = TRUE}, each series' \code{data} has numeric values and a \code{footnotes}
+column with BLS's footnotes for each observation.
 }
 \examples{
 \dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}

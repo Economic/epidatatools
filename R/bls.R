@@ -260,9 +260,21 @@ get_bls_catalog_batch = function(series_ids, year, bls_api_key) {
   )
 }
 
+# Warn with cli, which wraps each bullet to the console width and indents its
+# continuation lines. Braces are escaped because cli reads {...} as code, and BLS
+# footnotes and series IDs are plain text.
+#' @noRd
+bls_warn = function(message, class, ...) {
+  message = purrr::set_names(
+    gsub("([{}])", "\\1\\1", message),
+    names(message)
+  )
+  cli::cli_warn(message, class = class, ...)
+}
+
 #' @noRd
 warn_bls_catalog_unavailable = function(failed) {
-  rlang::warn(
+  bls_warn(
     c(
       paste0(
         "BLS could not return catalog metadata for ",
@@ -296,6 +308,18 @@ warn_bls_catalog_unavailable = function(failed) {
 #' their metadata is missing. A warning of class `bls_catalog_unavailable`
 #' lists those series. Series that BLS has no catalog for get `NA` titles
 #' without a warning.
+#'
+#' When BLS has no data for an observation, it sends a value that is not a number,
+#' usually with a footnote that explains why. For example, most series have no
+#' October 2025 value because of the 2025 lapse in appropriations. These values are
+#' `NA`, and a warning of class `bls_missing_values` lists them with BLS's
+#' explanation. Turn it off with `options(epidatatools.warn_missing = FALSE)`, or for
+#' one call with `suppressWarnings(get_bls(...), classes = "bls_missing_values")`.
+#' A value that is not a number and has no footnote gives a separate warning of class
+#' `bls_unexpected_values`, which the option does not turn off.
+#'
+#' With `metadata = TRUE`, each series' `data` has numeric values and a `footnotes`
+#' column with BLS's footnotes for each observation.
 #'
 #' @export
 #' @examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BLS_API_KEY"))
@@ -353,7 +377,8 @@ get_bls = function(
     series,
     start,
     end
-  )
+  ) |>
+    bls_convert_values()
 
   if (metadata) {
     complete_results
@@ -385,7 +410,7 @@ bls_payload_series_to_tibble = function(id, payload, start, end) {
 
   data = payload |>
     purrr::pluck(id, "data") |>
-    purrr::map(function(x) { x$footnotes <- NULL; tibble::as_tibble(x) }) |>
+    purrr::map(bls_observation_to_tibble) |>
     purrr::map(add_dates_to_bls_tibble) |>
     purrr::list_rbind()
 
@@ -404,6 +429,125 @@ bls_payload_series_to_tibble = function(id, payload, start, end) {
   )
 
   results
+}
+
+# One row per observation. An observation's footnotes are joined into one string,
+# because a list of several footnotes would otherwise make several rows.
+#' @noRd
+bls_observation_to_tibble = function(x) {
+  notes = purrr::map_chr(x$footnotes, function(f) f$text %||% NA_character_)
+  notes = notes[!is.na(notes) & nzchar(notes)]
+  x$footnotes = if (length(notes) > 0) paste(notes, collapse = "; ") else NA_character_
+  tibble::as_tibble(x)
+}
+
+# Convert values to numbers. BLS sends a value that is not a number, such as "-",
+# when it has no data, and usually explains why in a footnote: for example, most
+# series have no October 2025 value because of the 2025 lapse in appropriations.
+# Those values become NA, with one warning that gives BLS's explanation.
+#' @noRd
+bls_convert_values = function(complete_results) {
+  unreadable = purrr::map2(
+    complete_results$data,
+    complete_results$series_id,
+    bls_unreadable_values
+  ) |>
+    purrr::list_rbind()
+
+  complete_results$data = purrr::map(complete_results$data, function(data) {
+    if ("value" %in% names(data)) {
+      data$value = suppressWarnings(as.numeric(data$value))
+    }
+    data
+  })
+
+  if (!is.null(unreadable) && nrow(unreadable) > 0) {
+    explained = unreadable[!is.na(unreadable$footnotes), ]
+    unexplained = unreadable[is.na(unreadable$footnotes), ]
+    if (nrow(explained) > 0 && isTRUE(getOption("epidatatools.warn_missing", TRUE))) {
+      warn_bls_missing_values(explained)
+    }
+    if (nrow(unexplained) > 0) {
+      warn_bls_unexpected_values(unexplained)
+    }
+  }
+
+  complete_results
+}
+
+#' @noRd
+bls_unreadable_values = function(data, series_id) {
+  if (!"value" %in% names(data)) {
+    return(NULL)
+  }
+  bad = is.na(suppressWarnings(as.numeric(data$value))) & !is.na(data$value)
+  tibble::tibble(
+    series_id = rep(series_id, sum(bad)),
+    period = paste(data$periodName[bad], data$year[bad]),
+    value = data$value[bad],
+    footnotes = data$footnotes[bad]
+  )
+}
+
+# "October 2025 for A, B, C, D, E and 3 more", one entry per period
+#' @noRd
+bls_describe_periods = function(rows) {
+  rows |>
+    split(factor(rows$period, levels = unique(rows$period))) |>
+    purrr::imap_chr(function(g, period) {
+      ids = unique(g$series_id)
+      shown = paste(utils::head(ids, 5), collapse = ", ")
+      if (length(ids) > 5) {
+        shown = paste0(shown, " and ", length(ids) - 5, " more")
+      } else if (length(ids) > 1) {
+        shown = sub(", ([^,]+)$", " and \\1", shown)
+      }
+      paste(period, "for", shown)
+    }) |>
+    paste(collapse = "; ")
+}
+
+#' @noRd
+warn_bls_missing_values = function(explained) {
+  n = nrow(explained)
+  groups = split(explained, factor(explained$footnotes, levels = unique(explained$footnotes)))
+  bullets = purrr::imap_chr(groups, function(g, note) {
+    paste0(sub("\\.$", "", note), " (", bls_describe_periods(g), ")")
+  })
+  bls_warn(
+    c(
+      paste0(
+        "BLS has no value for ", n, " observation", if (n > 1) "s",
+        ", so ", if (n > 1) "they are" else "it is", " `NA`:"
+      ),
+      purrr::set_names(bullets, rep("*", length(bullets))),
+      i = "Set `options(epidatatools.warn_missing = FALSE)` to turn off this warning."
+    ),
+    class = "bls_missing_values",
+    observations = explained
+  )
+}
+
+#' @noRd
+warn_bls_unexpected_values = function(unexplained) {
+  n = nrow(unexplained)
+  shown = utils::head(unexplained, 5)
+  bullets = paste0(
+    shown$series_id, ", ", shown$period, ": ", encodeString(shown$value, quote = '"')
+  )
+  bls_warn(
+    c(
+      paste0(
+        "BLS returned ", n, " value", if (n > 1) "s", " that ",
+        if (n > 1) "are" else "is", " not a number, with no footnote to explain, so ",
+        if (n > 1) "they are" else "it is", " `NA`:"
+      ),
+      purrr::set_names(bullets, rep("*", length(bullets))),
+      if (n > 5) c(i = paste(n - 5, "more not shown."))
+    ),
+    class = "bls_unexpected_values",
+    observations = unexplained
+  )
 }
 
 #' @noRd

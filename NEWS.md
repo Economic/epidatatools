@@ -1,5 +1,10 @@
 # epidatatools (development version)
 
+* `get_bls()` now explains missing values, such as October 2025 during the 2025 lapse
+  in appropriations, in a warning of class `bls_missing_values` that gives BLS's
+  footnote. Turn it off with `options(epidatatools.warn_missing = FALSE)` (#13).
+* With `get_bls(metadata = TRUE)`, each series' data now has numeric values and a
+  `footnotes` column.
 * `get_bls()` errors and messages no longer show your BLS API key, which BLS includes
   in its daily-limit message.
 
