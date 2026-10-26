@@ -1,10 +1,11 @@
 #' Calculate the binned interpolated quantile
 #'
 #' @description
-#' `r lifecycle::badge("superseded")`
+#' `r lifecycle::badge("deprecated")`
 #'
-#' This function is superceded by EPI's current preferred
-#' method for interpolating quantiles, [averaged_quantile()].
+#' This function was deprecated in epidatatools 2.0.0. Use [averaged_quantile()],
+#' EPI's preferred method for interpolating quantiles, instead. It uses a different
+#' method, so its results differ.
 #'
 #' @param x numeric vector or an R object
 #' @param bin_size size used for binning
@@ -23,6 +24,17 @@ interpolated_quantile = function(
   w = NULL,
   na.rm = TRUE
 ) {
+  lifecycle::deprecate_soft(
+    "2.0.0",
+    "interpolated_quantile()",
+    "averaged_quantile()"
+  )
+  interpolated_quantile_impl(x, bin_size, probs, w, na.rm)
+}
+
+# The calculation behind the deprecated functions. interpolated_median() and
+# binipolate() call it directly, so each call gives one deprecation warning.
+interpolated_quantile_impl = function(x, bin_size, probs, w, na.rm) {
   if (is.null(w)) {
     w = 1
   }
@@ -86,11 +98,12 @@ interpolated_quantile_p = function(data, p) {
 
 #' Calculate the binned interpolated median
 #'
-#' #' @description
-#' `r lifecycle::badge("superseded")`
+#' @description
+#' `r lifecycle::badge("deprecated")`
 #'
-#' This function is superceded by EPI's current preferred
-#' method for interpolating medians, [averaged_median()].
+#' This function was deprecated in epidatatools 2.0.0. Use [averaged_median()], EPI's
+#' preferred method for interpolating medians, instead. It uses a different method, so
+#' its results differ.
 #'
 #' @param x numeric vector or an R object
 #' @param bin_size size used for binning
@@ -102,7 +115,8 @@ interpolated_quantile_p = function(data, p) {
 #'
 #' @examples interpolated_median(x = mtcars$mpg, bin_size = 0.50)
 interpolated_median = function(x, bin_size, w = NULL, na.rm = TRUE) {
-  interpolated_quantile(
+  lifecycle::deprecate_soft("2.0.0", "interpolated_median()", "averaged_median()")
+  interpolated_quantile_impl(
     x,
     bin_size = bin_size,
     probs = 0.5,
@@ -114,10 +128,16 @@ interpolated_median = function(x, bin_size, w = NULL, na.rm = TRUE) {
 #' Summarize a data frame as binned interpolated percentiles
 #'
 #' @description
-#' `r lifecycle::badge("superseded")`
+#' `r lifecycle::badge("deprecated")`
 #'
-#' This function was superseded and EPI insteads uses
-#' [averaged_quantile()] to interpolate percentiles.
+#' This function was deprecated in epidatatools 2.0.0. Use [averaged_quantile()],
+#' EPI's preferred method for interpolating percentiles, with [dplyr::reframe()]
+#' instead. It uses a different method, so its results differ:
+#'
+#' ```r
+#' dplyr::reframe(mtcars, probs = c(0.25, 0.75),
+#'   value = averaged_quantile(mpg, wt, probs), .by = cyl)
+#' ```
 #'
 #' @param data data frame
 #' @param x column to compute
@@ -132,15 +152,26 @@ interpolated_median = function(x, bin_size, w = NULL, na.rm = TRUE) {
 #' @examples binipolate(mtcars, mpg, probs = c(0.25, 0.5, 0.75), bin_size = 0.25)
 #' @examples binipolate(mtcars, mpg, probs = c(0.25, 0.5, 0.75), bin_size = 0.25, .by = cyl, w = wt)
 binipolate = function(data, x, probs = 0.5, bin_size, .by = NULL, w = NULL) {
+  lifecycle::deprecate_soft(
+    "2.0.0",
+    "binipolate()",
+    "averaged_quantile()",
+    details = paste0(
+      "For example: `dplyr::reframe(data, probs = probs, ",
+      "value = averaged_quantile(x, w, probs), .by = group)`. ",
+      "averaged_quantile() uses a different method, so its results differ."
+    )
+  )
   data |>
     dplyr::group_by(dplyr::pick({{ .by }})) |>
     dplyr::reframe(
       probs = probs,
-      value = interpolated_quantile(
+      value = interpolated_quantile_impl(
         {{ x }},
         bin_size = bin_size,
         probs = probs,
         w = {{ w }},
+        na.rm = TRUE
       )
     ) |>
     dplyr::ungroup()

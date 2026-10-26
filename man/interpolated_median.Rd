@@ -19,12 +19,11 @@ interpolated_median(x, bin_size, w = NULL, na.rm = TRUE)
 numeric vector
 }
 \description{
-#' @description
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
-}
-\details{
-This function is superceded by EPI's current preferred
-method for interpolating medians, \code{\link[=averaged_median]{averaged_median()}}.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+This function was deprecated in epidatatools 2.0.0. Use \code{\link[=averaged_median]{averaged_median()}}, EPI's
+preferred method for interpolating medians, instead. It uses a different method, so
+its results differ.
 }
 \examples{
 interpolated_median(x = mtcars$mpg, bin_size = 0.50)

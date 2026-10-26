@@ -21,10 +21,11 @@ interpolated_quantile(x, bin_size, probs = 0.5, w = NULL, na.rm = TRUE)
 a numeric vector
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
-This function is superceded by EPI's current preferred
-method for interpolating quantiles, \code{\link[=averaged_quantile]{averaged_quantile()}}.
+This function was deprecated in epidatatools 2.0.0. Use \code{\link[=averaged_quantile]{averaged_quantile()}},
+EPI's preferred method for interpolating quantiles, instead. It uses a different
+method, so its results differ.
 }
 \examples{
 interpolated_quantile(x = mtcars$mpg, bin_size = 0.50, probs = c(0.25, 0.5, 0.75))

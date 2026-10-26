@@ -1,8 +1,29 @@
-# epidatatools 1.1.0
-* Fix BEA API error handling so errors returned under `Results` (e.g., from `GetData` calls) are reported instead of failing later with an unrelated message (#22).
-* `get_bls()` now returns data even when BLS fails to return series catalog metadata, which used to make the whole request fail. Affected series get an `NA` `series_title`, and a `bls_catalog_unavailable` warning lists them (#23).
-* `get_bls()` now calls the BLS API directly instead of through the blsR package, which is no longer a dependency. Results are unchanged.
-* Fix BEA and BLS functions on R versions before 4.4, which lack base R's `%||%` operator; it is now imported from rlang.
+# epidatatools 2.0.0
+
+## Breaking changes
+
+* `find_bls()` now searches a weekly catalog of every BLS series (8.3 million series
+  from 33 programs), built by [bls-index](https://github.com/Economic/bls-index), instead
+  of scraping the BLS Data Finder (#29).
+  * The first search downloads the catalog (about 33 MB) into a cache, and later
+    searches check for a newer one at most once a week. `refresh = TRUE` checks now.
+  * Searching needs the arrow package, which `find_bls()` offers to install.
+
+## Deprecations
+
+* `dl_ipums_micro()`, `dl_ipums_acs1()`, `dl_ipums_asec()` and `dl_ipums_cps()` are
+  renamed `get_ipums_micro()`, `get_ipums_acs1()`, `get_ipums_asec()` and
+  `get_ipums_cps()`, to match the package's other data functions (#30). The old names
+  still work, but are deprecated: calling one directly warns, and they will be removed
+  in a future release.
+* `interpolated_quantile()`, `interpolated_median()` and `binipolate()` are
+  deprecated. Use `averaged_quantile()` and `averaged_median()` instead.
+
+## Improvements
+
+* `get_bls()` now returns data even when BLS fails to return series catalog metadata,
+  which used to make the whole request fail. Affected series get an `NA`
+  `series_title`, and a `bls_catalog_unavailable` warning lists them (#23).
 
 # epidatatools 1.0.5
 * Fix bug in `get_bls()` that duplicated rows when the BLS API call retrieves sublists of footnotes.
