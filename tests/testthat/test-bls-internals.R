@@ -1,8 +1,9 @@
 # Fake get_bls_api(): one monthly (January) observation per year for each
 # series, and a catalog when requested. A catalog request that includes any
 # series in `catalog_fails` fails with `status`, as BLS does during a catalog
-# outage.
-fake_bls_api = function(calls, catalog_fails = character(), status = "REQUEST_FAILED") {
+# outage. Series in `no_data` have no observations but can still have a catalog.
+fake_bls_api = function(calls, catalog_fails = character(), status = "REQUEST_FAILED",
+                        no_data = character()) {
   function(series_ids, start, end, catalog = FALSE, bls_api_key = "",
            annual_average = FALSE) {
     calls$n = calls$n + 1
@@ -26,6 +27,9 @@ fake_bls_api = function(calls, catalog_fails = character(), status = "REQUEST_FA
           )
         })
       )
+      if (id %in% no_data) {
+        series$data = list()
+      }
       if (catalog) {
         series$catalog = list(series_title = paste("Title", id), series_id = id)
       }
@@ -99,6 +103,61 @@ test_that("get_bls() combines batches and year spans without duplicates", {
   expect_equal(result$name[result$series_id == ids[1]][1], "first")
   expect_equal(unique(result$series_title), paste("Title", ids))
   expect_equal(range(result$year), c(1980, 2024))
+})
+
+test_that("default get_bls() returns typed empty flat output when BLS has no data", {
+  calls = new_calls()
+  local_mocked_bindings(get_bls_api = fake_bls_api(calls, no_data = "EMPTY"))
+
+  expect_no_warning(
+    result <- get_bls(c(empty = "EMPTY"), 2024, 2025, bls_api_key = "fake")
+  )
+  expect_identical(result, tibble::tibble(
+    name = character(), series_id = character(), series_title = character(),
+    date_frequency = character(), date = as.Date(character()),
+    year = numeric(), value = numeric()
+  ))
+  expect_identical(
+    get_bls(c(empty = "EMPTY"), 2024, 2025, bls_api_key = "fake",
+            annual_average = FALSE),
+    result
+  )
+})
+
+test_that("default get_bls() retains metadata and typed nested data for empty series", {
+  calls = new_calls()
+  local_mocked_bindings(get_bls_api = fake_bls_api(calls, no_data = "EMPTY"))
+
+  expect_no_warning(
+    result <- get_bls(c(empty = "EMPTY"), 2024, 2025, metadata = TRUE,
+                      bls_api_key = "fake")
+  )
+  expect_identical(result$name, "empty")
+  expect_identical(result$series_id, "EMPTY")
+  expect_identical(result$metadata[[1]], tibble::tibble(series_title = "Title EMPTY"))
+  expect_identical(result$data[[1]], tibble::tibble(
+    year = character(), period = character(), periodName = character(),
+    value = numeric(), footnotes = character(),
+    date_frequency = character(), date = as.Date(character())
+  ))
+  expect_identical(
+    get_bls(c(empty = "EMPTY"), 2024, 2025, metadata = TRUE,
+            bls_api_key = "fake", annual_average = FALSE),
+    result
+  )
+})
+
+test_that("empty series do not remove other series' observations in default calls", {
+  calls = new_calls()
+  local_mocked_bindings(get_bls_api = fake_bls_api(calls, no_data = "EMPTY"))
+
+  result = get_bls(c("EMPTY", "PRESENT"), 2024, 2025, bls_api_key = "fake")
+  expect_equal(result, get_bls("PRESENT", 2024, 2025, bls_api_key = "fake"))
+
+  nested = get_bls(c("EMPTY", "PRESENT"), 2024, 2025, metadata = TRUE,
+                   bls_api_key = "fake")
+  expect_identical(nested$series_id, c("EMPTY", "PRESENT"))
+  expect_equal(vapply(nested$data, nrow, integer(1)), c(0L, 2L))
 })
 
 test_that("get_bls() keeps data and isolates series whose catalog fails", {

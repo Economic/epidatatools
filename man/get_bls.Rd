@@ -54,6 +54,14 @@ A value that is not a number and has no footnote gives a separate warning of cla
 With \code{metadata = TRUE}, each series' \code{data} has numeric values and a \code{footnotes}
 column with BLS's footnotes for each observation.
 
+When BLS returns no observations for a series, that series contributes no rows
+to the flat output. If all requested series are empty, the output is a zero-row
+tibble with typed columns, including a \code{date} column of class \code{Date} and a
+numeric \code{value} column.
+With \code{metadata = TRUE}, empty series and their metadata are retained, and their
+nested \code{data} is a zero-row tibble with typed columns. This also applies with
+\code{annual_average = FALSE}.
+
 With \code{annual_average = TRUE}, annual-average periods (\code{M13}, \code{Q05}, and \code{S03})
 are returned with \code{date_frequency = "year"} and \code{date} set to January 1 of the
 observation year. This also applies to the nested \code{data} when \code{metadata = TRUE}.

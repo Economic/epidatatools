@@ -334,6 +334,14 @@ warn_bls_catalog_unavailable = function(failed) {
 #' With `metadata = TRUE`, each series' `data` has numeric values and a `footnotes`
 #' column with BLS's footnotes for each observation.
 #'
+#' When BLS returns no observations for a series, that series contributes no rows
+#' to the flat output. If all requested series are empty, the output is a zero-row
+#' tibble with typed columns, including a `date` column of class `Date` and a
+#' numeric `value` column.
+#' With `metadata = TRUE`, empty series and their metadata are retained, and their
+#' nested `data` is a zero-row tibble with typed columns. This also applies with
+#' `annual_average = FALSE`.
+#'
 #' With `annual_average = TRUE`, annual-average periods (`M13`, `Q05`, and `S03`)
 #' are returned with `date_frequency = "year"` and `date` set to January 1 of the
 #' observation year. This also applies to the nested `data` when `metadata = TRUE`.
@@ -468,7 +476,8 @@ bls_payload_series_to_tibble = function(id, payload, start, end) {
     data_sorted = data |>
       dplyr::arrange(.data$date)
   } else {
-    # Keep the schema when an annual-average request has no published rows.
+    # Keep the schema for any series with no observations, including after
+    # filtering for annual averages.
     data_sorted = tibble::tibble(
       year = character(), period = character(), periodName = character(),
       value = character(), footnotes = character(),

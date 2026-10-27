@@ -3,7 +3,12 @@
 * `get_bls(annual_average = TRUE)` requests and returns only BLS-published annual
   averages, dated January 1 with `date_frequency = "year"`, including with
   `metadata = TRUE`. Missing annual averages produce a warning; the package does
-  not calculate substitutes. The default behavior is unchanged (#44).
+  not calculate substitutes (#44).
+* When BLS returns no observations, `get_bls()` now returns a zero-row tibble
+  with typed columns instead of erroring. With `metadata = TRUE`, the series
+  and its metadata are retained, and its nested `data` is a zero-row tibble
+  with typed columns instead of a zero-column data frame. This also applies
+  to default calls with `annual_average = FALSE`.
 
 # epidatatools 2.1.0
 
