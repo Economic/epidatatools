@@ -3,7 +3,8 @@
 # series in `catalog_fails` fails with `status`, as BLS does during a catalog
 # outage.
 fake_bls_api = function(calls, catalog_fails = character(), status = "REQUEST_FAILED") {
-  function(series_ids, start, end, catalog = FALSE, bls_api_key = "") {
+  function(series_ids, start, end, catalog = FALSE, bls_api_key = "",
+           annual_average = FALSE) {
     calls$n = calls$n + 1
     calls$sizes = c(calls$sizes, length(series_ids))
     if (catalog) {

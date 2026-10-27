@@ -1,3 +1,10 @@
+# epidatatools (development version)
+
+* `get_bls(annual_average = TRUE)` requests and returns only BLS-published annual
+  averages, dated January 1 with `date_frequency = "year"`, including with
+  `metadata = TRUE`. Missing annual averages produce a warning; the package does
+  not calculate substitutes. The default behavior is unchanged (#44).
+
 # epidatatools 2.1.0
 
 * `get_bls()` now explains missing values, such as October 2025 during the 2025 lapse
