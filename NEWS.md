@@ -1,3 +1,10 @@
+# epidatatools (development version)
+
+* `get_bls(annual_average = TRUE)` returns only BLS-published annual averages,
+  dated January 1; missing averages warn (#44).
+* Empty BLS responses now produce typed, zero-row tibbles, including nested
+  `data` with `metadata = TRUE`.
+
 # epidatatools 2.1.0
 
 * `get_bls()` now explains missing values, such as October 2025 during the 2025 lapse

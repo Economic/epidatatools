@@ -9,7 +9,8 @@ get_bls(
   start,
   end,
   metadata = FALSE,
-  bls_api_key = Sys.getenv("BLS_API_KEY")
+  bls_api_key = Sys.getenv("BLS_API_KEY"),
+  annual_average = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,10 @@ get_bls(
 \item{metadata}{Flag for additional metadata}
 
 \item{bls_api_key}{BLS API key (defaults to BLS_API_KEY environment variable)}
+
+\item{annual_average}{A single logical value. If \code{TRUE}, request and return
+only BLS-published annual averages, without the underlying series. Defaults
+to \code{FALSE}, which returns the series at its usual frequency.}
 }
 \value{
 a tibble
@@ -48,10 +53,29 @@ A value that is not a number and has no footnote gives a separate warning of cla
 
 With \code{metadata = TRUE}, each series' \code{data} has numeric values and a \code{footnotes}
 column with BLS's footnotes for each observation.
+
+When BLS returns no observations for a series, that series contributes no rows
+to the flat output. If all requested series are empty, the output is a zero-row
+tibble with typed columns, including a \code{date} column of class \code{Date} and a
+numeric \code{value} column.
+With \code{metadata = TRUE}, empty series and their metadata are retained, and their
+nested \code{data} is a zero-row tibble with typed columns. This also applies with
+\code{annual_average = FALSE}.
+
+With \code{annual_average = TRUE}, annual-average periods (\code{M13}, \code{Q05}, and \code{S03})
+are returned with \code{date_frequency = "year"} and \code{date} set to January 1 of the
+observation year. This also applies to the nested \code{data} when \code{metadata = TRUE}.
+No averages are calculated locally. If BLS supplies no annual averages for a
+requested series and year range, a warning of class \code{bls_annual_average_unavailable}
+lists the affected series; their data has zero rows. Native annual observations
+(\code{A01}) are not treated as computed annual averages.
 }
 \examples{
 \dontshow{if (identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BLS_API_KEY"))) withAutoprint(\{ # examplesIf}
 get_bls("LNU02300060", start = 2020, end = 2024)
+
+# Return only published annual CPI averages, rather than monthly values
+get_bls("CUUR0000SA0", start = 2024, end = 2025, annual_average = TRUE)
 
 bls_series_ids = c(
   emp_fb_2534 = "LNU02073399",
