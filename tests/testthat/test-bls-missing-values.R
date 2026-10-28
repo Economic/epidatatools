@@ -27,7 +27,8 @@ warning_text = function(w) gsub("\\s+", " ", conditionMessage(w))
 
 # A fake get_bls_api() serving `series`, a list of observation lists named by ID
 fake_bls_series_api = function(series) {
-  function(series_ids, start, end, catalog = FALSE, bls_api_key = "") {
+  function(series_ids, start, end, catalog = FALSE, bls_api_key = "",
+           annual_average = FALSE) {
     purrr::map(series_ids, function(id) {
       s = list(seriesID = id, data = series[[id]])
       if (catalog) {

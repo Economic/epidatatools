@@ -20,13 +20,14 @@ normalize_api_frequency = function(
       # BLS uses period codes like "M01", "Q01", "A01", "S01"
       period_type = substr(period_code, 1, 1)
 
-      dplyr::recode_values(
+      frequency = dplyr::recode_values(
         period_type,
         "M" ~ "month",
         "Q" ~ "quarter",
         "A" ~ "year",
         "S" ~ "semiyear"
       )
+      dplyr::if_else(is_bls_annual_average_period(period_code), "year", frequency)
     },
     bea = {
       # BEA uses time periods like "2024Q1", "2024M01", "2024"
@@ -53,6 +54,10 @@ normalize_api_frequency = function(
   )
 }
 
+#' @noRd
+is_bls_annual_average_period = function(period) {
+  period %in% c("M13", "Q05", "S03")
+}
 
 #' Parse API date from period codes
 #'
@@ -78,6 +83,7 @@ parse_api_date = function(period, frequency = NULL, year = NULL) {
 #' @noRd
 parse_bls_date = function(date_frequency, year, period) {
   period_num = as.numeric(substr(period, 2, 3))
+  period_num[date_frequency == "year"] = 1
 
   period_num = dplyr::if_else(
     date_frequency == "semiyear" & period_num == 1, 1,

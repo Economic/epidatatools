@@ -32,6 +32,7 @@ handle_bls_api_error = function(result) {
 #' @param end End year, at most 19 years after `start`
 #' @param catalog Request series catalog metadata
 #' @param bls_api_key BLS API key (defaults to BLS_API_KEY environment variable)
+#' @param annual_average Request annual averages from BLS
 #'
 #' @returns List of series from the API response, each with seriesID, data,
 #'   and (when requested and available) catalog elements
@@ -41,7 +42,8 @@ get_bls_api = function(
   start,
   end,
   catalog = FALSE,
-  bls_api_key = Sys.getenv("BLS_API_KEY")
+  bls_api_key = Sys.getenv("BLS_API_KEY"),
+  annual_average = FALSE
 ) {
   # Check for API key
   validate_api_key(
@@ -58,6 +60,9 @@ get_bls_api = function(
     catalog = catalog,
     registrationkey = bls_api_key
   )
+  if (annual_average) {
+    body$annualaverage = TRUE
+  }
 
   # Make API request
   response = httr::POST(
@@ -93,8 +98,15 @@ process_bls_response = function(result, bls_api_key) {
   # Check for API errors
   handle_bls_api_error(result)
 
-  # Pass along non-fatal notes, such as missing catalog data
-  purrr::walk(as.character(unlist(result$message)), rlang::inform)
+  # Tag only BLS's whole-year no-data notes. get_bls() replaces these with
+  # coverage diagnostics derived from observations, after combining requests.
+  purrr::walk(as.character(unlist(result$message)), function(note) {
+    no_data = grepl(
+      "^No Data Available for Series\\s+\\S+\\s+Year:\\s*[0-9]{4}\\s*\\.?$",
+      note
+    )
+    rlang::inform(note, class = if (no_data) "bls_no_data_message")
+  })
 
   extract_bls_series(result)
 }
@@ -156,10 +168,12 @@ bls_series_batches = function(series_ids, series_limit = 50) {
 #' @param end End year
 #' @param catalog Request series catalog metadata
 #' @param bls_api_key BLS API key
+#' @param annual_average Request annual averages from BLS
 #'
 #' @returns List of series named by series ID, in the order given in `series`
 #' @noRd
-get_bls_payload = function(series, start, end, catalog, bls_api_key) {
+get_bls_payload = function(series, start, end, catalog, bls_api_key,
+                          annual_average = FALSE) {
   series_ids = unique(unname(series))
 
   requests = tidyr::expand_grid(
@@ -170,7 +184,10 @@ get_bls_payload = function(series, start, end, catalog, bls_api_key) {
   # Base Map() rather than purrr::map2(), which would wrap a bls_api_error in
   # purrr_error_indexed and hide its class and fields from callers
   responses = Map(
-    function(ids, years) get_bls_api(ids, years[1], years[2], catalog, bls_api_key),
+    function(ids, years) get_bls_api(
+      ids, years[1], years[2], catalog, bls_api_key,
+      annual_average = annual_average
+    ),
     requests$ids,
     requests$years
   ) |>
@@ -289,6 +306,54 @@ warn_bls_catalog_unavailable = function(failed) {
   )
 }
 
+#' @noRd
+bls_current_year = function() as.integer(format(Sys.Date(), "%Y"))
+
+# Compress consecutive years, and bound displayed ranges as well as series.
+# The full set of gaps is always available in the warning's missing_years field.
+#' @noRd
+bls_describe_years = function(years) {
+  groups = split(years, cumsum(c(TRUE, diff(years) != 1)))
+  ranges = vapply(groups, function(x) {
+    if (length(x) == 1) as.character(x) else paste0(x[1], "\u2013", x[length(x)])
+  }, character(1))
+  shown = paste(utils::head(ranges, 5), collapse = ", ")
+  if (length(ranges) > 5) {
+    shown = paste0(shown, " and ", length(ranges) - 5, " more ranges")
+  }
+  shown
+}
+
+#' @noRd
+warn_bls_years_unavailable = function(payload, start, end, annual_average) {
+  requested_years = seq.int(start, end)
+  missing = purrr::imap(payload, function(series, id) {
+    observed = as.integer(purrr::map_chr(series$data, "year"))
+    years = setdiff(requested_years, observed)
+    tibble::tibble(series_id = rep(id, length(years)), year = as.integer(years))
+  }) |>
+    purrr::list_rbind()
+  if (is.null(missing) || nrow(missing) == 0) {
+    return(invisible(NULL))
+  }
+
+  ids = unique(missing$series_id)
+  bullets = vapply(utils::head(ids, 5), function(id) {
+    paste0(id, ": ", bls_describe_years(missing$year[missing$series_id == id]))
+  }, character(1))
+  bls_warn(
+    c(
+      paste0("BLS returned no ", if (annual_average) "annual averages" else "observations",
+             " for these requested years:"),
+      purrr::set_names(bullets, rep("*", length(bullets))),
+      if (length(ids) > 5) c(i = paste(length(ids) - 5, "more series not shown."))
+    ),
+    class = c(if (annual_average) "bls_annual_average_unavailable", "bls_years_unavailable"),
+    series_ids = ids,
+    missing_years = missing
+  )
+}
+
 #' Retrieve data from the BLS API
 #'
 #' Requires you to have an \href{https://www.bls.gov/developers/}{BLS API key} saved in the `BLS_API_KEY` environment variable.
@@ -296,12 +361,20 @@ warn_bls_catalog_unavailable = function(failed) {
 #' @param series BLS series code
 #' @param start Start year (numeric)
 #' @param end End year (numeric)
+#' @param ... Reserved for future use. Must be empty.
+#' @param annual_average A single logical value. If `TRUE`, request and return
+#'   only BLS-published annual averages, without the underlying series. Defaults
+#'   to `FALSE`, which returns the series at its usual frequency.
 #' @param metadata Flag for additional metadata
 #' @param bls_api_key BLS API key (defaults to BLS_API_KEY environment variable)
 #'
 #' @returns a tibble
 #'
 #' @details
+#' The optional `annual_average`, `metadata`, and `bls_api_key` arguments must
+#' be supplied by their full names. Only `series`, `start`, and `end` can be
+#' supplied positionally.
+#'
 #' Series titles and other metadata come from the BLS series catalog, which is
 #' requested separately from the data. If BLS cannot return the catalog for
 #' some series, their data is still returned, but `series_title` is `NA` and
@@ -321,9 +394,41 @@ warn_bls_catalog_unavailable = function(failed) {
 #' With `metadata = TRUE`, each series' `data` has numeric values and a `footnotes`
 #' column with BLS's footnotes for each observation.
 #'
+#' When BLS returns no observations for a series, that series contributes no rows
+#' to the flat output. If all requested series are empty, the output is a zero-row
+#' tibble with typed columns, including a `date` column of class `Date` and a
+#' numeric `value` column.
+#' With `metadata = TRUE`, empty series and their metadata are retained, and their
+#' nested `data` is a zero-row tibble with typed columns. This also applies with
+#' `annual_average = FALSE`.
+#'
+#' A warning of class `bls_years_unavailable` reports requested series/year pairs
+#' with no returned observations. Its `series_ids` field lists affected series;
+#' `missing_years` is a tibble with `series_id` and integer `year` columns. The
+#' displayed list is abbreviated for large requests. This checks whole years,
+#' not completeness of months or quarters; an observation with an `NA` value
+#' still counts as present. BLS's corresponding no-data messages are replaced by
+#' this warning, while unrelated informational messages are retained. Suppress
+#' it selectively with `suppressWarnings(get_bls(...), classes = "bls_years_unavailable")`.
+#' Future end years are included in these diagnostics, but retrieval stops at the
+#' current calendar year. An entirely future interval raises a
+#' `bls_future_interval` error before making any API requests.
+#'
+#' With `annual_average = TRUE`, annual-average periods (`M13`, `Q05`, and `S03`)
+#' are returned with `date_frequency = "year"` and `date` set to January 1 of the
+#' observation year. This also applies to the nested `data` when `metadata = TRUE`.
+#' No averages are calculated locally. Missing annual series/year pairs use the
+#' warning class `bls_annual_average_unavailable`, which also inherits from
+#' `bls_years_unavailable` and has the same fields. Entirely unavailable series
+#' have zero data rows and are covered by the same warning. Native annual observations
+#' (`A01`) are not treated as computed annual averages.
+#'
 #' @export
 #' @examplesIf identical(Sys.getenv("IN_PKGDOWN"), "true") && nzchar(Sys.getenv("BLS_API_KEY"))
 #' get_bls("LNU02300060", start = 2020, end = 2024)
+#'
+#' # Return only published annual CPI averages, rather than monthly values
+#' get_bls("CUUR0000SA0", start = 2024, end = 2025, annual_average = TRUE)
 #'
 #' bls_series_ids = c(
 #'   emp_fb_2534 = "LNU02073399",
@@ -342,9 +447,24 @@ get_bls = function(
   series,
   start,
   end,
+  ...,
+  annual_average = FALSE,
   metadata = FALSE,
   bls_api_key = Sys.getenv("BLS_API_KEY")
 ) {
+  rlang::check_dots_empty()
+  if (!rlang::is_bool(annual_average)) {
+    rlang::abort("`annual_average` must be TRUE or FALSE.")
+  }
+  current_year = bls_current_year()
+  if (start > current_year) {
+    rlang::abort(
+      paste0("`start` must be at most the current year (", current_year,
+             "); the requested interval is entirely in the future."),
+      class = "bls_future_interval",
+      start = start, end = end, current_year = current_year
+    )
+  }
   # Check for API key
   validate_api_key(
     bls_api_key,
@@ -354,15 +474,30 @@ get_bls = function(
 
   # Request data and catalogs separately, so a catalog failure cannot block
   # the data
-  raw_results = get_bls_payload(
-    series,
-    start = start,
-    end = end,
-    catalog = FALSE,
-    bls_api_key = bls_api_key
+  raw_results = withCallingHandlers(
+    get_bls_payload(
+      series,
+      start = start,
+      end = min(end, current_year),
+      catalog = FALSE,
+      bls_api_key = bls_api_key,
+      annual_average = annual_average
+    ),
+    bls_no_data_message = function(cnd) invokeRestart("muffleMessage")
   )
 
-  catalogs = get_bls_catalogs(names(raw_results), end, bls_api_key)
+  if (annual_average) {
+    raw_results = purrr::map(raw_results, function(x) {
+      x$data = purrr::keep(x$data, function(obs) {
+        is_bls_annual_average_period(obs$period)
+      })
+      x
+    })
+  }
+
+  # Catalog metadata does not depend on year. The successful data request has
+  # already accepted start, whereas the original end may be in the future.
+  catalogs = get_bls_catalogs(names(raw_results), start, bls_api_key)
   raw_results = purrr::imap(raw_results, function(x, id) {
     x$catalog = catalogs$catalogs[[id]]
     x
@@ -371,6 +506,8 @@ get_bls = function(
   if (length(catalogs$failed) > 0) {
     warn_bls_catalog_unavailable(catalogs$failed)
   }
+
+  warn_bls_years_unavailable(raw_results, start, end, annual_average)
 
   complete_results = bls_payload_to_tibble(
     raw_results,
@@ -419,7 +556,13 @@ bls_payload_series_to_tibble = function(id, payload, start, end) {
     data_sorted = data |>
       dplyr::arrange(.data$date)
   } else {
-    data_sorted = data
+    # Keep the schema for any series with no observations, including after
+    # filtering for annual averages.
+    data_sorted = tibble::tibble(
+      year = character(), period = character(), periodName = character(),
+      value = character(), footnotes = character(),
+      date_frequency = character(), date = as.Date(character())
+    )
   }
 
   results = tibble::tibble(

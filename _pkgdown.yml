@@ -47,9 +47,11 @@ reference:
   - summarize_groups
 - title: Deprecated
   desc: >
-    Use averaged_quantile() and averaged_median() instead.
+    Functions that will be removed in a future release. Each page names its
+    replacement.
   contents:
   - binipolate
   - interpolated_median
   - interpolated_quantile
+  - ipums_micro_deprecated
 
