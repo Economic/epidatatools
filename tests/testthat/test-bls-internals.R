@@ -109,8 +109,9 @@ test_that("default get_bls() returns typed empty flat output when BLS has no dat
   calls = new_calls()
   local_mocked_bindings(get_bls_api = fake_bls_api(calls, no_data = "EMPTY"))
 
-  expect_no_warning(
-    result <- get_bls(c(empty = "EMPTY"), 2024, 2025, bls_api_key = "fake")
+  expect_warning(
+    result <- get_bls(c(empty = "EMPTY"), 2024, 2025, bls_api_key = "fake"),
+    class = "bls_years_unavailable"
   )
   expect_identical(result, tibble::tibble(
     name = character(), series_id = character(), series_title = character(),
@@ -118,8 +119,8 @@ test_that("default get_bls() returns typed empty flat output when BLS has no dat
     year = numeric(), value = numeric()
   ))
   expect_identical(
-    get_bls(c(empty = "EMPTY"), 2024, 2025, bls_api_key = "fake",
-            annual_average = FALSE),
+    suppressWarnings(get_bls(c(empty = "EMPTY"), 2024, 2025, bls_api_key = "fake",
+                             annual_average = FALSE), classes = "bls_years_unavailable"),
     result
   )
 })
@@ -128,9 +129,10 @@ test_that("default get_bls() retains metadata and typed nested data for empty se
   calls = new_calls()
   local_mocked_bindings(get_bls_api = fake_bls_api(calls, no_data = "EMPTY"))
 
-  expect_no_warning(
+  expect_warning(
     result <- get_bls(c(empty = "EMPTY"), 2024, 2025, metadata = TRUE,
-                      bls_api_key = "fake")
+                      bls_api_key = "fake"),
+    class = "bls_years_unavailable"
   )
   expect_identical(result$name, "empty")
   expect_identical(result$series_id, "EMPTY")
@@ -141,8 +143,9 @@ test_that("default get_bls() retains metadata and typed nested data for empty se
     date_frequency = character(), date = as.Date(character())
   ))
   expect_identical(
-    get_bls(c(empty = "EMPTY"), 2024, 2025, metadata = TRUE,
-            bls_api_key = "fake", annual_average = FALSE),
+    suppressWarnings(get_bls(c(empty = "EMPTY"), 2024, 2025, metadata = TRUE,
+                             bls_api_key = "fake", annual_average = FALSE),
+                     classes = "bls_years_unavailable"),
     result
   )
 })
@@ -151,11 +154,17 @@ test_that("empty series do not remove other series' observations in default call
   calls = new_calls()
   local_mocked_bindings(get_bls_api = fake_bls_api(calls, no_data = "EMPTY"))
 
-  result = get_bls(c("EMPTY", "PRESENT"), 2024, 2025, bls_api_key = "fake")
+  expect_warning(
+    result <- get_bls(c("EMPTY", "PRESENT"), 2024, 2025, bls_api_key = "fake"),
+    class = "bls_years_unavailable"
+  )
   expect_equal(result, get_bls("PRESENT", 2024, 2025, bls_api_key = "fake"))
 
-  nested = get_bls(c("EMPTY", "PRESENT"), 2024, 2025, metadata = TRUE,
-                   bls_api_key = "fake")
+  expect_warning(
+    nested <- get_bls(c("EMPTY", "PRESENT"), 2024, 2025, metadata = TRUE,
+                      bls_api_key = "fake"),
+    class = "bls_years_unavailable"
+  )
   expect_identical(nested$series_id, c("EMPTY", "PRESENT"))
   expect_equal(vapply(nested$data, nrow, integer(1)), c(0L, 2L))
 })

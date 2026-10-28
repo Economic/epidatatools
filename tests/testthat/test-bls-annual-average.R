@@ -79,17 +79,34 @@ test_that("metadata output keeps annual periods, numeric values, and footnotes",
   expect_equal(data$footnotes, rep("Published footnote.", 2))
 })
 
-test_that("default and positional calls keep native observations", {
+test_that("default and explicitly named calls keep native observations", {
   calls = annual_calls()
   local_mocked_bindings(get_bls_api = annual_api(calls))
-  # Preserve the existing fifth positional argument (API key).
-  usual = get_bls("MONTH", 2025, 2025, FALSE, "fake")
-  explicit = get_bls("MONTH", 2025, 2025, FALSE, "fake", annual_average = FALSE)
+  usual = get_bls("MONTH", 2025, 2025, bls_api_key = "fake")
+  explicit = get_bls("MONTH", 2025, 2025, metadata = FALSE,
+                     bls_api_key = "fake", annual_average = FALSE)
   expect_identical(usual, explicit)
   expect_equal(usual$value, c(10, 20))
   expect_equal(usual$month, c(1, 12))
   expect_equal(unique(usual$date_frequency), "month")
   expect_false(any(vapply(calls$requests, function(x) x$annual_average, logical(1))))
+})
+
+test_that("optional arguments require exact names and dots are reserved", {
+  calls = annual_calls()
+  local_mocked_bindings(get_bls_api = annual_api(calls))
+  for (extra in list(
+    list(TRUE), list(FALSE, "fake"), list(TRUE, FALSE, "fake"),
+    list(annual = TRUE), list(meta = TRUE), list(bls_api = "fake"),
+    list(annual_averages = TRUE), list(future = TRUE)
+  )) {
+    expect_error(
+      do.call(get_bls, c(list(series = "MONTH", start = 2025, end = 2025,
+                              bls_api_key = "fake"), extra)),
+      class = "rlib_error_dots_nonempty"
+    )
+  }
+  expect_length(calls$requests, 0)
 })
 
 test_that("annual requests span every series batch and year range", {

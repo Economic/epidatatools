@@ -1,9 +1,24 @@
 # epidatatools (development version)
 
+## Breaking changes
+
+* `get_bls()` now requires the full argument names for `annual_average`,
+  `metadata`, and `bls_api_key`. Only `series`, `start`, and `end` remain
+  positional. `...` is reserved for future use; extra or misspelled arguments
+  raise an error. Update positional calls to use, for example,
+  `get_bls(id, 2024, 2025, metadata = TRUE, bls_api_key = key)`.
+
+## Improvements
+
 * `get_bls(annual_average = TRUE)` returns only BLS-published annual averages,
   dated January 1; missing averages warn (#44).
 * Empty BLS responses now produce typed, zero-row tibbles, including nested
   `data` with `metadata = TRUE`.
+* `get_bls()` warns about missing requested series/year pairs, including partial
+  annual coverage, with a structured `bls_years_unavailable` warning (also
+  `bls_annual_average_unavailable` for annual averages). It replaces BLS's no-data
+  messages and can be suppressed selectively. Requests ending in future years
+  return available data; entirely future intervals fail before API calls (#46).
 
 # epidatatools 2.1.0
 

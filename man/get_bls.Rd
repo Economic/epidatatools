@@ -8,9 +8,10 @@ get_bls(
   series,
   start,
   end,
+  ...,
+  annual_average = FALSE,
   metadata = FALSE,
-  bls_api_key = Sys.getenv("BLS_API_KEY"),
-  annual_average = FALSE
+  bls_api_key = Sys.getenv("BLS_API_KEY")
 )
 }
 \arguments{
@@ -20,13 +21,15 @@ get_bls(
 
 \item{end}{End year (numeric)}
 
-\item{metadata}{Flag for additional metadata}
-
-\item{bls_api_key}{BLS API key (defaults to BLS_API_KEY environment variable)}
+\item{...}{Reserved for future use. Must be empty.}
 
 \item{annual_average}{A single logical value. If \code{TRUE}, request and return
 only BLS-published annual averages, without the underlying series. Defaults
 to \code{FALSE}, which returns the series at its usual frequency.}
+
+\item{metadata}{Flag for additional metadata}
+
+\item{bls_api_key}{BLS API key (defaults to BLS_API_KEY environment variable)}
 }
 \value{
 a tibble
@@ -35,6 +38,10 @@ a tibble
 Requires you to have an \href{https://www.bls.gov/developers/}{BLS API key} saved in the \code{BLS_API_KEY} environment variable.
 }
 \details{
+The optional \code{annual_average}, \code{metadata}, and \code{bls_api_key} arguments must
+be supplied by their full names. Only \code{series}, \code{start}, and \code{end} can be
+supplied positionally.
+
 Series titles and other metadata come from the BLS series catalog, which is
 requested separately from the data. If BLS cannot return the catalog for
 some series, their data is still returned, but \code{series_title} is \code{NA} and
@@ -62,12 +69,25 @@ With \code{metadata = TRUE}, empty series and their metadata are retained, and t
 nested \code{data} is a zero-row tibble with typed columns. This also applies with
 \code{annual_average = FALSE}.
 
+A warning of class \code{bls_years_unavailable} reports requested series/year pairs
+with no returned observations. Its \code{series_ids} field lists affected series;
+\code{missing_years} is a tibble with \code{series_id} and integer \code{year} columns. The
+displayed list is abbreviated for large requests. This checks whole years,
+not completeness of months or quarters; an observation with an \code{NA} value
+still counts as present. BLS's corresponding no-data messages are replaced by
+this warning, while unrelated informational messages are retained. Suppress
+it selectively with \code{suppressWarnings(get_bls(...), classes = "bls_years_unavailable")}.
+Future end years are included in these diagnostics, but retrieval stops at the
+current calendar year. An entirely future interval raises a
+\code{bls_future_interval} error before making any API requests.
+
 With \code{annual_average = TRUE}, annual-average periods (\code{M13}, \code{Q05}, and \code{S03})
 are returned with \code{date_frequency = "year"} and \code{date} set to January 1 of the
 observation year. This also applies to the nested \code{data} when \code{metadata = TRUE}.
-No averages are calculated locally. If BLS supplies no annual averages for a
-requested series and year range, a warning of class \code{bls_annual_average_unavailable}
-lists the affected series; their data has zero rows. Native annual observations
+No averages are calculated locally. Missing annual series/year pairs use the
+warning class \code{bls_annual_average_unavailable}, which also inherits from
+\code{bls_years_unavailable} and has the same fields. Entirely unavailable series
+have zero data rows and are covered by the same warning. Native annual observations
 (\code{A01}) are not treated as computed annual averages.
 }
 \examples{
