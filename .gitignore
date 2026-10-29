@@ -8,3 +8,5 @@ docs
 *.xlsx
 
 /.quarto/
+# roborev snapshots
+/.roborev/
