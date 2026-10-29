@@ -10,6 +10,9 @@
 
 ## Improvements
 
+* `find_bls()` now matches "taxis" with "taxi" and "movies" with "movie", while
+  excluding unrelated matches such as "cookies"/"cooks" and
+  "supplies"/"supplemental", in line with the reference client (#42).
 * `get_bls(annual_average = TRUE)` returns only BLS-published annual averages,
   dated January 1; missing averages warn (#44).
 * Empty BLS responses now produce typed, zero-row tibbles, including nested

@@ -51,9 +51,12 @@ string. The catalog is built weekly from the BLS flat files by
 Every word in \code{search_string} must match, ignoring case, in the series title, the
 survey name or a survey alias (such as "CPI" or "JOLTS"). Words match by the part
 they share with their English stem, so "nurses" also finds "nursing" and
-"industries" also finds "industry". When that part is shorter than four letters,
-the word must match a whole word, so "CES" does not match "services". A short word
-ending in "y" or "ies" also matches its other form, so "city" finds "cities".
+"industries" also finds "industry". For words ending in "y" or "ies" whose stem
+ends in "i", the shared root must be followed by "y" or "i", so "supplies" finds
+"supply" but not "supplemental". When the root is shorter than four letters, the
+word must match a whole word, so "CES" does not match "services". Short "y"/"ies"
+forms allow whole-word "y", "ie" or "ies" endings: "city" finds "cities" and
+"movies" finds "movie", without matching "citizen" or "movement".
 
 Results are sorted by the number of words that match the title or a survey alias,
 then by title length (shortest first), then by title and series ID. Short titles

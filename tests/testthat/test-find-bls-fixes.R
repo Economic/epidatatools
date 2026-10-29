@@ -16,6 +16,28 @@ test_that("short -y words match their -ies plural as whole words", {
   expect_true(grepl(p, "U.S. city average", perl = TRUE))
   expect_true(grepl(p, "large cities", perl = TRUE))
   expect_false(grepl(p, "citizens", perl = TRUE))
+  expect_false(grepl(p, "electricity", perl = TRUE))
+  expect_false(grepl(bls_index_word_pattern("cities"), "citizen", perl = TRUE))
+  expect_false(grepl(bls_index_word_pattern("cities"), "electricity", perl = TRUE))
+})
+
+test_that("y/ies stemming keeps other endings and excludes unrelated words", {
+  expect_identical(
+    grepl(bls_index_word_pattern("taxis"), c("Taxi", "Taxis"),
+      ignore.case = TRUE, perl = TRUE),
+    c(TRUE, TRUE)
+  )
+  for (case in list(
+    list(word = "cookies", titles = c("cookie", "cookies", "cooks")),
+    list(word = "supplies", titles = c("supply", "supplies", "supplemental")),
+    list(word = "movies", titles = c("movie", "movies", "movement"))
+  )) {
+    expect_identical(
+      grepl(bls_index_word_pattern(case$word), case$titles, perl = TRUE),
+      c(TRUE, TRUE, FALSE),
+      info = case$word
+    )
+  }
 })
 
 test_that("short words still match whole words only", {
@@ -28,15 +50,12 @@ test_that("short words still match whole words only", {
 test_that("on the fixture, singular and plural searches find the same titles", {
   skip_if_not_installed("arrow")
   local_bls_fixture()
-  expect_identical(
-    quiet_find_bls("industries", titles_only = TRUE)$series_id,
-    quiet_find_bls("industry", titles_only = TRUE)$series_id
-  )
-  expect_identical(
-    quiet_find_bls("cities", titles_only = TRUE)$series_id,
-    quiet_find_bls("city", titles_only = TRUE)$series_id
-  )
-  expect_gt(nrow(quiet_find_bls("cities", titles_only = TRUE)), 0)
+  for (pair in list(c("industry", "industries"), c("salary", "salaries"), c("city", "cities"))) {
+    singular = quiet_find_bls(pair[1], titles_only = TRUE, limit = Inf)
+    plural = quiet_find_bls(pair[2], titles_only = TRUE, limit = Inf)
+    expect_gt(nrow(singular), 0)
+    expect_identical(singular, plural, info = paste(pair, collapse = "/"))
+  }
 })
 
 # -- arguments ----------------------------------------------------------------------
