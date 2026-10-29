@@ -1,0 +1,99 @@
+# Adapted from realtalk and productivity_pay_gap. Reviewer and panel names are
+# repo-local labels; section names and configuration keys are roborev's vocabulary.
+agent = "codex"
+model = "gpt-6.1-sol"
+review_reasoning = "high"
+design_agent = "codex"
+design_model = "gpt-6.1-sol"
+review_min_severity = "medium"
+auto_close_passing_reviews = true
+isolate_reviews = true
+
+# Generated help stays available to reviewers in the isolated checkout.
+exclude_patterns = ["man/", "NAMESPACE", "docs/"]
+
+review_guidelines = """
+epidatatools is an R package used by EPI staff and outside researchers to retrieve
+BLS, BEA, FRED and IPUMS data, search series, and calculate summary statistics.
+Wrong values, dates, joins, series selection or duplicate observations can silently
+affect published analysis. Public output columns, types, ordering and documented
+warnings matter. Read AGENTS.md and CLAUDE.md for the workflow and contracts.
+
+Priorities:
+- Flag concrete regressions in normal supported use: wrong data or frequencies,
+  missing or duplicated rows, broken public interfaces, loss of usable cached data,
+  and credentials leaked in errors, logs, or GitHub Actions.
+- find_bls() follows Economic/bls-index's reference client. Check its documented
+  search rules and offline fixture behavior. Respect an issue's acceptance checks
+  and explicit non-goals; do not turn a targeted parity fix into a redesign.
+- State replacement failure after a valid catalog download is a real recovery case
+  covered by issue #43. Keep the old catalog until the new state is saved.
+- API failures and legitimate missing observations should follow the documented
+  fallback or warning behavior. Prefer mocked offline tests; live APIs are opt-in.
+- Flag unjustified complexity too: speculative features, duplicated validation,
+  defensive checks of internal invariants, and tests tied to incidental details.
+  Removing an unnecessary mechanism or test is a valid recommendation.
+
+Keep findings proportional:
+- Give a concrete trigger, affected user behavior, and evidence from the change.
+  Judge severity by plausible use and impact, not the worst imaginable outcome.
+- Prefer the smallest fix that preserves the public contract. A new abstraction,
+  dependency, retry system, cache state, or collection of special cases needs a
+  demonstrated user benefit. A theoretical possibility alone is insufficient.
+- Do not flag style, wording or formatting unless meaning changes. Do not invent
+  requirements for undocumented inputs, hostile edits of trusted local files, or
+  races between maintainers without evidence that they matter to this task.
+- The reference design accepts semantic corruption of local cache filenames. Do
+  not request extra filename/checksum validation for that accepted risk. Likewise,
+  do not report an explicitly accepted risk in an issue or plan as a defect unless
+  there is new evidence outside the accepted scenario.
+- Avoid scenarios requiring several unrelated unusual conditions. Ordinary single
+  failures within the public contract, such as issue #43's failed state save, still
+  deserve attention. If a narrow risk needs more machinery than its user benefit
+  warrants, recommend documenting the accepted risk instead.
+- Review the changed behavior and its integration; do not accumulate unrelated
+  hardening requests. When only increasingly narrow hypothetical cases remain,
+  pass. Do not repeat a previously resolved finding without new evidence.
+"""
+
+[review.subagents.codex_code_reviewer]
+review_type = "default"
+agent = "codex"
+model = "gpt-6.1-sol"
+reasoning = "high"
+
+[review.subagents.claude_code_reviewer]
+review_type = "default"
+agent = "claude-code"
+model = "opus"
+reasoning = "high"
+
+[review.subagents.codex_design_reviewer]
+review_type = "design"
+agent = "codex"
+model = "gpt-6.1-sol"
+reasoning = "high"
+
+[review.subagents.codex_security_reviewer]
+review_type = "security"
+agent = "codex"
+model = "gpt-6.1-sol"
+reasoning = "high"
+
+[review.panels.every_commit_panel]
+members = ["codex_code_reviewer"]
+
+[review.panels.checkpoint_panel]
+members = ["codex_code_reviewer", "claude_code_reviewer", "codex_design_reviewer",
+           "codex_security_reviewer"]
+synthesis_agent = "codex"
+synthesis_model = "gpt-6.1-sol"
+
+[review.panels.design_only_panel]
+members = ["codex_design_reviewer"]
+
+[review]
+hook_review_panel = "every_commit_panel"
+
+[auto_design_review]
+hook_enabled = false

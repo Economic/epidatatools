@@ -11,3 +11,4 @@ CLAUDE.md
 ^data-raw$
 ^\.claude$
 ^plans$
+^\.roborev\.toml$

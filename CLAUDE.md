@@ -2,6 +2,10 @@
 
 This file provides context about the `epidatatools` R package.
 
+Read `AGENTS.md` for branch and roborev review guidance. `.roborev.toml` configures
+automatic commit reviews and milestone panels, with a focus on concrete user
+benefit and proportionate fixes.
+
 ## Package Description
 
 `epidatatools` is an R package containing various data tools used by the Economic Policy Institute.
