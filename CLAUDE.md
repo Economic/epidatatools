@@ -2,6 +2,10 @@
 
 This file provides context about the `epidatatools` R package.
 
+Read `AGENTS.md` for branch and roborev review guidance. `.roborev.toml` configures
+automatic commit reviews and milestone panels, with a focus on concrete user
+benefit and proportionate fixes.
+
 ## Package Description
 
 `epidatatools` is an R package containing various data tools used by the Economic Policy Institute.
@@ -12,7 +16,7 @@ Here is a list of the main user-facing functions available in this package:
 
 - `averaged_quantile(x, w, probs, na.rm, quantiles_n, quantiles_w)`: Calculates the averaged (smoothed) quantile of a numeric vector.
 - `averaged_median(x, w, na.rm, quantiles_n, quantiles_w)`: Calculates the averaged (smoothed) median of a numeric vector.
-- `find_bls(search_string, survey, seasonality, limit, titles_only, refresh)`: Searches the weekly bls-index catalog of every BLS series (https://github.com/Economic/bls-index) and returns series_id, series_title, program, survey_name, seasonal, begin_year, end_year and end_period. Every search word must match the title, survey name or a survey alias, by English stem. `survey` and `seasonality` filter by one or more values; `limit` (default 1000, `Inf` for all) caps the rows. The catalog is cached in `tools::R_user_dir("epidatatools", "cache")` and checked for updates weekly (`refresh = TRUE` checks now). Needs the arrow package (in Suggests). The code is a port of bls-index's reference client (`examples/find_bls.R`); its search rules live in bls-index's design.md, except that `bls_index_word_pattern()` also matches a word ending in "-y" with its "-ies" plural (proposed upstream in Economic/bls-index#24). Tests use a fixture catalog in `tests/testthat/fixtures/`.
+- `find_bls(search_string, survey, seasonality, limit, titles_only, refresh)`: Searches the weekly bls-index catalog of every BLS series (https://github.com/Economic/bls-index) and returns series_id, series_title, program, survey_name, seasonal, begin_year, end_year and end_period. Every search word must match the title, survey name or a survey alias, by English stem. `survey` and `seasonality` filter by one or more values; `limit` (default 1000, `Inf` for all) caps the rows. The catalog is cached in `tools::R_user_dir("epidatatools", "cache")` and checked for updates weekly (`refresh = TRUE` checks now). Needs the arrow package (in Suggests). The code is a port of bls-index's reference client (`examples/find_bls.R`); its search rules live in bls-index's design.md. The y/ies stemming rule follows the reference client: only these endings drop a final stem `i`, long roots require `y` or `i` next, and short roots match whole words ending in `y`, `ie`, or `ies`. Tests use a fixture catalog in `tests/testthat/fixtures/`.
 - `find_fred(search_string, max_results, metadata, seasonality)`: Searches the FRED database for series matching a search string and returns series IDs and titles. Can optionally return additional metadata and filter by seasonal adjustment (NULL, "NSA", or "SA").
 - `get_bea_nipa(tables, years, frequency, underlying, metadata, bea_api_key)`: Retrieves National Income and Product Accounts (NIPA) data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Supports both NIPA and NIUnderlyingDetail datasets. The `tables` parameter can be a named vector to add custom names (e.g., `c("gdp" = "T10101")`) which adds a "name" column as the first column. Returns a tibble with table_name, table_description, line_number, line_description, date_frequency, date, value, and date variables appropriate to the frequency of data returned (annual data includes only year; quarterly data includes year and quarter; monthly data includes year, quarter, and month). When metadata=TRUE, also includes unit_mult, metric_name, cl_unit, series_code, and note_text (list column containing all notes from the API response).
 - `get_bea_regional(geo_fips, table_name, line_code, year, metadata, bea_api_key)`: Retrieves regional economic data from the Bureau of Economic Analysis (BEA) API. Requires a BEA API key. Takes a single table_name and line_code (or "ALL" for all line codes), but allows multiple geo_fips and years. A single geo_fips can be a state abbreviation (e.g., "NY"). Returns a tibble with geo_fips, geo_name, table_name, table_description, line_number, line_description, date_frequency, date, year, value. When metadata=TRUE, also includes cl_unit, mult_unit, and note_text (list column containing all notes from the API response). Results are sorted by geo_fips, table_name, line_number, date.
@@ -61,6 +65,11 @@ Examples for `get_bls()`, `get_fred()`, `get_bea_*()` and `find_bls()` run only 
 
 ### Key Test File
 
+- `test-find-bls-fixes.R`: Offline stemming regressions and cache recovery. The
+  state writer reports success only after writing and renaming; the previous
+  catalog is removed only after the replacement catalog and state are saved.
+  Tests simulate state-save failure directly, preserving the old cache for later
+  offline calls while allowing the current search to use the verified new catalog.
 - `test-api-no-duplicates.R`: Verifies that API functions do not return duplicate data rows. This was added to catch regressions of a bug where multiple series queries returned duplicated observations.
 - `test-bls-missing-values.R`: Tests `get_bls()` missing-value warnings and footnotes with a mocked `get_bls_api()`.
 - `test-bls-annual-average.R`: Tests annual-only retrieval, M13/Q05/S03 dating, metadata/footnotes, missing annual averages, argument validation, request batching, and the BLS payload option offline.

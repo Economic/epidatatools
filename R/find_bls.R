@@ -1,9 +1,7 @@
 # find_bls() searches the bls-index catalog of BLS series, published weekly by
 # https://github.com/Economic/bls-index. It is a port of that repository's reference
 # client (examples/find_bls.R), whose rules are in the "Clients" section of its
-# design.md. Change the search rules there first. One difference: the stemming rule
-# for words ending in "-y" or "-ies" (bls_index_word_pattern()), proposed upstream in
-# https://github.com/Economic/bls-index/issues/24.
+# design.md. Change the search rules there first.
 
 bls_index_default_manifest =
   "https://github.com/Economic/bls-index/releases/latest/download/latest.json"
@@ -30,9 +28,12 @@ bls_index_columns = c(
 #' Every word in `search_string` must match, ignoring case, in the series title, the
 #' survey name or a survey alias (such as "CPI" or "JOLTS"). Words match by the part
 #' they share with their English stem, so "nurses" also finds "nursing" and
-#' "industries" also finds "industry". When that part is shorter than four letters,
-#' the word must match a whole word, so "CES" does not match "services". A short word
-#' ending in "y" or "ies" also matches its other form, so "city" finds "cities".
+#' "industries" also finds "industry". For words ending in "y" or "ies" whose stem
+#' ends in "i", the shared root must be followed by "y" or "i", so "supplies" finds
+#' "supply" but not "supplemental". When the root is shorter than four letters, the
+#' word must match a whole word, so "CES" does not match "services". Short "y"/"ies"
+#' forms allow whole-word "y", "ie" or "ies" endings: "city" finds "cities" and
+#' "movies" finds "movie", without matching "citizen" or "movement".
 #'
 #' Results are sorted by the number of words that match the title or a survey alias,
 #' then by title length (shortest first), then by title and series ID. Short titles
@@ -227,20 +228,20 @@ bls_index_search_words = function(search_string) {
   words
 }
 
-# A word matches the start of any word beginning with its root: the part it shares
-# with its stem ("nurses" -> "nurs"). The stemmer turns a final "y" or "ies" into "i"
-# ("industry" and "industries" -> "industri"), so a final "i" is dropped from the stem
-# first; otherwise "industries" would give "industri", which misses "industry".
-# If the root is under 4 characters, the word must match as a whole word, so short
-# words such as "ces" and "oes" stay exact. A short "-y" or "-ies" word matches both
-# forms ("city" and "cities") without matching longer words ("citizen").
+# For "-y" and "-ies" words, drop a final "i" from the stem before taking the shared
+# root, so "industry" and "industries" both give "industr". Other endings keep the
+# stem intact ("taxis" -> "taxi"). Keep a "y" or "i" after long roots so "cookies"
+# does not match "cooks". Roots under 4 characters match whole words only, including
+# "y", "ie" and "ies" endings for these forms ("city"/"cities", "movie"/"movies").
 bls_index_word_pattern = function(word) {
   stem = SnowballC::wordStem(word, language = "english")
-  root = bls_index_shared_prefix(word, sub("i$", "", stem))
+  y_ies = grepl("i$", stem) && grepl("(y|ies)$", word)
+  root_stem = if (y_ies) sub("i$", "", stem) else stem
+  root = bls_index_shared_prefix(word, root_stem)
   if (nchar(root) >= 4) {
-    paste0("\\b", bls_index_escape_regex(root))
-  } else if (grepl("i$", stem) && grepl("(y|ies)$", word)) {
-    paste0("\\b", bls_index_escape_regex(root), "(y|ies)\\b")
+    paste0("\\b", bls_index_escape_regex(root), if (y_ies) "(y|i)" else "")
+  } else if (y_ies) {
+    paste0("\\b", bls_index_escape_regex(root), "(y|ie|ies)\\b")
   } else {
     paste0("\\b", bls_index_escape_regex(word), "\\b")
   }
@@ -303,6 +304,7 @@ bls_index_catalog = function(refresh = FALSE) {
   state = bls_index_read_state(state_file)
   cached = if (is.null(state)) NA_character_ else file.path(dir, state$file)
   have = !is.na(cached) && file.exists(cached)
+  old_cached = cached
 
   if (have && !refresh && isTRUE(bls_index_days_since(state$checked_at) < 7)) {
     return(bls_index_warn_if_stale(cached, state))
@@ -368,7 +370,7 @@ bls_index_catalog = function(refresh = FALSE) {
       bls_index_record_check(state, state_file)
       return(bls_index_warn_if_stale(cached, state))
     }
-    # Delete the old catalog only once the new one is in place
+    # Install the new catalog before changing state or deleting the old one.
     if (!bls_index_rename(partial, file.path(dir, file))) {
       if (!have) {
         rlang::abort(paste0("Could not save the BLS catalog to ", dir, "."))
@@ -383,9 +385,6 @@ bls_index_catalog = function(refresh = FALSE) {
       bls_index_record_check(state, state_file)
       return(bls_index_warn_if_stale(cached, state))
     }
-    if (have && basename(cached) != file) {
-      unlink(cached)
-    }
     cached = file.path(dir, file)
   }
   state = list(
@@ -395,7 +394,10 @@ bls_index_catalog = function(refresh = FALSE) {
     built_at = manifest$built_at,
     checked_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
   )
-  bls_index_write_state(state, state_file)
+  # If saving state fails, later calls must still find the catalog it names.
+  if (bls_index_write_state(state, state_file) && have && cached != old_cached) {
+    unlink(old_cached)
+  }
   bls_index_warn_if_stale(cached, state)
 }
 
@@ -423,10 +425,11 @@ bls_index_read_state = function(state_file) {
 
 # Best effort: an unwritable cache must not stop a search that has a cached catalog.
 # Writing to a temporary file and renaming it means a reader never sees a partial file.
+# Return TRUE only when both steps succeed, so callers can safely remove old data.
 bls_index_write_state = function(state, state_file) {
   temp = tempfile("bls_index_state-", tmpdir = dirname(state_file), fileext = ".json")
   on.exit(unlink(temp))
-  try(
+  isTRUE(try(
     {
       suppressWarnings(
         jsonlite::write_json(state, temp, auto_unbox = TRUE, pretty = TRUE)
@@ -434,8 +437,7 @@ bls_index_write_state = function(state, state_file) {
       bls_index_rename(temp, state_file)
     },
     silent = TRUE
-  )
-  invisible(NULL)
+  ))
 }
 
 # Record a check attempt, keeping the cached catalog's details. A failed check counts
