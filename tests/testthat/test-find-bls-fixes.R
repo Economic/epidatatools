@@ -131,6 +131,67 @@ test_that("the state file is written whole, leaving no temporary files", {
   )
 })
 
+test_that("state writes report success, write failure, and rename failure", {
+  dir = withr::local_tempdir()
+  state_file = file.path(dir, "state.json")
+  state = list(file = "old.parquet", sha256 = "old")
+  expect_true(bls_index_write_state(state, state_file))
+  expect_identical(jsonlite::read_json(state_file), state)
+
+  expect_false(bls_index_write_state(state, file.path(dir, "missing", "state.json")))
+  local_mocked_bindings(bls_index_rename = function(from, to) FALSE)
+  expect_false(bls_index_write_state(list(file = "new.parquet"), state_file))
+  expect_identical(jsonlite::read_json(state_file), state)
+  expect_identical(list.files(dir), "state.json")
+})
+
+test_that("a new catalog keeps the old cache until its state is saved", {
+  skip_if_not_installed("arrow")
+  fixture = local_bls_fixture()
+  previous = quiet_find_bls("wage", limit = Inf)
+  old_state = read_state(fixture$cache)
+  old_cached = file.path(fixture$cache, old_state$file)
+
+  # A second valid catalog with observably different results and a real checksum.
+  newer = arrow::read_parquet(bls_fixture_catalog())
+  newer$series_title = paste("Updated", newer$series_title)
+  catalog = file.path(fixture$dir, "new.parquet")
+  arrow::write_parquet(newer, catalog)
+  sha = bls_index_sha256_file(catalog)
+  expect_false(identical(sha, old_state$sha256))
+  manifest = write_fixture_manifest(
+    fixture$dir, url = file_url(catalog), sha256 = sha, bytes = file.size(catalog)
+  )
+  new_cached = file.path(fixture$cache, paste0("bls_index-", sha, ".parquet"))
+  set_manifest_url(file_url(manifest))
+
+  write_state = bls_index_write_state
+  fail_state = TRUE
+  local_mocked_bindings(bls_index_write_state = function(state, state_file) {
+    if (fail_state) FALSE else write_state(state, state_file)
+  })
+  current = quiet_find_bls("wage", refresh = TRUE, limit = Inf)
+  expect_identical(current$series_id, previous$series_id)
+  expect_identical(current$series_title, paste("Updated", previous$series_title))
+  expect_identical(bls_index_sha256_file(new_cached), sha)
+  expect_true(file.exists(old_cached))
+  expect_identical(read_state(fixture$cache), old_state)
+
+  # A later offline call must still find the file named by the saved state.
+  set_manifest_url("file:///nonexistent/latest.json")
+  expect_identical(quiet_find_bls("wage", refresh = TRUE, limit = Inf), previous)
+  expect_true(file.exists(old_cached))
+  expect_identical(read_state(fixture$cache), old_state)
+
+  fail_state = FALSE
+  set_manifest_url(file_url(manifest))
+  expect_identical(quiet_find_bls("wage", refresh = TRUE, limit = Inf), current)
+  expect_identical(read_state(fixture$cache)$file, basename(new_cached))
+  expect_identical(read_state(fixture$cache)$sha256, sha)
+  expect_true(file.exists(new_cached))
+  expect_false(file.exists(old_cached))
+})
+
 test_that("a failed rename keeps the cached catalog", {
   skip_if_not_installed("arrow")
   fixture = local_bls_fixture()

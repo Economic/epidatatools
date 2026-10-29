@@ -13,6 +13,8 @@
 * `find_bls()` now matches "taxis" with "taxi" and "movies" with "movie", while
   excluding unrelated matches such as "cookies"/"cooks" and
   "supplies"/"supplemental", in line with the reference client (#42).
+* `find_bls()` keeps the previous cached catalog until the new cache state is
+  saved, so a failed state save leaves later offline searches working (#43).
 * `get_bls(annual_average = TRUE)` returns only BLS-published annual averages,
   dated January 1; missing averages warn (#44).
 * Empty BLS responses now produce typed, zero-row tibbles, including nested

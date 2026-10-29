@@ -304,6 +304,7 @@ bls_index_catalog = function(refresh = FALSE) {
   state = bls_index_read_state(state_file)
   cached = if (is.null(state)) NA_character_ else file.path(dir, state$file)
   have = !is.na(cached) && file.exists(cached)
+  old_cached = cached
 
   if (have && !refresh && isTRUE(bls_index_days_since(state$checked_at) < 7)) {
     return(bls_index_warn_if_stale(cached, state))
@@ -369,7 +370,7 @@ bls_index_catalog = function(refresh = FALSE) {
       bls_index_record_check(state, state_file)
       return(bls_index_warn_if_stale(cached, state))
     }
-    # Delete the old catalog only once the new one is in place
+    # Install the new catalog before changing state or deleting the old one.
     if (!bls_index_rename(partial, file.path(dir, file))) {
       if (!have) {
         rlang::abort(paste0("Could not save the BLS catalog to ", dir, "."))
@@ -384,9 +385,6 @@ bls_index_catalog = function(refresh = FALSE) {
       bls_index_record_check(state, state_file)
       return(bls_index_warn_if_stale(cached, state))
     }
-    if (have && basename(cached) != file) {
-      unlink(cached)
-    }
     cached = file.path(dir, file)
   }
   state = list(
@@ -396,7 +394,10 @@ bls_index_catalog = function(refresh = FALSE) {
     built_at = manifest$built_at,
     checked_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
   )
-  bls_index_write_state(state, state_file)
+  # If saving state fails, later calls must still find the catalog it names.
+  if (bls_index_write_state(state, state_file) && have && cached != old_cached) {
+    unlink(old_cached)
+  }
   bls_index_warn_if_stale(cached, state)
 }
 
@@ -424,10 +425,11 @@ bls_index_read_state = function(state_file) {
 
 # Best effort: an unwritable cache must not stop a search that has a cached catalog.
 # Writing to a temporary file and renaming it means a reader never sees a partial file.
+# Return TRUE only when both steps succeed, so callers can safely remove old data.
 bls_index_write_state = function(state, state_file) {
   temp = tempfile("bls_index_state-", tmpdir = dirname(state_file), fileext = ".json")
   on.exit(unlink(temp))
-  try(
+  isTRUE(try(
     {
       suppressWarnings(
         jsonlite::write_json(state, temp, auto_unbox = TRUE, pretty = TRUE)
@@ -435,8 +437,7 @@ bls_index_write_state = function(state, state_file) {
       bls_index_rename(temp, state_file)
     },
     silent = TRUE
-  )
-  invisible(NULL)
+  ))
 }
 
 # Record a check attempt, keeping the cached catalog's details. A failed check counts

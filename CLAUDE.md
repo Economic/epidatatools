@@ -65,6 +65,11 @@ Examples for `get_bls()`, `get_fred()`, `get_bea_*()` and `find_bls()` run only 
 
 ### Key Test File
 
+- `test-find-bls-fixes.R`: Offline stemming regressions and cache recovery. The
+  state writer reports success only after writing and renaming; the previous
+  catalog is removed only after the replacement catalog and state are saved.
+  Tests simulate state-save failure directly, preserving the old cache for later
+  offline calls while allowing the current search to use the verified new catalog.
 - `test-api-no-duplicates.R`: Verifies that API functions do not return duplicate data rows. This was added to catch regressions of a bug where multiple series queries returned duplicated observations.
 - `test-bls-missing-values.R`: Tests `get_bls()` missing-value warnings and footnotes with a mocked `get_bls_api()`.
 - `test-bls-annual-average.R`: Tests annual-only retrieval, M13/Q05/S03 dating, metadata/footnotes, missing annual averages, argument validation, request batching, and the BLS payload option offline.
